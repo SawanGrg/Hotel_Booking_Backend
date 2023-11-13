@@ -1,7 +1,6 @@
 package com.fyp.hotel.dto;
 
 import org.hibernate.validator.constraints.Length;
-
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequestDto {

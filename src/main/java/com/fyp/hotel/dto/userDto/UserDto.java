@@ -15,7 +15,7 @@ public class UserDto {
     private String userName;
 
     @NotNull(message = "Password cannot be null")
-    @Length(min = 8, max = 50, message = "Password must be between 8 and 50 characters")
+    @Length(min = 5, max = 50, message = "Password must be between 8 and 50 characters")
     private String password;
 
     @NotNull(message = "First name cannot be null")

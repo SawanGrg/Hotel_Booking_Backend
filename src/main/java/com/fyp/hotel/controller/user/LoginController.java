@@ -1,14 +1,12 @@
 package com.fyp.hotel.controller.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.fyp.hotel.dto.LoginRequestDto;
 import com.fyp.hotel.dto.LoginResponseDto;
@@ -16,20 +14,27 @@ import com.fyp.hotel.model.User;
 import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 import com.fyp.hotel.util.JwtUtils;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600) 
-@RequiredArgsConstructor
-@RequestMapping("/login")
+@CrossOrigin(origins = "*")
+@RequestMapping("/v1")
 public class LoginController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final UserServiceImplementation userServiceImplementation;
+
+    @Autowired
+    public LoginController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserServiceImplementation userServiceImplementation) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.userServiceImplementation = userServiceImplementation;
+    }
     
-    @PostMapping()
-    public ResponseEntity<LoginResponseDto> authenticate(@RequestBody LoginRequestDto request) {
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> authenticate(
+            @Validated
+            @RequestBody
+            LoginRequestDto request) {
 
         System.out.println("came in login controller  step 1 : " + request);
         doAuthenticate(request.getUsername(), request.getPassword());
@@ -80,8 +85,5 @@ public class LoginController {
             throw new BadCredentialsException ("Invalid credentials, please check your username and password");
         }
     }
-
-
-
     
 }

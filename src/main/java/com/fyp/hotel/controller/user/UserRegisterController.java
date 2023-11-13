@@ -16,7 +16,7 @@ import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
-@RequestMapping("/user")
+@RequestMapping("/v1/user")
 public class UserRegisterController {
 
     private ObjectMapper objectMapper;
@@ -36,9 +36,11 @@ public class UserRegisterController {
             @RequestParam("userData") String stringUserData,
             @RequestParam("userImage") MultipartFile stringUserImage) {
 
+        System.out.println(
+                stringUserData + " " + stringUserImage.getOriginalFilename() + " " + stringUserImage.getSize());
         try {
             User user = this.objectMapper.readValue(stringUserData, User.class);
-
+            System.out.println("this is user data" + user.getPassword());
             // Move image upload and default role assignment to the service
             String registerStatus = this.userServiceImplementation.registerUser(user, stringUserImage);
 
@@ -46,7 +48,7 @@ public class UserRegisterController {
             registerDto.setMessage(registerStatus);
             registerDto.setStatus(HttpStatus.OK);
 
-            return new ResponseEntity<RegisterDto>(registerDto, HttpStatus.OK);
+            return new ResponseEntity<>(registerDto, HttpStatus.OK);
 
         } catch (Exception e) {
 
@@ -54,7 +56,7 @@ public class UserRegisterController {
             RegisterDto registerDto = new RegisterDto();
             registerDto.setMessage(e.getMessage());
             registerDto.setStatus(HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<RegisterDto>(registerDto, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(registerDto, HttpStatus.BAD_REQUEST);
         }
     }
 

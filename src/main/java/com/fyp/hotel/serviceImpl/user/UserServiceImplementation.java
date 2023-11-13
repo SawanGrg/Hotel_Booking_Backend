@@ -1,11 +1,17 @@
 package com.fyp.hotel.serviceImpl.user;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
+import com.fyp.hotel.model.Hotel;
+import com.fyp.hotel.repository.HotelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,27 +43,9 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Autowired
     @Lazy
     private PasswordEncoder passwordEncoder;
-
-    // setter dependency injection
-    // @Autowired
-    // public void setUserRepo(UserRepository userRepo) {
-    // this.userRepo = userRepo;
-    // }
-
-    // @Autowired
-    // public void setRoleRepo(RoleRepository roleRepo) {
-    // this.roleRepo = roleRepo;
-    // }
-
-    // @Autowired
-    // public void setFileUploaderHelper(FileUploaderHelper fileUploaderHelper) {
-    // this.fileUploaderHelper = fileUploaderHelper;
-    // }
-
-    // @Autowired
-    // public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-    // this.passwordEncoder = passwordEncoder;
-    // }
+    @Autowired
+    @Lazy
+    private HotelRepository hotelRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -104,7 +92,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             boolean isImageUploaded = fileUploaderHelper.fileUploader(userImage);
             String imageUrl = isImageUploaded ? "/images/" + userImage.getOriginalFilename() : "/images/default.png";
             user.setUserProfilePicture(imageUrl);
-
+            user.setUserStatus("ACTIVE");
             Role defaultRole = roleRepo.findByRoleName("ROLE_USER");
             if (defaultRole != null) {
                 user.getRoles().add(defaultRole);
@@ -115,6 +103,65 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
+        }
+    }
+
+    //extract all the hotels details with pagination
+    @Transactional
+    public List<Hotel> getAllHotels(int page, int size) {
+        return this.hotelRepo.findAll();
+    }
+
+    //update user profile
+    @Transactional
+    public String updateDetails(
+            String userName,
+            String userFirstName,
+            String userLastName,
+            String userEmail,
+            String userPhone,
+            String userAddress,
+            String dateOfBirth
+    ) {
+        try {
+            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+            if (authenticatedUser != null) {
+                String authenticatedUserName = authenticatedUser.getName();
+                User user = userRepo.findByUserName(authenticatedUserName);
+
+                user.setUserName(userName.isEmpty() ? user.getUsername() : userName);
+                user.setUserFirstName(userFirstName.isEmpty() ? user.getUserFirstName() : userFirstName);
+                user.setUserLastName(userLastName.isEmpty() ? user.getUserLastName() : userLastName);
+                user.setUserEmail(userEmail.isEmpty() ? user.getUserEmail() : userEmail);
+                user.setUserPhone(userPhone.isEmpty() ? user.getUserPhone() : userPhone);
+                user.setUserAddress(userAddress.isEmpty() ? user.getUserAddress() : userAddress);
+                user.setDateOfBirth(dateOfBirth.isEmpty() ? user.getDateOfBirth() : dateOfBirth);
+                user.setUpdatedAt(Instant.now());
+
+                userRepo.save(user);
+                return "User details updated successfully";
+            } else {
+                return "User not authenticated"; // Handle unauthenticated user
+            }
+        } catch (DataAccessException e) {
+            return "Database error: " + e.getMessage(); // Handle database errors
+        } catch (Exception e) {
+            return "An error occurred: " + e.getMessage();
+        }
+    }
+
+    @Transactional
+    public String clearOutJwtToken(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            //setAuthenticated(false) will clear the context
+            authentication.setAuthenticated(false);
+            //clear the context holder
+            SecurityContextHolder.clearContext();
+            return "User logged out successfully";
+        }
+        else {
+            return "User not authenticated";
         }
     }
 }

@@ -2,9 +2,17 @@ package com.fyp.hotel.serviceImpl.vendor;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.fyp.hotel.dto.vendorDto.VendorDto;
+import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,14 +64,20 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     @Lazy
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    @Lazy
+    private ValueMapper valueMapper;
 
     @Override
     @Transactional
-    public String registerVendor(UserDto userDto, MultipartFile userImage, HotelDto hotelDto,
-            MultipartFile hotelImage) {
+    public String registerVendor(VendorDto vendorDto, MultipartFile userImage, HotelDto hotelDto,
+                                 MultipartFile hotelImage) {
 
-        User userObj = conversionToUser(userDto);
-        Hotel hotelObj = conversionToHotel(hotelDto);
+        System.out.println("user data in dto :step 3 --> " + vendorDto);
+        User userObj = valueMapper.conversionToUser(vendorDto);
+        System.out.println("user data in object :step 4 --> " + userObj);
+        Hotel hotelObj = valueMapper.conversionToHotel(hotelDto);
+        System.out.println("hotel data in object :step 5 --> " + hotelObj);
 
         boolean isUserImageUploaded = fileUploaderHelper.fileUploader(userImage);
         boolean isHotelImageUploaded = fileUploaderHelper.fileUploader(hotelImage);
@@ -90,37 +104,6 @@ public class VendorServiceImplementation implements VendorService {
             return "Vendor Registration Failed";
         }
     }
-
-    // conversion of the userDto to user
-    private User conversionToUser(UserDto userDto) {
-        User user = new User();
-        user.setUserName(userDto.getUserName());
-        user.setUserFirstName(userDto.getUserFirstName());
-        user.setUserLastName(userDto.getUserLastName());
-        user.setUserEmail(userDto.getUserEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getUserPassword()));
-        user.setUserPhone(userDto.getUserPhone());
-        user.setUserAddress(userDto.getUserAddress());
-        user.setDateOfBirth(userDto.getUserDateOfBirth());
-        user.setUserStatus("ACTIVE");
-        user.setCreatedAt(Instant.now()); // instant is a class that is used to get the current time
-        return user;
-    }
-
-    // conversion of the hotelDto to hotel
-    private Hotel conversionToHotel(HotelDto hotelDto) {
-        Hotel hotel = new Hotel();
-        hotel.setHotelName(hotelDto.getHotelName());
-        hotel.setHotelAddress(hotelDto.getHotelAddress());
-        hotel.setHotelContact(hotelDto.getHotelContact());
-        hotel.setHotelEmail(hotelDto.getHotelEmail());
-        hotel.setHotelPan(hotelDto.getHotelPan());
-        hotel.setHotelStatus("ACTIVE");
-        hotel.setCreatedAt(Instant.now());
-        hotel.setUpdatedAt(Instant.now());
-        return hotel;
-    }
-
     @Override
     @Transactional
     public String addRooms(RoomDto roomData, MultipartFile mainRoomImage, MultipartFile roomImage1,
@@ -132,11 +115,15 @@ public class VendorServiceImplementation implements VendorService {
         System.out.println("room image 2 : " + roomImage2.getOriginalFilename());
         System.out.println("room image 3 : " + roomImage3.getOriginalFilename());
 
-        HotelRoom hotelRoom = conversionToHotelRoom(roomData);
+        System.out.println("room data : step 1");
+        HotelRoom hotelRoom = valueMapper.conversionToHotelRoom(roomData);
+        System.out.println("room data : " + hotelRoom);
+        System.out.println("room data : step 2");
 
         System.out.println("hotel room --> : " + hotelRoom);
 
         boolean isMainRoomImageUploaded = fileUploaderHelper.fileUploader(mainRoomImage);
+        System.out.println("room data : step 3");
 
         if (isMainRoomImageUploaded) {
 
@@ -199,35 +186,29 @@ public class VendorServiceImplementation implements VendorService {
         return "Room Registered Successfully";
     }
 
-    private HotelRoom conversionToHotelRoom(RoomDto roomDto) {
+    @Transactional
+    public Page<HotelRoom> getHotelRooms(int page, int size) {
+        Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+        String username = authenticatedUser.getName();
 
-        HotelRoom hotelRoom = new HotelRoom();
-        hotelRoom.setRoomNumber(roomDto.getRoomNumber());
+        // Fetch the hotel ID for the given username
+        Long hotelId = hotelRepo.findByUser(userRepo.findByUserName(username)).getHotelId();
 
-        // Convert String values to enumerated values
-        // .valueof is used to convert string to enum it also checks the case of the
-        // string
-        HotelRoomType roomType = HotelRoomType.valueOf(roomDto.getRoomType());
-        HotelRoomCategory roomCategory = HotelRoomCategory.valueOf(roomDto.getRoomCategory());
-        HotelBedType roomBed = HotelBedType.valueOf(roomDto.getRoomBed());
+        // Fetch the hotel rooms with pagination
+        Pageable pageable = PageRequest.of(page, size);
+        Page<HotelRoom> hotelRooms = hotelRoomRepo.findByHotel_HotelId(hotelId, pageable);
 
-        hotelRoom.setRoomType(roomType);
-        hotelRoom.setRoomCategory(roomCategory);
-        hotelRoom.setRoomBed(roomBed);
-
-        hotelRoom.setRoomPrice(roomDto.getRoomPrice());
-        hotelRoom.setRoomDescription(roomDto.getRoomDescription());
-
-        // boolean values
-        hotelRoom.setHasAC(roomDto.getHasAC());
-        hotelRoom.setHasBalcony(roomDto.getHasBalcony());
-        hotelRoom.setHasRefridge(roomDto.getHasRefridge());
-        hotelRoom.setHasTV(roomDto.getHasTV());
-        hotelRoom.setHasWifi(roomDto.getHasWifi());
-
-        hotelRoom.setRoomStatus("AVAILABLE");
-        hotelRoom.setCreatedAt(ZonedDateTime.now());
-        return hotelRoom;
+        return hotelRooms;
     }
 
+    @Transactional
+    public String deleteRoom(Long hotelId) {
+        try {
+            hotelRoomRepo.deleteById(hotelId);
+            return "Room deleted successfully";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to delete room";
+        }
+    }
 }

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -75,10 +77,14 @@ User implements UserDetails {
     @Column(name = "updated_at", length = 20, nullable = true)
     private Instant updatedAt;
 
+    @JsonManagedReference
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @JsonBackReference
     @OneToOne( mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Hotel hotel;
     
@@ -127,12 +133,11 @@ User implements UserDetails {
     //overriding the toString() method
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", userName=" + userName + ", password=" + password + ", userFirstName="
-                + userFirstName + ", userLastName=" + userLastName + ", userEmail=" + userEmail + ", userPhone="
-                + userPhone + ", userAddress=" + userAddress + ", userProfilePicture=" + userProfilePicture
-                + ", dateOfBirth=" + dateOfBirth + ", userStatus=" + userStatus + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt + ", roles=" + roles + "]";
+        return "User [userId=" + userId + ", userName=" + userName + ", userFirstName="
+                + userFirstName + ", userLastName=" + userLastName
+                + ", userEmail=" + userEmail + "]";
     }
+
     @Override
 public int hashCode() {
     return Objects.hash(userId, userName); // Use only fields that uniquely identify a user

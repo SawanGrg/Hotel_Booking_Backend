@@ -1,8 +1,11 @@
 package com.fyp.hotel.model;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +18,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -54,12 +59,19 @@ public class Hotel {
     private String hotelImage;
 
     //one user has one hotel relationship
+    @JsonManagedReference
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY) //deletion of hotel means deletion of the rooms
-    private List<HotelRoom> hotelRooms; // One Hotel can have many HotelRoom objects
+    @JsonBackReference
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)//deletion of hotel means deletion of the rooms
+    private List<HotelRoom> hotelRooms = new ArrayList<>(); // One Hotel can have many HotelRoom objects
 
-    
+    @Override
+    public String toString() {
+        return "Hotel [hotelId=" + this.hotelId + ", hotelName=" + this.hotelName + ", hotelAddress="
+                + this.hotelAddress + ", hotelContact=" + this.hotelContact + ", hotelEmail=" + this.hotelEmail
+                 + "]"; // Modify the hotelRooms part
+    }
 }

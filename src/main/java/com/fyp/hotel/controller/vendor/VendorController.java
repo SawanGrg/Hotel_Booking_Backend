@@ -1,28 +1,33 @@
 package com.fyp.hotel.controller.vendor;
 
+import com.fyp.hotel.model.HotelRoom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", maxAge = 3600) // maxage used to cache where the browser will not send the preflight request
-@RequestMapping("/vendor")
+@RequestMapping("/v1/vendor")
 public class VendorController {
 
     @Autowired
     private final ObjectMapper objectMapper;
     @Autowired
     private final VendorServiceImplementation vendorServiceImplementation;
+
+    private static final Logger logger = LoggerFactory.getLogger(VendorController.class);
+
 
     public VendorController(ObjectMapper objectMapper, 
             VendorServiceImplementation vendorServiceImplementation) {
@@ -36,7 +41,7 @@ public class VendorController {
     }
 
     //insert the hotel rooms 
-    @PostMapping("/addhotelroom")
+    @PostMapping("/addHotelRooms")
     public ResponseEntity<String> addHotelRooms(
         @RequestParam("roomData") String stringRoomData,
         @RequestParam("mainRoomImage") MultipartFile stringHotelImage,
@@ -63,5 +68,41 @@ public class VendorController {
             return ResponseEntity.badRequest().body("Error in vendor controller : " + e.getMessage());
             
         }
+    }
+
+    @GetMapping("/hotelRooms")
+    public ResponseEntity<Page<HotelRoom>> getHotelRooms(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size) {
+        try {
+            Page<HotelRoom> hotelRooms = vendorServiceImplementation.getHotelRooms(page, size);
+            return ResponseEntity.ok(hotelRooms);
+        } catch (Exception e) {
+            e.printStackTrace(); // Print the exception for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    //delete a specific room
+    @DeleteMapping("/delete/{hotelId}")
+    public ResponseEntity<?> deleteRoom(
+            @PathVariable(name = "hotelId") Long hotelId
+    ){
+        try {
+            logger.info("Attempting to delete room with ID: {}", hotelId);
+            String response = vendorServiceImplementation.deleteRoom(hotelId);
+
+            if ("Room deleted successfully".equals(response)) {
+                logger.info("Room deleted successfully with ID: {}", hotelId);
+                return ResponseEntity.ok(response);
+            } else {
+                logger.error("Failed to delete room with ID {}: {}", hotelId, response);
+                return ResponseEntity.status(500).body(response);
+            }
+        } catch (Exception e) {
+            logger.error("Exception occurred while deleting room with ID {}: {}", hotelId, e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+
     }
 }

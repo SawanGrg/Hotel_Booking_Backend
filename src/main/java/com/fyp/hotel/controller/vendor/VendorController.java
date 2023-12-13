@@ -56,7 +56,7 @@ public class VendorController {
         System.out.println("Hotel Image 3 : " + stringHotelImage3);
 
         try {
-
+            //read the json data and convert it into room dto
             RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class);
             System.out.println("Hotel DTO : " + roomDto);
 
@@ -84,7 +84,7 @@ public class VendorController {
     }
 
     //delete a specific room
-    @DeleteMapping("/delete/{hotelId}")
+    @PostMapping("/delete/{hotelId}")
     public ResponseEntity<?> deleteRoom(
             @PathVariable(name = "hotelId") Long hotelId
     ){

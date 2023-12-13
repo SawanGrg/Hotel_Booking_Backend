@@ -96,7 +96,11 @@ public class HotelRoom {
     private Hotel hotel; // Many HotelRoom objects can belong to one Hotel
 
     @JsonBackReference
-    @OneToMany(mappedBy = "hotelRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // One HotelRoom can have many RoomImage objects
+    //mappedBy = "hotelRoom" means that the HotelRoom object is the owner of the relationship
+    //cascade = CascadeType.ALL means that if a HotelRoom object is deleted, all its RoomImage objects will also be deleted
+    //orphanRemoval = true means that if a RoomImage object is removed from the HotelRoom object, it will be deleted from the database
+    @OneToMany(mappedBy = "hotelRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomImage> roomImages = new ArrayList<>(); // One HotelRoom can have many RoomImage objects
 
     @Override

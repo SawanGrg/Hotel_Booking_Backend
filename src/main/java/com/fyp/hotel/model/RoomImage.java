@@ -43,7 +43,7 @@ public class RoomImage {
     private ZonedDateTime updatedAt;
 
     @JsonIgnore //to avoid infinite recursion between hotel and hotel room
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //many images can be associated with one hotel room
     @JoinColumn(name = "room_id", nullable = false, unique = false)
     private HotelRoom hotelRoom = new HotelRoom();
 

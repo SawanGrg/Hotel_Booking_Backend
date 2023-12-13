@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fyp.hotel.dto.vendorDto.VendorDto;
@@ -67,6 +68,9 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     @Lazy
     private ValueMapper valueMapper;
+    @Autowired
+    @Lazy
+    private RoomImageRepository roomImageRepository;
 
     @Override
     @Transactional
@@ -200,15 +204,39 @@ public class VendorServiceImplementation implements VendorService {
 
         return hotelRooms;
     }
-
     @Transactional
-    public String deleteRoom(Long hotelId) {
+    public String deleteRoom(Long roomId) {
         try {
-            hotelRoomRepo.deleteById(hotelId);
-            return "Room deleted successfully";
+            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+            String username = authenticatedUser.getName();
+            if (authenticatedUser.isAuthenticated()){
+                // Fetch the hotel ID for the given username
+                Long hotelIdFromDb = hotelRepo.findByUser(userRepo.findByUserName(username)).getHotelId();
+                System.out.println("Hotel ID from DB: " + hotelIdFromDb);
+
+                //delete room images before deleting the room
+                List<RoomImage> roomImages = roomImageRepository.findImageUrlByHotelRoom_RoomId(roomId);
+                System.out.println("Room images: " + roomImages);
+
+                for (RoomImage roomImage : roomImages) {
+                    System.out.println("Room image: " + roomImage);
+                    roomImageRepository.deleteImageUrlByHotelRoom_RoomId(roomId);
+                }
+                // Delete the room and check if the deletion was successful
+                hotelRoomRepo.deleteRoomById(roomId);
+                System.out.println("Deleted room ID: " + roomId);
+
+                Optional<HotelRoom> deletedRoom = hotelRoomRepo.findById(roomId);
+                System.out.println("Deleted room: " + deletedRoom);
+
+                return "Room deleted successfully";
+            }
+        return  "user is no authenticated";
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to delete room";
         }
     }
+
+
 }

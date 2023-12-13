@@ -1,5 +1,7 @@
 package com.fyp.hotel.config;
 
+//import com.fyp.hotel.filter.MyCustomFilter;
+import com.fyp.hotel.filter.TimingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,6 +38,7 @@ public class SecurityConfig {
 
     private final UserServiceImplementation userServiceImplementation;
     private final JwtAuthFilter jwtAuthFilter;
+    private final TimingFilter timingFilter;
     // private final CookieFilter cookieFilter;
 
     @Bean
@@ -57,9 +60,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+//                securityMatcher() is used to set the RequestMatcher bean where requestMatchers bean means the request is matched against the provided matchers.
+//                 it is usefull when we want to use multiple request matchers.
+//                 .securityMatcher(request -> request.getServletPath().startsWith("/v1")
+//                        || request.getServletPath().startsWith("/admin")
+//                        || request.getServletPath().startsWith("/vendor")
+//                        || request.getServletPath().startsWith("/user")
+//
+//                )
+//                .securityMatcher("/api/test")
+//                .addFilterBefore(new MyCustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .cors(cors -> cors
-                        //configurationsource() is used to set the CorsConfigurationSource bean.
-                        //CorsConfigurationSource is used to configure the cors filter.
                         .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 .csrf(crsf -> crsf
                         .disable())
@@ -77,6 +88,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/admin/dashboard").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendor/dashboard").hasAuthority("ROLE_ADMIN")
+
+//                        .requestMatchers(HttpMethod.GET,"/api/test").hasAuthority("ROLE_USER")
+
                         .anyRequest().authenticated())
                 .exceptionHandling( ex -> ex
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
@@ -87,27 +101,28 @@ public class SecurityConfig {
         // it is usefull when we want to use multiple authentication providers.
         // such as DaoAuthenticationProvider, LdapAuthenticationProvider, etc.
         http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(timingFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         //http.addFilterAfter(cookieFilter, JwtAuthFilter.class);
 
         return http.build();
     }
-
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+//        config.addAllowedMethod("GET");
+//        config.addAllowedMethod("POST");
+//        config.addAllowedMethod("PUT");
+//        config.addAllowedMethod("DELETE"); // Allow DELETE method
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
-        source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/**", config); //registerCorsConfiguration("/**", config) means that all the endpoints in the application will have the CORS filter applied to them.
         return new CorsFilter(source);
     }
-//    public void configure(WebSecurity web) throws Exception {
-//        web.ignoring()s
-//                .requestMatchers(HttpMethod.POST, "/v1/login");
-//    }
-
 
 }

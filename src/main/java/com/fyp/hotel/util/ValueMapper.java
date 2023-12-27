@@ -82,21 +82,53 @@ public class ValueMapper {
         return hotelRoom;
     }
 
+    // conversion of the hotelRoom to hotelRoomDto
     public List<HotelDto> mapToHotelDTOs(List<Hotel> hotels) {
 
         List<HotelDto> hotelDTOs = new ArrayList<>();
         for (Hotel hotel : hotels) {
+
             HotelDto hotelDTO = new HotelDto();
+
             hotelDTO.setHotelId(hotel.getHotelId());
             hotelDTO.setHotelName(hotel.getHotelName());
             hotelDTO.setHotelAddress(hotel.getHotelAddress());
             hotelDTO.setHotelContact(hotel.getHotelContact());
             hotelDTO.setHotelEmail(hotel.getHotelEmail());
             hotelDTO.setHotelPan(hotel.getHotelPan());
+            hotelDTO.setHotelImage(hotel.getHotelImage());
+            //i dont have the hotel description in the hotel table of the database
+//            hotelDTO.setHotelDescription(hotel.getHotelDescription());
 
             hotelDTOs.add(hotelDTO);
         }
         return hotelDTOs;
+    }
+
+    // conversion of the hotelRoom to hotelRoomDto
+    public List<RoomDto> mapToHotelRoom(List<HotelRoom> hotelRooms){
+        List<RoomDto> roomDtos = new ArrayList<>();
+        for(HotelRoom hotelRoom : hotelRooms){
+
+            RoomDto roomDto = new RoomDto();
+
+            roomDto.setRoomNumber(hotelRoom.getRoomNumber());
+            roomDto.setRoomType(hotelRoom.getRoomType().toString());
+            roomDto.setRoomCategory(hotelRoom.getRoomCategory().toString());
+            roomDto.setRoomBed(hotelRoom.getRoomBed().toString());
+            roomDto.setRoomPrice(hotelRoom.getRoomPrice());
+            roomDto.setRoomDescription(hotelRoom.getRoomDescription());
+            roomDto.setRoomStatus(hotelRoom.getRoomStatus());
+            roomDto.setHasAC(hotelRoom.getHasAC());
+            roomDto.setHasBalcony(hotelRoom.getHasBalcony());
+            roomDto.setHasRefridge(hotelRoom.getHasRefridge());
+            roomDto.setHasTV(hotelRoom.getHasTV());
+            roomDto.setHasWifi(hotelRoom.getHasWifi());
+            roomDto.setMainRoomImage(hotelRoom.getMainRoomImage());
+
+            roomDtos.add(roomDto);
+        }
+        return roomDtos;
     }
 
 }

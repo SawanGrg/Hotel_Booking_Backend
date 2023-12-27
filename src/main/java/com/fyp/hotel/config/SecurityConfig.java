@@ -1,6 +1,7 @@
 package com.fyp.hotel.config;
 
 //import com.fyp.hotel.filter.MyCustomFilter;
+import com.fyp.hotel.filter.ApiRateLimit;
 import com.fyp.hotel.filter.TimingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,14 +32,15 @@ import org.springframework.web.filter.CorsFilter;
 import lombok.AllArgsConstructor;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity // @EnableWebSecurity is used to enable web security in a project.
 @AllArgsConstructor
-@EnableMethodSecurity
+@EnableMethodSecurity // @EnableMethodSecurity is used to enable method level security based on annotations.
 public class SecurityConfig {
 
     private final UserServiceImplementation userServiceImplementation;
     private final JwtAuthFilter jwtAuthFilter;
     private final TimingFilter timingFilter;
+    private final ApiRateLimit apiRateLimit;
     // private final CookieFilter cookieFilter;
 
     @Bean
@@ -80,10 +82,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/home").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotel").permitAll()
+//                        for dynamic url
+                        .requestMatchers(HttpMethod.GET, "/v1/user/hotelRooms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/profile").hasAuthority("ROLE_USER")
+
+                        .requestMatchers(HttpMethod.GET, "/v1/user/view").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.PUT, "/v1/user/update-profile").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/v1/user/logout").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/dashboard").hasAnyAuthority("ROLE_VENDOR")
+
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/addHotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/admin/dashboard").hasAuthority("ROLE_ADMIN")
@@ -91,7 +99,7 @@ public class SecurityConfig {
 
 //                        .requestMatchers(HttpMethod.GET,"/api/test").hasAuthority("ROLE_USER")
 
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .exceptionHandling( ex -> ex
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
@@ -101,6 +109,7 @@ public class SecurityConfig {
         // it is usefull when we want to use multiple authentication providers.
         // such as DaoAuthenticationProvider, LdapAuthenticationProvider, etc.
         http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(apiRateLimit, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(timingFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

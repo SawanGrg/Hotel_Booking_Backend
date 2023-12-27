@@ -1,9 +1,17 @@
 package com.fyp.hotel.dto.vendorDto;
 
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
+
 public class RoomDto {
-    
+
+    @NotNull(message = "Room number cannot be null")
+    @Length(min = 4, max = 50, message = "Room number must be between 3 and 50 characters")
     private String roomNumber;
+    @NotNull(message = "Room type cannot be null")
+    @Length(min = 4, max = 50, message = "Room type must be between 3 and 50 characters")
     private String roomType;
+    @NotNull(message = "Room category cannot be null")
     private String roomCategory;
     private String roomBed;
     private Double roomPrice;
@@ -14,6 +22,8 @@ public class RoomDto {
     private Boolean hasRefridge;
     private Boolean hasTV;
     private Boolean hasWifi;
+    @NotNull(message = "Room image cannot be null")
+    private String mainRoomImage;
 
     public RoomDto() {
     }
@@ -112,6 +122,13 @@ public class RoomDto {
 
     public void setHasWifi(Boolean hasWifi) {
         this.hasWifi = hasWifi;
+    }
+
+    public String getMainRoomImage() {
+        return mainRoomImage;
+    }
+    public void setMainRoomImage(String mainRoomImage) {
+        this.mainRoomImage = mainRoomImage;
     }
 
 }

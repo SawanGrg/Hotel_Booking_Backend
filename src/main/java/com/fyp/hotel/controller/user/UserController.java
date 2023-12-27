@@ -2,7 +2,9 @@ package com.fyp.hotel.controller.user;
 
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
+import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.model.Hotel;
+import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,5 +83,33 @@ public class UserController {
             ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", response);
             return ResponseEntity.status(401).body(errorResponse);
         }
+    }
+
+    //GET all the hotel rooms of a specific hotel
+    @GetMapping("/hotelRooms/{hotelId}")
+    public ResponseEntity<?> getHotelRooms(
+            @PathVariable(name = "hotelId") Long hotelId,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size
+    ) {
+        System.out.println("hotel id: " + hotelId);
+        try {
+            List<HotelRoom> hotelRooms = userServiceImplementation.getAllRoomsOfHotel(hotelId, page, size);
+//            List<RoomDto> hotelRoomDTOS = valueMapper.mapToHotelRoom(hotelRooms);
+//
+//            System.out.println("hotel details: from controller " + hotelRoomDTOS);
+            System.out.println("hotel details: from controller " + hotelRooms);
+
+            ApiResponse<List<HotelRoom>> response = new ApiResponse<List<HotelRoom>>(200, "Success", hotelRooms);
+            return ResponseEntity.status(200).body(response);
+        } catch (Exception e) {
+            // Handle the exception and return an appropriate response
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+    @GetMapping("/view")
+    public ResponseEntity<?> viewUserDetails(){
+          return ResponseEntity.ok(userServiceImplementation.getUserById());
     }
 }

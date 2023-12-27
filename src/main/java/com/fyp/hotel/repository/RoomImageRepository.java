@@ -1,5 +1,6 @@
 package com.fyp.hotel.repository;
 
+import com.fyp.hotel.model.HotelRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,9 @@ public interface RoomImageRepository extends JpaRepository<RoomImage, Long> {
     @Modifying
     @Query("DELETE FROM RoomImage r WHERE r.hotelRoom.roomId = :roomId")
     void deleteImageUrlByHotelRoom_RoomId(long roomId);
+
+    List<RoomImage> findByHotelRoom(HotelRoom room);
+
+
+    List<RoomImage> findByHotelRoom_RoomId(Long hotelId);
 }

@@ -24,6 +24,12 @@ public class HotelDto {
     @NotNull(message = "Hotel PAN cannot be null")
     private String hotelPan;
 
+    @NotNull(message = "Hotel image cannot be null")
+    private String mainHotelImage;
+
+    @NotNull(message = "Hotel image cannot be null")
+    private String hotelDescription;
+
     private String createdAt;
 
     private String updatedAt;
@@ -111,5 +117,20 @@ public class HotelDto {
         return "HotelDto [hotelId=" + hotelId + ", hotelName=" + hotelName + ", hotelAddress=" + hotelAddress +
                 ", hotelContact=" + hotelContact + ", hotelEmail=" + hotelEmail + ", hotelPan=" + hotelPan +
                 ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
+    }
+
+    public String getHotelImage() {
+        return mainHotelImage;
+    }
+
+    public void setHotelImage(String hotelImage) {
+        this.mainHotelImage = hotelImage;
+    }
+
+    public String getHotelDescription() {
+        return hotelDescription;
+    }
+    public void setHotelDescription(String hotelDescription) {
+        this.hotelDescription = hotelDescription;
     }
 }

@@ -31,4 +31,6 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
     @Modifying // modify the database
     @Query("DELETE FROM HotelRoom hr WHERE hr.roomId = :wantedRoomId")
     void deleteRoomById(@Param("wantedRoomId") Long roomId);
+
+    Page<HotelRoom> findAllByHotel_HotelId(Long hotelId, Pageable pageable);
 }

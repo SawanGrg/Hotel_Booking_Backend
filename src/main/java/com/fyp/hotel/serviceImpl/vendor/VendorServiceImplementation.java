@@ -2,6 +2,7 @@ package com.fyp.hotel.serviceImpl.vendor;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -108,16 +109,17 @@ public class VendorServiceImplementation implements VendorService {
             return "Vendor Registration Failed";
         }
     }
+
     @Override
     @Transactional
     public String addRooms(RoomDto roomData, MultipartFile mainRoomImage, MultipartFile roomImage1,
-            MultipartFile roomImage2, MultipartFile roomImage3) {
+                           MultipartFile roomImage2, MultipartFile roomImage3) {
 
         System.out.println("room data : from vendor service " + roomData);
         System.out.println("main room image : from vendor service " + mainRoomImage.getOriginalFilename());
-        System.out.println("room image 1 : " + roomImage1.getOriginalFilename());
-        System.out.println("room image 2 : " + roomImage2.getOriginalFilename());
-        System.out.println("room image 3 : " + roomImage3.getOriginalFilename());
+//        System.out.println("room image 1 : " + roomImage1.getOriginalFilename());
+//        System.out.println("room image 2 : " + roomImage2.getOriginalFilename());
+//        System.out.println("room image 3 : " + roomImage3.getOriginalFilename());
 
         System.out.println("room data : step 1");
         HotelRoom hotelRoom = valueMapper.conversionToHotelRoom(roomData);
@@ -149,9 +151,8 @@ public class VendorServiceImplementation implements VendorService {
             if (currentRoom == null) {
                 return "Room Registration Failed";
             }
-            
 
-            if (!roomImage1.isEmpty()) {
+            if (roomImage1 != null) {
                 boolean isRoomImage1Uploaded = fileUploaderHelper.fileUploader(roomImage1);
                 if (isRoomImage1Uploaded) {
                     RoomImage roomImageObj = new RoomImage();
@@ -163,7 +164,7 @@ public class VendorServiceImplementation implements VendorService {
                 }
             }
 
-            if (!roomImage2.isEmpty()) {
+            if (roomImage2 != null) {
                 boolean isRoomImage2Uploaded = fileUploaderHelper.fileUploader(roomImage2);
                 if (isRoomImage2Uploaded) {
                     RoomImage roomImageObj = new RoomImage();
@@ -175,7 +176,7 @@ public class VendorServiceImplementation implements VendorService {
                 }
             }
 
-            if (!roomImage3.isEmpty()) {
+            if (roomImage3 != null) {
                 boolean isRoomImage3Uploaded = fileUploaderHelper.fileUploader(roomImage3);
                 if (isRoomImage3Uploaded) {
                     RoomImage roomImageObj = new RoomImage();
@@ -190,6 +191,7 @@ public class VendorServiceImplementation implements VendorService {
         return "Room Registered Successfully";
     }
 
+    //extract all the hotel rooms and their images with pagination
     @Transactional
     public Page<HotelRoom> getHotelRooms(int page, int size) {
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
@@ -200,16 +202,141 @@ public class VendorServiceImplementation implements VendorService {
 
         // Fetch the hotel rooms with pagination
         Pageable pageable = PageRequest.of(page, size);
-        Page<HotelRoom> hotelRooms = hotelRoomRepo.findByHotel_HotelId(hotelId, pageable);
+        Page<HotelRoom> hotelRooms = hotelRoomRepo.findAllByHotel_HotelId(hotelId, pageable);
 
+        // Fetch all room images for each room
+        for (HotelRoom room : hotelRooms) {
+            List<RoomImage> roomImages = roomImageRepo.findByHotelRoom(room);
+            for(RoomImage roomImage : roomImages){
+                System.out.println("Room image first : " + roomImages);
+                System.out.println("Room image second iteration: " + roomImage);
+                room.setRoomImages(roomImages);
+            }
+        }
+        System.out.println("Hotel rooms final: " + hotelRooms);
         return hotelRooms;
     }
+    @Transactional
+    public List<RoomImage> getRoomImagesOfRoom(Long roomId) {
+        // Fetch the specific room based on roomId
+        Optional<HotelRoom> optionalHotelRoom = hotelRoomRepo.findById(roomId);
+        if (optionalHotelRoom.isPresent()) {
+            HotelRoom room = optionalHotelRoom.get();
+            return room.getRoomImages();
+        }
+        return new ArrayList<>(); // Return an empty list if room or images not found
+    }
+
+    @Transactional
+    public String updateRoom(
+            Long roomId,
+            RoomDto roomDto,
+            MultipartFile mainRoomImage,
+            MultipartFile roomImage1,
+            MultipartFile roomImage2,
+            MultipartFile roomImage3
+    ) {
+        try {
+            System.out.println("room data: from vendor service " + roomDto);
+            System.out.println("main room image: from vendor service " + mainRoomImage.getOriginalFilename());
+            System.out.println("room image 1: " + roomImage1.getOriginalFilename());
+            System.out.println("room image 2: " + roomImage2.getOriginalFilename());
+            System.out.println("room image 3: " + roomImage3.getOriginalFilename());
+
+            // Convert DTO to HotelRoom entity
+            HotelRoom updatedRoom = valueMapper.conversionToHotelRoom(roomDto);
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.isAuthenticated()) {
+                String vendorName = authentication.getName();
+
+                // Fetch the room based on room ID and vendor name
+                Optional<HotelRoom> optionalRoom = hotelRoomRepo.findById(roomId);
+                if (optionalRoom.isPresent()) {
+                    HotelRoom room = optionalRoom.get();
+
+                    // Update room details
+                    room.setRoomNumber(updatedRoom.getRoomNumber().isEmpty() ? room.getRoomNumber() : updatedRoom.getRoomNumber());
+                    room.setRoomType(updatedRoom.getRoomType() == null ? room.getRoomType() : updatedRoom.getRoomType());
+                    room.setRoomCategory(updatedRoom.getRoomCategory() == null ? room.getRoomCategory() : updatedRoom.getRoomCategory());
+                    room.setRoomBed(updatedRoom.getRoomBed() == null ? room.getRoomBed() : updatedRoom.getRoomBed());
+                    room.setRoomPrice(updatedRoom.getRoomPrice() == null ? room.getRoomPrice() : updatedRoom.getRoomPrice());
+                    room.setRoomDescription(updatedRoom.getRoomDescription().isEmpty() ? room.getRoomDescription() : updatedRoom.getRoomDescription());
+                    room.setHasAC(updatedRoom.getHasAC() == null ? room.getHasAC() : updatedRoom.getHasAC());
+                    room.setHasBalcony(updatedRoom.getHasBalcony() == null ? room.getHasBalcony() : updatedRoom.getHasBalcony());
+                    room.setHasRefridge(updatedRoom.getHasRefridge() == null ? room.getHasRefridge() : updatedRoom.getHasRefridge());
+                    room.setHasTV(updatedRoom.getHasTV() == null ? room.getHasTV() : updatedRoom.getHasTV());
+                    room.setHasWifi(updatedRoom.getHasWifi() == null ? room.getHasWifi() : updatedRoom.getHasWifi());
+                    room.setRoomStatus(updatedRoom.getRoomStatus().isEmpty() ? room.getRoomStatus() : updatedRoom.getRoomStatus());
+                    room.setUpdatedAt(ZonedDateTime.now());
+
+                    // Save the updated room
+                    hotelRoomRepo.save(room);
+
+                    //update the room image
+                    if (!mainRoomImage.isEmpty()) {
+                        boolean isMainRoomImageUploaded = fileUploaderHelper.fileUploader(mainRoomImage);
+                        if (isMainRoomImageUploaded) {
+                            room.setMainRoomImage(mainRoomImage.getOriginalFilename());
+                            hotelRoomRepo.save(room);
+                        }
+                    }
+
+                    //update the side room image
+                    if(!roomImage1.isEmpty()){
+                        boolean isRoomImage1Uploaded = fileUploaderHelper.fileUploader(roomImage1);
+                        if(isRoomImage1Uploaded){
+                            RoomImage roomImageObj = new RoomImage();
+                            roomImageObj.setImageUrl(roomImage1.getOriginalFilename());
+                            roomImageObj.setHotelRoom(room);
+                            roomImageObj.setCreatedAt(ZonedDateTime.now());
+                            roomImageObj.setImageStatus("ACTIVE");
+                            roomImageRepo.save(roomImageObj);
+                        }
+                    }
+
+                    if(!roomImage2.isEmpty()){
+                        boolean isRoomImage2Uploaded = fileUploaderHelper.fileUploader(roomImage2);
+                        if(isRoomImage2Uploaded){
+                            RoomImage roomImageObj = new RoomImage();
+                            roomImageObj.setImageUrl(roomImage2.getOriginalFilename());
+                            roomImageObj.setHotelRoom(room);
+                            roomImageObj.setCreatedAt(ZonedDateTime.now());
+                            roomImageObj.setImageStatus("ACTIVE");
+                            roomImageRepo.save(roomImageObj);
+                        }
+                    }
+                    if(!roomImage3.isEmpty()){
+                        boolean isRoomImage3Uploaded = fileUploaderHelper.fileUploader(roomImage3);
+                        if(isRoomImage3Uploaded){
+                            RoomImage roomImageObj = new RoomImage();
+                            roomImageObj.setImageUrl(roomImage3.getOriginalFilename());
+                            roomImageObj.setHotelRoom(room);
+                            roomImageObj.setCreatedAt(ZonedDateTime.now());
+                            roomImageObj.setImageStatus("ACTIVE");
+                            roomImageRepo.save(roomImageObj);
+                        }
+                    }
+                    return "Room updated successfully";
+                } else {
+                    return "Room not found for the given ID and vendor";
+                }
+            } else {
+                return "Authentication failed";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to update room";
+        }
+    }
+
+
     @Transactional
     public String deleteRoom(Long roomId) {
         try {
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
             String username = authenticatedUser.getName();
-            if (authenticatedUser.isAuthenticated()){
+            if (authenticatedUser.isAuthenticated()) {
                 // Fetch the hotel ID for the given username
                 Long hotelIdFromDb = hotelRepo.findByUser(userRepo.findByUserName(username)).getHotelId();
                 System.out.println("Hotel ID from DB: " + hotelIdFromDb);
@@ -231,7 +358,7 @@ public class VendorServiceImplementation implements VendorService {
 
                 return "Room deleted successfully";
             }
-        return  "user is no authenticated";
+            return "user is no authenticated";
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to delete room";

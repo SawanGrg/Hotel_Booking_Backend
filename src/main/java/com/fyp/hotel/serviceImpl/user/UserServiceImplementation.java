@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.repository.HotelRepository;
+import com.fyp.hotel.dao.UserHibernateRepo;
+import com.fyp.hotel.model.*;
+import com.fyp.hotel.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
@@ -17,12 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fyp.hotel.model.Role;
-import com.fyp.hotel.model.User;
-import com.fyp.hotel.repository.RoleRepository;
-import com.fyp.hotel.repository.UserRepository;
 import com.fyp.hotel.service.user.UserService;
 import com.fyp.hotel.util.FileUploaderHelper;
 
@@ -46,6 +44,16 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Autowired
     @Lazy
     private HotelRepository hotelRepo;
+    @Autowired
+    @Lazy
+    private UserHibernateRepo userHibernateRepo;
+    @Autowired
+    @Lazy
+    private HotelRoomRepository hotelRoomRepository;
+    @Autowired
+    @Lazy
+    private RoomImageRepository roomImageRepository;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -150,6 +158,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         }
     }
 
+    //logout user logic
     @Transactional
     public String clearOutJwtToken(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -163,5 +172,32 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         else {
             return "User not authenticated";
         }
+    }
+
+    //Get all the details of rooms of a specific hotel
+//    @Transactional
+//    public List<HotelRoom> getAllRoomsDetails(Long hotelId) {
+//        return this.hotelRepo.findHotelRoomByHotel_HotelId(hotelId);
+//    }
+
+    @Transactional
+    public List<HotelRoom> getAllRoomsOfHotel(Long hotelId, int page, int size) {
+        List<HotelRoom> roomDatas = this.hotelRoomRepository.findHotelRoomByHotel_HotelId(hotelId);
+        List< RoomImage> roomImages = this.roomImageRepository.findByHotelRoom_RoomId(hotelId);
+
+        for (HotelRoom roomData : roomDatas) {
+            for (RoomImage roomImage : roomImages) {
+                if (roomData.getRoomId() == roomImage.getHotelRoom().getRoomId()) {
+                    roomData.getRoomImages().add(roomImage);
+                }
+            }
+        }
+        return roomDatas;
+    }
+
+    public User getUserById() {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("from user service implementation " + name);
+        return userHibernateRepo.getUserByUsername(name);
     }
 }

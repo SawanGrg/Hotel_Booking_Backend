@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) //auto means auto increment by 1 it will be in sequence and it will be unique
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //auto means auto increment by 1 it will be in sequence and it will be unique
     @Column(name = "payment_id")
     private long paymentId;
 

@@ -4,9 +4,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import com.fyp.hotel.dao.PaymentMethodDAO;
 import com.fyp.hotel.dao.UserHibernateRepo;
+import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
@@ -18,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,23 +57,19 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Autowired
     @Lazy
     private RoomImageRepository roomImageRepository;
-
+    @Autowired
+    @Lazy
+    private BookingRepository bookingRepository;
+    @Autowired
+    @Lazy
+    private PaymentMethodDAO paymentMethodDAO;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("from class userservice implementation step 4  --->" + username);
         User user = this.userRepo.findByUserName(username);
-
-        System.out.println("from class userservice implementation step 5  --->" + user);
-
         // Extract roles of a user based on the user details
         Set<Role> roles = this.roleRepo.findRolesByUser(user); // Corrected method name
-        System.out.println("from class userservice implementation step 6  --->" + roles);
-
         user.setRoles(roles);
-
-        System.out.println("from class userservice implementation step 7  --->" + user);
-
         if (!user.isEnabled()) {
             throw new DisabledException("User is disabled");
         }
@@ -199,5 +199,44 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("from user service implementation " + name);
         return userHibernateRepo.getUserByUsername(name);
+    }
+
+    @Transactional
+    public String hotelPaymentGateWay(
+            @Validated BookDto bookDto
+    ){
+        if(bookDto.getPaymentMethod().equals("CASH")){
+
+            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+            String userName = authenticatedUser.getName();
+
+            User user = userRepo.findByUserName(userName);
+            Long userId = user.getUserId();
+            System.out.println("user id: " + userId);
+
+            HotelRoom hotelRoom = hotelRoomRepository.findByRoomId(bookDto.getRoomId());
+            Long roomId = hotelRoom.getRoomId();
+            Double roomPrice = hotelRoom.getRoomPrice();
+            PaymentMethod paymentMethodObject = paymentMethodDAO.getPaymentMethod(bookDto.getPaymentMethod());
+            Booking booking = new Booking();
+
+            booking.setHotelRoom(hotelRoom);
+            booking.setUser(user);
+            booking.setPaymentMethod(paymentMethodObject);
+            booking.setCheckInDate(bookDto.getCheckInDate());
+            booking.setCheckOutDate(bookDto.getCheckOutDate());
+            booking.setBookingDate(bookDto.getBookingDate());
+            booking.setDaysOfStay(bookDto.getDaysOfStay());
+            booking.setTotalAmount((long) (roomPrice * bookDto.getDaysOfStay()));
+            booking.setCreatedAt(Instant.now());
+
+            bookingRepository.save(booking);
+
+            return "Payment successful by cash on arrival";
+        }
+        if(bookDto.getPaymentMethod().equals("KHALTI")){
+            return "Payment successful by khalti";
+        }
+        return "Payment failed";
     }
 }

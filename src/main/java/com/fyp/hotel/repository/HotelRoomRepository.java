@@ -33,4 +33,7 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
     void deleteRoomById(@Param("wantedRoomId") Long roomId);
 
     Page<HotelRoom> findAllByHotel_HotelId(Long hotelId, Pageable pageable);
+
+    //get hotel room details by room id
+    HotelRoom findByRoomId(Long roomId);
 }

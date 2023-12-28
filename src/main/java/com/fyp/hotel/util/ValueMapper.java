@@ -1,5 +1,6 @@
 package com.fyp.hotel.util;
 
+import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.dto.userDto.UserDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
@@ -11,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +132,30 @@ public class ValueMapper {
             roomDtos.add(roomDto);
         }
         return roomDtos;
+    }
+
+    //check the incoming booking info and map it to the booking object
+    public BookDto mapToBooking(
+           Long roomId,
+           String checkInDate,
+           String checkOutDate,
+           String daysOfStay,
+           String paymentMethod
+    ){
+        BookDto bookDto = new BookDto();
+
+        // Define a DateTimeFormatter corresponding to your date string format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        bookDto.setRoomId(roomId);
+        bookDto.setCheckInDate(LocalDate.parse(checkInDate, formatter));  //convert string to local date
+        bookDto.setCheckOutDate(LocalDate.parse(checkOutDate, formatter));
+        bookDto.setDaysOfStay(Long.parseLong(daysOfStay)); //convert string to long
+        bookDto.setBookingDate(LocalDate.now()); //get the current date
+        bookDto.setPaymentMethod(paymentMethod);
+        bookDto.setCreatedAt(Instant.now());
+
+        return bookDto;
     }
 
 }

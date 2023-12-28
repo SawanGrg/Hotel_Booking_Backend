@@ -60,7 +60,7 @@ public class Hotel {
 
     //one user has one hotel relationship
     @JsonManagedReference
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY) //fetch type lazy means that the user will not be fetched until it is called
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 

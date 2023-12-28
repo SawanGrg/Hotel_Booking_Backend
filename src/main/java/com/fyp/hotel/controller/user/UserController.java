@@ -1,14 +1,17 @@
 package com.fyp.hotel.controller.user;
 
 import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 import com.fyp.hotel.util.ValueMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -112,4 +115,33 @@ public class UserController {
     public ResponseEntity<?> viewUserDetails(){
           return ResponseEntity.ok(userServiceImplementation.getUserById());
     }
+
+    //payment gateway for booking room of a hotel
+    @PostMapping("/payment/{roomId}")
+    public ResponseEntity<?> paymentGateway(
+            @PathVariable(name = "roomId") Long roomId,
+            @Validated @RequestParam(name = "checkInDate") String checkInDate,
+            @Validated @RequestParam(name = "checkOutDate") String checkOutDate,
+            @Validated @RequestParam(name = "daysOfStay") String daysOfStay,
+            @Validated @RequestParam(name = "paymentMethod") String paymentMethod
+    ) {
+        try {
+
+            System.out.println("step 1");
+            BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, daysOfStay, paymentMethod);
+            System.out.println("step 2");
+            String response = userServiceImplementation.hotelPaymentGateWay(bookDto);
+            if ("Payment successful by cash on arrival".equals(response) || "Payment successful by khalti".equals(response)) {
+                ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
+                return ResponseEntity.status(200).body(successResponse);
+            } else {
+                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", response);
+                return ResponseEntity.status(500).body(errorResponse);
+            }
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
 }

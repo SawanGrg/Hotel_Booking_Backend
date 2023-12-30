@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,10 +20,11 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor // generate constructor with all final fields as arguments
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "user")
-public class 
+public class
 User implements UserDetails {
 
     @Id
@@ -75,11 +76,13 @@ User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @JsonIgnore //json ignore means that this field will not be shown in the json response
     @JsonBackReference
     @OneToOne( mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Hotel hotel;
 
     //one use can have many bookings
+    @JsonIgnore
     @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Booking> bookings = new ArrayList<>();

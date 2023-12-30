@@ -1,12 +1,10 @@
 package com.fyp.hotel.controller.user;
 
+import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.util.OtpMailSender;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,14 +19,16 @@ public class UserRegisterController {
 
     private ObjectMapper objectMapper;
     private UserServiceImplementation userServiceImplementation;
+    private OtpMailSender otpMailSender;
 
     public UserRegisterController(
             ObjectMapper objectMapper,
-            UserServiceImplementation userServiceImplementation
+            UserServiceImplementation userServiceImplementation,
+            OtpMailSender otpMailSender
     ) {
         this.objectMapper = objectMapper;
         this.userServiceImplementation = userServiceImplementation;
-
+        this.otpMailSender = otpMailSender;
     }
 
     @PostMapping("/register")
@@ -60,4 +60,26 @@ public class UserRegisterController {
         }
     }
 
+    @PostMapping("/verifyOtp")
+    public ResponseEntity<?> verifyOtp(
+            @RequestParam("OTP") String OTP
+    ){
+        System.out.println("OTP : " + OTP);
+        try{
+            String status = this.userServiceImplementation.verifyOtp(OTP);
+            if(status.equals("verified successfully")) {
+                System.out.println("OTP verified");
+                ApiResponse<String> apiResponse = new ApiResponse(200, "successfully registered user with OTP", status);
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }else{
+                System.out.println("OTP not verified");
+                ApiResponse<String> apiResponse = new ApiResponse(400, "Error in verify OTP", status);
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            System.out.println("Error in verify OTP : " + e.getMessage());
+            ApiResponse<String> apiResponse = new ApiResponse(400, "Error in verify OTP", e.getMessage());
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

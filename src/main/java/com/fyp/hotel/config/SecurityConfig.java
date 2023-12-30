@@ -80,6 +80,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/user/verifyOtp").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/home").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotel").permitAll()
 //                        for dynamic url

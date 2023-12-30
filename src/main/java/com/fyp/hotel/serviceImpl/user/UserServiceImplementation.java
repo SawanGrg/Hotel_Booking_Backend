@@ -2,17 +2,23 @@ package com.fyp.hotel.serviceImpl.user;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fyp.hotel.dao.PaymentMethodDAO;
 import com.fyp.hotel.dao.UserHibernateRepo;
 import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
+import com.fyp.hotel.util.EmailSenderService;
+import com.fyp.hotel.util.OtpGenerator;
+import com.fyp.hotel.util.OtpMailSender;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -63,6 +69,21 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Autowired
     @Lazy
     private PaymentMethodDAO paymentMethodDAO;
+    @Autowired
+    @Lazy
+    private OtpMailSender otpMailSender;
+    @Autowired
+    @Lazy
+    private EmailSenderService emailSenderService;
+    @Autowired
+    @Lazy
+    private OtpGenerator otpGenerator;
+    private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
+
+//    @Scheduled(cron = "10 * * * * *") // Cron expression 10 seconds
+//    public void execute() {
+//        System.out.println("Cron job running every minute");
+//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -107,6 +128,19 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             }
 
             userRepo.save(user);
+
+            //generate otp
+            String otp = otpGenerator.generateOTP();
+            //store in map
+            storeOtpAndUserName.put(otp, user.getUsername());
+            //pass otp and set mail message
+            Map<String, String> sendMail = otpMailSender.getVerifyEmailMessage(otp);
+            //send mail to the specific user
+            emailSenderService.sendEmail(
+                    user.getUserEmail(),
+                    sendMail.get("subject"),
+                    sendMail.get("message"));
+
             return "User registered successfully";
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,6 +148,22 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         }
     }
 
+    //verify otp
+    @Transactional
+    public String verifyOtp(String otp) {
+        try {
+              String userName = storeOtpAndUserName.get(otp);
+              System.out.println("user name from map: " + userName);
+              System.out.println("otp from map: " + otp);
+            User user = userRepo.findByUserName(userName);
+            user.setUserStatus("VERIFIED");
+            userRepo.save(user);
+            return "verified successfully";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
     //extract all the hotels details with pagination
     @Transactional
     public List<Hotel> getAllHotels(int page, int size) {

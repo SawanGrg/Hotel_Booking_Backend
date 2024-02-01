@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,8 +33,8 @@ public class Booking {
     @Column(name = "booking_date", nullable = false, length = 50, unique = false)
     private LocalDate bookingDate;
 
-    @Column(name = "days_of_stay", nullable = false, length = 50, unique = false)
-    private Long daysOfStay;
+    @Column(name = "number_of_guest", nullable = false, length = 50, unique = false)
+    private Long numberOfGuest;
 
     @Column(name = "total_amount", nullable = false, length = 50, unique = false)
     private Long totalAmount;
@@ -53,8 +54,8 @@ public class Booking {
     )
     private User user;
 
-    //one room can be booked one time at a time
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(
             name = "room_id",
             nullable = false,

@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fyp.hotel.dto.vendorDto.VendorDto;
+import com.fyp.hotel.model.*;
+import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -24,19 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fyp.hotel.dto.userDto.UserDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
-import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.model.HotelBedType;
-import com.fyp.hotel.model.HotelRoom;
-import com.fyp.hotel.model.HotelRoomCategory;
-import com.fyp.hotel.model.HotelRoomType;
-import com.fyp.hotel.model.Role;
-import com.fyp.hotel.model.RoomImage;
-import com.fyp.hotel.model.User;
-import com.fyp.hotel.repository.HotelRepository;
-import com.fyp.hotel.repository.HotelRoomRepository;
-import com.fyp.hotel.repository.RoleRepository;
-import com.fyp.hotel.repository.RoomImageRepository;
-import com.fyp.hotel.repository.UserRepository;
 import com.fyp.hotel.service.vendor.VendorService;
 import com.fyp.hotel.util.FileUploaderHelper;
 
@@ -72,6 +61,9 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     @Lazy
     private RoomImageRepository roomImageRepository;
+    @Autowired
+    @Lazy
+    private ReportRepository reportRepository;
 
     @Override
     @Transactional
@@ -89,7 +81,7 @@ public class VendorServiceImplementation implements VendorService {
 
         if (isUserImageUploaded && isHotelImageUploaded) {
 
-            userObj.setUserProfilePicture(userImage.getOriginalFilename());
+            userObj.setUserProfilePicture("/images/" + userImage.getOriginalFilename());
             hotelObj.setHotelImage(hotelImage.getOriginalFilename());
 
             Role vendorRole = roleRepo.findByRoleName("ROLE_VENDOR");
@@ -362,6 +354,29 @@ public class VendorServiceImplementation implements VendorService {
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to delete room";
+        }
+    }
+
+    //post report and issue by the vendor
+    @Transactional
+    public String postReport(Report report){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.isAuthenticated()) {
+                String username = authentication.getName();
+
+                User vendorObject = userRepo.findByUserName(username);
+
+                report.setUser(vendorObject);
+
+                reportRepository.save(report);
+
+                return "Report posted successfully";
+            }
+            return "Authentication failed";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to post report";
         }
     }
 

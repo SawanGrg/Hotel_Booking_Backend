@@ -1,7 +1,10 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.dto.vendorDto.ReportDto;
 import com.fyp.hotel.model.HotelRoom;
+import com.fyp.hotel.model.Report;
+import com.fyp.hotel.util.ValueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,8 @@ public class VendorController {
     private final ObjectMapper objectMapper;
     @Autowired
     private final VendorServiceImplementation vendorServiceImplementation;
+    @Autowired
+    private ValueMapper valueMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(VendorController.class);
 
@@ -39,6 +44,7 @@ public class VendorController {
     public String dashboard(){
         return "Vendor dashboard";
     }
+
 
     //insert the hotel rooms 
     @PostMapping("/addHotelRooms")
@@ -146,5 +152,26 @@ public class VendorController {
             return ResponseEntity.status(500).body(e.getMessage());
         }
 
+    }
+
+    //post report and issue by the vendor
+    @PostMapping("/report")
+    public ResponseEntity<?> postReport(
+            @RequestBody ReportDto reportDto
+            ){
+        try {
+            Report report = valueMapper.conversionToReport(reportDto);
+            String response = vendorServiceImplementation.postReport(report);
+            if ("Report posted successfully".equals(response)) {
+                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
+                return ResponseEntity.ok(apiResponse);
+            } else {
+                ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", response);
+                return ResponseEntity.status(500).body(apiResponse);
+            }
+        } catch (Exception e) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
     }
 }

@@ -151,11 +151,11 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
-			<version>4.0.3</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.zaxxer</groupId>-->
+<!--			<artifactId>HikariCP</artifactId>-->
+<!--			<version>4.0.3</version>-->
+<!--		</dependency>-->
 
 <!--		for swagger api documentatation -->
 		<dependency>
@@ -169,6 +169,20 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>6.4.0.Final</version>
 			<type>pom</type>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4-runtime -->
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.10.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/net.n2oapp.criteria/criteria-api -->
+		<dependency>
+			<groupId>net.n2oapp.criteria</groupId>
+			<artifactId>criteria-api</artifactId>
+			<version>7.4.0</version>
 		</dependency>
 
 

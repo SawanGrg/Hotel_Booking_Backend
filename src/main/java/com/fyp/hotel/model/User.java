@@ -86,6 +86,11 @@ User implements UserDetails {
     @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Booking> bookings = new ArrayList<>();
+
+    @JsonIgnore
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Report> reports = new ArrayList<>();
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

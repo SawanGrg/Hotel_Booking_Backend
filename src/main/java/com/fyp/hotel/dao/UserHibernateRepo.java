@@ -27,7 +27,8 @@ public class UserHibernateRepo {
 
     public User getUserById(int userId) {
         Session session = sessionFactory.openSession();
-        User user = session.get(User.class, userId);
+        Transaction transaction = session.beginTransaction();
+        User user = session.get(User.class, userId); // get method is used to get the data from the database
         session.close();
         return user;
     }
@@ -51,6 +52,7 @@ public class UserHibernateRepo {
         session.close();
     }
 
+    //    extract user details based on username
     public User getUserByUsername(String username) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -62,5 +64,6 @@ public class UserHibernateRepo {
         session.close();
         return user;
     }
+
 
 }

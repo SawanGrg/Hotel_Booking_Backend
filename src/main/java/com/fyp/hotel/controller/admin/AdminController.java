@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", maxAge = 3600) 
-@RequestMapping("/admin")
+@RequestMapping("/v1/admin")
 public class AdminController {
 
     @GetMapping("/dashboard")

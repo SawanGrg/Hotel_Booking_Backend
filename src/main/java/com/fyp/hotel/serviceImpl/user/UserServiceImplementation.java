@@ -6,14 +6,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fyp.hotel.dao.HotelRoomDAO;
 import com.fyp.hotel.dao.PaymentMethodDAO;
 import com.fyp.hotel.dao.UserHibernateRepo;
 import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
-import com.fyp.hotel.util.EmailSenderService;
-import com.fyp.hotel.util.OtpGenerator;
-import com.fyp.hotel.util.OtpMailSender;
+import com.fyp.hotel.util.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -32,7 +31,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fyp.hotel.service.user.UserService;
-import com.fyp.hotel.util.FileUploaderHelper;
 
 import jakarta.transaction.Transactional;
 
@@ -78,6 +76,14 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Autowired
     @Lazy
     private OtpGenerator otpGenerator;
+    @Autowired
+    @Lazy
+    private DaysChecker daysChecker;
+    @Autowired
+    @Lazy
+    private HotelRoomDAO hotelRoomDAO;
+
+
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
 
 //    @Scheduled(cron = "10 * * * * *") // Cron expression 10 seconds
@@ -255,7 +261,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     public String hotelPaymentGateWay(
             @Validated BookDto bookDto
     ){
-        if(bookDto.getPaymentMethod().equals("CASH")){
+        if(bookDto.getPaymentMethod().equals("Cash")){
 
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
             String userName = authenticatedUser.getName();
@@ -268,6 +274,13 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             Long roomId = hotelRoom.getRoomId();
             Double roomPrice = hotelRoom.getRoomPrice();
             PaymentMethod paymentMethodObject = paymentMethodDAO.getPaymentMethod(bookDto.getPaymentMethod());
+
+            long daysOfStay = daysChecker.getDays(bookDto.getCheckInDate(), bookDto.getCheckOutDate());
+            long totalAmount = Long.valueOf(roomPrice.intValue() * daysOfStay);
+
+            System.out.println("days of stay: " + daysOfStay);
+            System.out.println("total amount: " + totalAmount);
+
             Booking booking = new Booking();
 
             booking.setHotelRoom(hotelRoom);
@@ -276,8 +289,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             booking.setCheckInDate(bookDto.getCheckInDate());
             booking.setCheckOutDate(bookDto.getCheckOutDate());
             booking.setBookingDate(bookDto.getBookingDate());
-            booking.setDaysOfStay(bookDto.getDaysOfStay());
-            booking.setTotalAmount((long) (roomPrice * bookDto.getDaysOfStay()));
+            booking.setNumberOfGuest(bookDto.getNumberOfGuest());
+            booking.setTotalAmount(totalAmount);
             booking.setCreatedAt(Instant.now());
 
             bookingRepository.save(booking);
@@ -288,5 +301,35 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             return "Payment successful by khalti";
         }
         return "Payment failed";
+    }
+
+    public List<HotelRoom> filterRooms(
+            Long hotelId,
+            String roomType,
+            String roomCategory,
+            String roomBed,
+            String minRoomPrice,
+            String maxRoomPrice,
+            Boolean hasAC,
+            Boolean hasBalcony,
+            Boolean hasRefridge,
+            int page,
+            int size
+    ){
+        System.out.println("in the service implementation");
+        // Delegate to the DAO for retrieving filtered hotel rooms
+        return hotelRoomDAO.getHotelRooms(
+                hotelId,
+                roomType,
+                roomCategory,
+                roomBed,
+                minRoomPrice,
+                maxRoomPrice,
+                hasAC,
+                hasBalcony,
+                hasRefridge,
+                page,
+                size
+        );
     }
 }

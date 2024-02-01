@@ -3,6 +3,7 @@ package com.fyp.hotel.util;
 import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.dto.userDto.UserDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
+import com.fyp.hotel.dto.vendorDto.ReportDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.dto.vendorDto.VendorDto;
 import com.fyp.hotel.model.*;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -139,7 +141,8 @@ public class ValueMapper {
            Long roomId,
            String checkInDate,
            String checkOutDate,
-           String daysOfStay,
+//           String daysOfStay,
+           String numberOfGuest,
            String paymentMethod
     ){
         BookDto bookDto = new BookDto();
@@ -150,12 +153,25 @@ public class ValueMapper {
         bookDto.setRoomId(roomId);
         bookDto.setCheckInDate(LocalDate.parse(checkInDate, formatter));  //convert string to local date
         bookDto.setCheckOutDate(LocalDate.parse(checkOutDate, formatter));
-        bookDto.setDaysOfStay(Long.parseLong(daysOfStay)); //convert string to long
+        bookDto.setNumberOfGuest(Long.parseLong(numberOfGuest)); //convert string to long
         bookDto.setBookingDate(LocalDate.now()); //get the current date
         bookDto.setPaymentMethod(paymentMethod);
         bookDto.setCreatedAt(Instant.now());
 
         return bookDto;
+    }
+
+    //conversion of report dto to report
+    public Report conversionToReport(ReportDto reportDto){
+
+        Report report = new Report();
+
+        report.setTitle(reportDto.getTitle());
+        report.setDescription(reportDto.getDescription());
+        report.setStatus("PENDING");
+        // Convert Instant to Date
+        report.setCreatedAt(Date.from(Instant.now()));
+        return report;
     }
 
 }

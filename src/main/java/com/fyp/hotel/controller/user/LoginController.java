@@ -32,7 +32,7 @@ public class LoginController {
     
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticate(
-            @Validated
+            @Validated //validated is used to validate the request body of the request we validate based on the annotations given in the dto class
             @RequestBody
             LoginRequestDto request) {
 
@@ -74,7 +74,7 @@ public class LoginController {
             //token is created with the help of username and password
             //UsernamePasswordAuthenticationToken is useful when we want to authenticate a user with a username and password.
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-            System.out.println("token:------------------> " + token);
+            System.out.println(" from username password authentication token:------------------> " + token);
             
             //authenticate method makes sure that the user is authenticated or not
             authenticationManager.authenticate(token);

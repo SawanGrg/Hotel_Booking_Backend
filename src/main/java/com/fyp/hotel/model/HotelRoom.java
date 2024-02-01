@@ -93,8 +93,8 @@ public class HotelRoom {
 
     @JsonBackReference //json back reference is used to avoid infinite recursion between hotel room and booking
     //one room can be booked one time at a time
-    @OneToOne(mappedBy = "hotelRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Booking booking;
+    @OneToMany(mappedBy = "hotelRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Booking> booking;
 
     @Override
     public String toString() {

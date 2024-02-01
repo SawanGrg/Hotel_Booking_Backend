@@ -32,8 +32,8 @@ public class BookDto {
     @Length(min = 1, message = "Booking Date cannot be null")
     private LocalDate bookingDate;
 
-    @NotNull(message = "Days Of Stay cannot be null")
-    private Long daysOfStay;
+    @NotNull(message = "number of guest cannot be null")
+    private Long numberOfGuest;
 
     @NotNull(message = "Payment Method cannot be null")
     @Length(min = 1, message = "Payment Method cannot be null")

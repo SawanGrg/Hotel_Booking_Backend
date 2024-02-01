@@ -55,7 +55,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         httpServletResponse.getOutputStream().println(
-                objectMapper.writeValueAsString(errorDto)
+                objectMapper.writeValueAsString(errorDto) // this line converts errorDto to json
         );
 
     }

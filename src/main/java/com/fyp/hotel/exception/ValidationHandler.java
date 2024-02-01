@@ -15,11 +15,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ValidationHandler extends ResponseEntityExceptionHandler{
 
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, //this exception is thrown when argument annotated with @valid failed validation
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request //webrequest is used to get the request that is coming from the client
+    ) {
 
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) ->{
+        ex.getBindingResult()
+                //getbindingresult is helpful to get the error message thrown by the validator such as @notnull, @notempty, @size, @pattern, etc
+                .getAllErrors()
+                //getallerrors is used to get all the errors thrown by the validator
+                .forEach((error) ->{
 
             String fieldName = ((FieldError) error).getField();
             String message = error.getDefaultMessage();

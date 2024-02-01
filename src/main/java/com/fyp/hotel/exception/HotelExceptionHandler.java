@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.fyp.hotel.dto.ErrorDto;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class HotelExceptionHandler {
     
     @ExceptionHandler( value = HotelAlreadyExist.class )

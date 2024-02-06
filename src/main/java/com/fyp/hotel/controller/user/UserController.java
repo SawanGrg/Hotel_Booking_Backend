@@ -2,17 +2,20 @@ package com.fyp.hotel.controller.user;
 
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.userDto.BookDto;
+import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 import com.fyp.hotel.util.ValueMapper;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,11 +62,38 @@ public class UserController {
             @RequestParam(name = "userEmail") String userEmail,
             @RequestParam(name = "userPhone") String userPhone,
             @RequestParam(name = "userAddress") String userAddress,
-            @RequestParam(name = "dateOfBirth") String dateOfBirth
+            @RequestParam(name = "dateOfBirth") String dateOfBirth,
+            @RequestParam(name = "userProfileImage") MultipartFile userProfileImage
     ) {
         try {
-            String response = userServiceImplementation.updateDetails(userName, userFirstName, userLastName, userEmail, userPhone, userAddress, dateOfBirth);
+            String response = userServiceImplementation.updateDetails(userName, userFirstName, userLastName, userEmail, userPhone, userAddress, dateOfBirth, userProfileImage);
             if ("User details updated successfully".equals(response)) {
+                ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
+                return ResponseEntity.status(200).body(successResponse);
+            } else {
+                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", response);
+                return ResponseEntity.status(500).body(errorResponse);
+            }
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    //change possword
+    @PatchMapping("/user-change-password")
+    public ResponseEntity<?> changePassword(
+            @Valid()
+            @RequestBody UserChangePasswordDto userChangePasswordDto
+            )
+    {
+        try {
+
+            System.out.println("userChangePasswordDto: " + userChangePasswordDto.getNewPassword());
+            System.out.println("userChangePasswordDto: " + userChangePasswordDto.getOldPassword());
+
+            String response = userServiceImplementation.changePassword(userChangePasswordDto);
+            if ("Password changed successfully".equals(response)) {
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
                 return ResponseEntity.status(200).body(successResponse);
             } else {

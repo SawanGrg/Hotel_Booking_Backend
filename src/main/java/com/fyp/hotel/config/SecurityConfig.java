@@ -2,7 +2,9 @@ package com.fyp.hotel.config;
 
 //import com.fyp.hotel.filter.MyCustomFilter;
 import com.fyp.hotel.filter.ApiRateLimit;
+import com.fyp.hotel.filter.MyCustomFilter;
 import com.fyp.hotel.filter.TimingFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -41,7 +43,7 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final TimingFilter timingFilter;
     private final ApiRateLimit apiRateLimit;
-    // private final CookieFilter cookieFilter;
+    private final MyCustomFilter myCustomFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -62,16 +64,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-//                securityMatcher() is used to set the RequestMatcher bean where requestMatchers bean means the request is matched against the provided matchers.
-//                 it is usefull when we want to use multiple request matchers.
-//                 .securityMatcher(request -> request.getServletPath().startsWith("/v1")
-//                        || request.getServletPath().startsWith("/admin")
-//                        || request.getServletPath().startsWith("/vendor")
-//                        || request.getServletPath().startsWith("/user")
-//
-//                )
-//                .securityMatcher("/api/test")
-//                .addFilterBefore(new MyCustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .cors(cors -> cors
                         .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 .csrf(crsf -> crsf
@@ -90,6 +82,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/v1/user/payment/**").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.GET, "/v1/user/profile").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.PATCH, "v1/user/user-change-password").hasAuthority("ROLE_USER")
 
                         .requestMatchers(HttpMethod.GET, "/v1/user/view-user-details").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.PUT, "/v1/user/update-profile").hasAuthority("ROLE_USER")
@@ -105,7 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/vendor/dashboard").hasAuthority("ROLE_ADMIN")
 
 
-//                        .requestMatchers(HttpMethod.GET,"/api/test").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.GET,"/api/test").permitAll()
 
                         .anyRequest().permitAll())
                 .exceptionHandling( ex -> ex
@@ -113,15 +106,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // authenticationProvider() is used to set the AuthenticationProvider bean.
-        // it is usefull when we want to use multiple authentication providers.
-        // such as DaoAuthenticationProvider, LdapAuthenticationProvider, etc.
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(apiRateLimit, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(timingFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        //http.addFilterAfter(cookieFilter, JwtAuthFilter.class);
+
+        http.addFilterBefore(myCustomFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -132,10 +123,6 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-//        config.addAllowedMethod("GET");
-//        config.addAllowedMethod("POST");
-//        config.addAllowedMethod("PUT");
-//        config.addAllowedMethod("DELETE"); // Allow DELETE method
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", config); //registerCorsConfiguration("/**", config) means that all the endpoints in the application will have the CORS filter applied to them.

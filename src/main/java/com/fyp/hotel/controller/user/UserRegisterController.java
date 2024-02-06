@@ -39,6 +39,7 @@ public class UserRegisterController {
         System.out.println(
                 stringUserData + " " + stringUserImage.getOriginalFilename() + " " + stringUserImage.getSize());
         try {
+            // Convert string to user object
             User user = this.objectMapper.readValue(stringUserData, User.class);
             System.out.println("this is user data" + user.getPassword());
             // Move image upload and default role assignment to the service

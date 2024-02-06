@@ -10,6 +10,7 @@ import com.fyp.hotel.dao.HotelRoomDAO;
 import com.fyp.hotel.dao.PaymentMethodDAO;
 import com.fyp.hotel.dao.UserHibernateRepo;
 import com.fyp.hotel.dto.userDto.BookDto;
+import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.*;
@@ -121,9 +122,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
             System.out.println(" this is the user password after encoding " + encodedPassword);
             user.setPassword(encodedPassword);
-
             user.setCreatedAt(Instant.now());
-
             boolean isImageUploaded = fileUploaderHelper.fileUploader(userImage);
             String imageUrl = isImageUploaded ? "/images/" + userImage.getOriginalFilename() : "/images/default.png";
             user.setUserProfilePicture(imageUrl);
@@ -185,13 +184,22 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             String userEmail,
             String userPhone,
             String userAddress,
-            String dateOfBirth
+            String dateOfBirth,
+            MultipartFile userProfilePicture
     ) {
         try {
+
+            if(userProfilePicture != null){
+                boolean isImageUploaded = fileUploaderHelper.fileUploader(userProfilePicture);
+            }
+
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
             if (authenticatedUser != null) {
+
+
                 String authenticatedUserName = authenticatedUser.getName();
                 User user = userRepo.findByUserName(authenticatedUserName);
+
 
                 user.setUserName(userName.isEmpty() ? user.getUsername() : userName);
                 user.setUserFirstName(userFirstName.isEmpty() ? user.getUserFirstName() : userFirstName);
@@ -200,10 +208,44 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                 user.setUserPhone(userPhone.isEmpty() ? user.getUserPhone() : userPhone);
                 user.setUserAddress(userAddress.isEmpty() ? user.getUserAddress() : userAddress);
                 user.setDateOfBirth(dateOfBirth.isEmpty() ? user.getDateOfBirth() : dateOfBirth);
+                user.setUserProfilePicture(userProfilePicture.isEmpty() ? user.getUserProfilePicture() : "/images/" + userProfilePicture.getOriginalFilename());
                 user.setUpdatedAt(Instant.now());
 
                 userRepo.save(user);
                 return "User details updated successfully";
+            } else {
+                return "User not authenticated"; // Handle unauthenticated user
+            }
+        } catch (DataAccessException e) {
+            return "Database error: " + e.getMessage(); // Handle database errors
+        } catch (Exception e) {
+            return "An error occurred: " + e.getMessage();
+        }
+    }
+
+    //change user password
+    @Transactional
+    public String changePassword(
+            UserChangePasswordDto userChangePasswordDto
+    ){
+            try {
+            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+            if (authenticatedUser != null) {
+                String authenticatedUserName = authenticatedUser.getName();
+
+                User user = userRepo.findByUserName(authenticatedUserName);
+
+                String oldPassword = userChangePasswordDto.getOldPassword();
+                String newPassword = userChangePasswordDto.getNewPassword();
+
+                if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+                    user.setPassword(passwordEncoder.encode(newPassword));
+                    user.setUpdatedAt(Instant.now());
+                    userRepo.save(user);
+                    return "Password changed successfully";
+                } else {
+                    return "Old password is incorrect";
+                }
             } else {
                 return "User not authenticated"; // Handle unauthenticated user
             }

@@ -81,7 +81,7 @@ public class UserController {
     }
 
     //change possword
-    @PatchMapping("/user-change-password")
+    @PostMapping("/user-change-password")
     public ResponseEntity<?> changePassword(
             @Valid()
             @RequestBody UserChangePasswordDto userChangePasswordDto
@@ -97,7 +97,7 @@ public class UserController {
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
                 return ResponseEntity.status(200).body(successResponse);
             } else {
-                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", response);
+                ApiResponse<String> errorResponse = new ApiResponse<>(400, "An error occurred", response);
                 return ResponseEntity.status(500).body(errorResponse);
             }
         } catch (Exception e) {

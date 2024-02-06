@@ -82,7 +82,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/v1/user/payment/**").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.GET, "/v1/user/profile").hasAuthority("ROLE_USER")
-                        .requestMatchers(HttpMethod.PATCH, "v1/user/user-change-password").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/user-change-password").hasAuthority("ROLE_USER")
 
                         .requestMatchers(HttpMethod.GET, "/v1/user/view-user-details").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.PUT, "/v1/user/update-profile").hasAuthority("ROLE_USER")

@@ -1,23 +1,30 @@
 package com.fyp.hotel.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Component
 public class FileUploaderHelper {
 
-    // The directory path where uploaded files will be saved
-    private final String pathToSave = "src/main/resources/static/images";
+    private static final Logger logger = LoggerFactory.getLogger(FileUploaderHelper.class);
 
-    // Constructor for FileUploaderHelper
-    public FileUploaderHelper() throws IOException {
-        System.out.println("File Upload Helper Constructor called");
+    private final String pathToSave;
+
+    public FileUploaderHelper() {
+        // Make the directory path configurable or provide a default path
+        this.pathToSave = "src/main/resources/static/images";
+        // Create directory if it doesn't exist
+        createDirectoryIfNotExists(pathToSave);
+        logger.info("File Upload Helper Constructor called");
     }
 
     /**
@@ -27,18 +34,35 @@ public class FileUploaderHelper {
      * @return True if the file was uploaded successfully, false otherwise.
      */
     public boolean fileUploader(MultipartFile file) {
-        boolean state = false;
-        try {
-            // Copy the contents of the uploaded file's InputStream to the destination directory
-            //file.getInputStream() returns an InputStream object which points to the uploaded file
-            //which means that we can read the contents of the uploaded file from this InputStream object
-            Files.copy(file.getInputStream(), Paths.get(pathToSave + File.separator + file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
-            
-            // Set the state to true to indicate successful upload
-            state = true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (file.isEmpty()) {
+            logger.error("Cannot upload empty file");
+            return false;
         }
-        return state;
+
+        try {
+            Path destination = Paths.get(pathToSave + File.separator + file.getOriginalFilename());
+            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+            logger.info("File uploaded successfully: {}", destination);
+            return true;
+        } catch (IOException e) {
+            logger.error("Failed to upload file: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Creates a directory if it doesn't exist.
+     *
+     * @param directoryPath The path of the directory to be created.
+     */
+    private void createDirectoryIfNotExists(String directoryPath) {
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            if (directory.mkdirs()) {
+                logger.info("Directory created: {}", directoryPath);
+            } else {
+                logger.error("Failed to create directory: {}", directoryPath);
+            }
+        }
     }
 }

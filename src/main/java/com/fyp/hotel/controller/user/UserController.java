@@ -1,8 +1,11 @@
 package com.fyp.hotel.controller.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
+import com.fyp.hotel.dto.userDto.UserProfileDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.model.*;
@@ -17,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -27,7 +31,11 @@ public class UserController {
     @Autowired
     private UserServiceImplementation userServiceImplementation;
     @Autowired
+    private  UserProfileDto userProfileDto;
+    @Autowired
     private ValueMapper valueMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/profile")
     public String userProfile() {
@@ -54,19 +62,43 @@ public class UserController {
     }
 
     //update user profile
-    @PutMapping("/update-profile")
+    @PostMapping("/update-user-details")
     public ResponseEntity<?> updateUserDetails(
-            @RequestParam(name = "userName") String userName,
-            @RequestParam(name = "userFirstName") String userFirstName,
-            @RequestParam(name = "userLastName") String userLastName,
-            @RequestParam(name = "userEmail") String userEmail,
-            @RequestParam(name = "userPhone") String userPhone,
-            @RequestParam(name = "userAddress") String userAddress,
-            @RequestParam(name = "dateOfBirth") String dateOfBirth,
-            @RequestParam(name = "userProfileImage") MultipartFile userProfileImage
+            @RequestParam(value = "userUpgradingDetails", required = false) String userUpgradingDetailsJson,
+            @RequestParam(value = "userProfileImage", required = false) MultipartFile userProfileImage
     ) {
         try {
-            String response = userServiceImplementation.updateDetails(userName, userFirstName, userLastName, userEmail, userPhone, userAddress, dateOfBirth, userProfileImage);
+            UserProfileDto userUpgradingDetails = null;
+            if (userUpgradingDetailsJson != null) {
+                userUpgradingDetails = objectMapper.readValue(userUpgradingDetailsJson, UserProfileDto.class);
+            }
+
+            String userProfileImageFilename = userProfileImage != null ? userProfileImage.getOriginalFilename() : null;
+
+            // Log userUpgradingDetails and userProfileImageFilename
+            System.out.println("user name : " + userUpgradingDetails.getUserName());
+            System.out.println("user first name : " + userUpgradingDetails.getUserFirstName());
+            System.out.println("user last name : " + userUpgradingDetails.getUserLastName());
+            System.out.println("user email : " + userUpgradingDetails.getUserEmail());
+            System.out.println("user phone : " + userUpgradingDetails.getUserPhone());
+            System.out.println("user address : " + userUpgradingDetails.getUserAddress());
+            System.out.println("user date of birth : " + userUpgradingDetails.getDateOfBirth());
+            System.out.println("user profile image : " + userProfileImageFilename);
+
+            System.out.println("before calling the service method step 1");
+            // Call the service method to update user details, passing null for userProfileImage if not provided
+            String response = userServiceImplementation.updateDetails(
+                    userUpgradingDetails != null ? userUpgradingDetails.getUserName() : null,
+                    userUpgradingDetails != null ? userUpgradingDetails.getUserFirstName() : null,
+                    userUpgradingDetails != null ? userUpgradingDetails.getUserLastName() : null,
+                    userUpgradingDetails != null ? userUpgradingDetails.getUserEmail() : null,
+                    userUpgradingDetails != null ? userUpgradingDetails.getUserPhone() : null,
+                    userUpgradingDetails != null ? userUpgradingDetails.getUserAddress() : null,
+                    userUpgradingDetails != null ? userUpgradingDetails.getDateOfBirth() : null,
+                    userProfileImage // Pass userProfileImage directly without checking for null
+            );
+
+            // Return appropriate response based on the service method result
             if ("User details updated successfully".equals(response)) {
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
                 return ResponseEntity.status(200).body(successResponse);
@@ -75,10 +107,14 @@ public class UserController {
                 return ResponseEntity.status(500).body(errorResponse);
             }
         } catch (Exception e) {
-            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            // Handle other exceptions
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "Internal Server Error", e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
+
+
+
 
     //change possword
     @PostMapping("/user-change-password")

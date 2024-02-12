@@ -15,7 +15,7 @@ import java.util.Date;
 public class Report {
 
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id")
     @Basic
     private Long reportId;

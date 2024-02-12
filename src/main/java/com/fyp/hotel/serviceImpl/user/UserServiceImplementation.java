@@ -15,7 +15,10 @@ import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.*;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,54 +39,60 @@ import com.fyp.hotel.service.user.UserService;
 import jakarta.transaction.Transactional;
 
 @Service
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserServiceImplementation implements UserService, UserDetailsService {
 
-    @Autowired
-    @Lazy
     private UserRepository userRepo;
-    @Autowired
-    @Lazy
     private RoleRepository roleRepo;
-    @Autowired
-    @Lazy
     private FileUploaderHelper fileUploaderHelper;
-    @Autowired
-    @Lazy
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    @Lazy
     private HotelRepository hotelRepo;
-    @Autowired
-    @Lazy
     private UserHibernateRepo userHibernateRepo;
-    @Autowired
-    @Lazy
     private HotelRoomRepository hotelRoomRepository;
-    @Autowired
-    @Lazy
     private RoomImageRepository roomImageRepository;
-    @Autowired
-    @Lazy
     private BookingRepository bookingRepository;
-    @Autowired
-    @Lazy
     private PaymentMethodDAO paymentMethodDAO;
-    @Autowired
-    @Lazy
     private OtpMailSender otpMailSender;
-    @Autowired
-    @Lazy
     private EmailSenderService emailSenderService;
-    @Autowired
-    @Lazy
     private OtpGenerator otpGenerator;
-    @Autowired
-    @Lazy
     private DaysChecker daysChecker;
-    @Autowired
-    @Lazy
     private HotelRoomDAO hotelRoomDAO;
 
+    @Autowired
+    public UserServiceImplementation(
+            @Qualifier("userRepository") @Lazy UserRepository userRepo,
+            @Qualifier("roleRepository") @Lazy RoleRepository roleRepo,
+            @Lazy FileUploaderHelper fileUploaderHelper,
+            @Lazy PasswordEncoder passwordEncoder,
+            @Lazy HotelRepository hotelRepo,
+            @Lazy UserHibernateRepo userHibernateRepo,
+            @Lazy HotelRoomRepository hotelRoomRepository,
+            @Lazy RoomImageRepository roomImageRepository,
+            @Lazy BookingRepository bookingRepository,
+            @Lazy PaymentMethodDAO paymentMethodDAO,
+            @Lazy OtpMailSender otpMailSender,
+            @Lazy EmailSenderService emailSenderService,
+            @Lazy OtpGenerator otpGenerator,
+            @Lazy DaysChecker daysChecker,
+            @Lazy HotelRoomDAO hotelRoomDAO
+    ) {
+        this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
+        this.fileUploaderHelper = fileUploaderHelper;
+        this.passwordEncoder = passwordEncoder;
+        this.hotelRepo = hotelRepo;
+        this.userHibernateRepo = userHibernateRepo;
+        this.hotelRoomRepository = hotelRoomRepository;
+        this.roomImageRepository = roomImageRepository;
+        this.bookingRepository = bookingRepository;
+        this.paymentMethodDAO = paymentMethodDAO;
+        this.otpMailSender = otpMailSender;
+        this.emailSenderService = emailSenderService;
+        this.otpGenerator = otpGenerator;
+        this.daysChecker = daysChecker;
+        this.hotelRoomDAO = hotelRoomDAO;
+    }
 
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
 
@@ -187,37 +196,58 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             String dateOfBirth,
             MultipartFile userProfilePicture
     ) {
+        System.out.println("step 1 in the service implementation");
         try {
-
-            if(userProfilePicture != null){
-                boolean isImageUploaded = fileUploaderHelper.fileUploader(userProfilePicture);
+            // Check if userProfilePicture is provided and save it
+            System.out.println("step 2 in the service implementation");
+            boolean isProfilePictureProvided = false;
+            if (userProfilePicture != null && !userProfilePicture.isEmpty()) {
+                System.out.println("step 4 in the service implementation");
+                isProfilePictureProvided = fileUploaderHelper.fileUploader(userProfilePicture);
+                System.out.println("step 5 in the service implementation");
             }
-
+            System.out.println("step 6 in the service implementation");
+            // Retrieve authenticated user
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
             if (authenticatedUser != null) {
-
-
                 String authenticatedUserName = authenticatedUser.getName();
                 User user = userRepo.findByUserName(authenticatedUserName);
 
+                // Update user details
+                if (userName != null && !userName.isEmpty()) {
+                    user.setUserName(userName);
+                }
+                if (userFirstName != null && !userFirstName.isEmpty()) {
+                    user.setUserFirstName(userFirstName);
+                }
+                if (userLastName != null && !userLastName.isEmpty()) {
+                    user.setUserLastName(userLastName);
+                }
+                if (userEmail != null && !userEmail.isEmpty()) {
+                    user.setUserEmail(userEmail);
+                }
+                if (userPhone != null && !userPhone.isEmpty()) {
+                    user.setUserPhone(userPhone);
+                }
+                if (userAddress != null && !userAddress.isEmpty()) {
+                    user.setUserAddress(userAddress);
+                }
+                if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+                    user.setDateOfBirth(dateOfBirth);
+                }
+                if (isProfilePictureProvided) {
+                    user.setUserProfilePicture("/images/" + userProfilePicture.getOriginalFilename());
+                }
 
-                user.setUserName(userName.isEmpty() ? user.getUsername() : userName);
-                user.setUserFirstName(userFirstName.isEmpty() ? user.getUserFirstName() : userFirstName);
-                user.setUserLastName(userLastName.isEmpty() ? user.getUserLastName() : userLastName);
-                user.setUserEmail(userEmail.isEmpty() ? user.getUserEmail() : userEmail);
-                user.setUserPhone(userPhone.isEmpty() ? user.getUserPhone() : userPhone);
-                user.setUserAddress(userAddress.isEmpty() ? user.getUserAddress() : userAddress);
-                user.setDateOfBirth(dateOfBirth.isEmpty() ? user.getDateOfBirth() : dateOfBirth);
-                user.setUserProfilePicture(userProfilePicture.isEmpty() ? user.getUserProfilePicture() : "/images/" + userProfilePicture.getOriginalFilename());
                 user.setUpdatedAt(Instant.now());
-
                 userRepo.save(user);
+
                 return "User details updated successfully";
             } else {
-                return "User not authenticated"; // Handle unauthenticated user
+                return "User not authenticated";
             }
         } catch (DataAccessException e) {
-            return "Database error: " + e.getMessage(); // Handle database errors
+            return "Database error: " + e.getMessage();
         } catch (Exception e) {
             return "An error occurred: " + e.getMessage();
         }

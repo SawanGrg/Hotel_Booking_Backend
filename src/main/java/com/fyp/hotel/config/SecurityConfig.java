@@ -83,7 +83,7 @@ public class SecurityConfig {
     public SecurityFilterChain apiTestFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatchers(matchers -> matchers
-                        .requestMatchers("/api/test/**")
+//                        .requestMatchers("/api/test/**")
                         .requestMatchers("/v1/user/hotel")
                 )
 
@@ -113,6 +113,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user/verifyOtp").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/home").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/test/upload-video").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/v1/user/hotel").permitAll()
 //                        for dynamic url
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotelRooms/**").permitAll()
@@ -136,7 +137,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/admin/dashboard").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendor/dashboard").hasAuthority("ROLE_ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/test").hasAuthority("ROLE_USER")
 
                         .anyRequest().permitAll())
                 .exceptionHandling( ex -> ex

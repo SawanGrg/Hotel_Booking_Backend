@@ -380,5 +380,17 @@ public class VendorServiceImplementation implements VendorService {
         }
     }
 
+    //get hotel details only
+    @Transactional
+    public Hotel getHotelDetails(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            User vendor = userRepo.findByUserName(username);
+            return hotelRepo.findByUser(vendor);
+        }
+        return null;
+    }
+
 
 }

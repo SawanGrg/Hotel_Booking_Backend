@@ -132,6 +132,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/addHotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/report").hasAnyAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "v1/vendor/hotelDetails").hasAnyAuthority("ROLE_VENDOR")
 
 //                        admin url
                         .requestMatchers(HttpMethod.GET, "/v1/admin/dashboard").hasAuthority("ROLE_ADMIN")

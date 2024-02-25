@@ -65,13 +65,13 @@ public class Hotel {
     private User user;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)//deletion of hotel means deletion of the rooms
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HotelRoom> hotelRooms = new ArrayList<>(); // One Hotel can have many HotelRoom objects
 
     @Override
     public String toString() {
         return "Hotel [hotelId=" + this.hotelId + ", hotelName=" + this.hotelName + ", hotelAddress="
                 + this.hotelAddress + ", hotelContact=" + this.hotelContact + ", hotelEmail=" + this.hotelEmail
-                 + "]"; // Modify the hotelRooms part
+                 + "]";
     }
 }

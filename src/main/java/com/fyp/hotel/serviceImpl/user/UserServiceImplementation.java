@@ -389,7 +389,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             int size
     ){
         System.out.println("in the service implementation");
-        // Delegate to the DAO for retrieving filtered hotel rooms
+
         return hotelRoomDAO.getHotelRooms(
                 hotelId,
                 roomType,

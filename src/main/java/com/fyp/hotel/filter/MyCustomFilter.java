@@ -27,7 +27,7 @@ public class MyCustomFilter extends OncePerRequestFilter {
 //    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("My custom filter is called");
+        System.out.println("My custom filter is called from doFilterInternal");
         filterChain.doFilter(request, response);
     }
 

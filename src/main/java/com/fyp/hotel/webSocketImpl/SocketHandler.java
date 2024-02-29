@@ -5,16 +5,15 @@ import org.springframework.web.socket.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 public class SocketHandler implements WebSocketHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Set<WebSocketSession> sessions = new HashSet<>();
+
+//    private Map<WebSocketSession, String> sessions = new HashMap<>();
 
 
     @Override
@@ -28,19 +27,22 @@ public class SocketHandler implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         String clientMessage = (String) message.getPayload();
         log.info("Received message: {} from session: {}", clientMessage, session.getId());
+
+
+
         for (WebSocketSession webSocketSession : sessions) {
             webSocketSession.sendMessage(new TextMessage(clientMessage));
         }
     }
 
-    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws IOException {
-        byte[] imageData = message.getPayload().array();
-        log.info("Received binary message from session: {}", session.getId());
-        // Handle binary message
-        // Process the binary data as per your application requirements
-        // For example, save the image to storage, process it, or broadcast it to other clients.
-        // Your implementation here...
-    }
+//    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws IOException {
+//        byte[] imageData = message.getPayload().array();
+//        log.info("Received binary message from session: {}", session.getId());
+//        // Handle binary message
+//        // Process the binary data as per your application requirements
+//        // For example, save the image to storage, process it, or broadcast it to other clients.
+//        // Your implementation here...
+//    }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {

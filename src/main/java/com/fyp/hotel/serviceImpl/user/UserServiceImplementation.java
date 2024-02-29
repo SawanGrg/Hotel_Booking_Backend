@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fyp.hotel.dao.HotelDAO;
 import com.fyp.hotel.dao.HotelRoomDAO;
 import com.fyp.hotel.dao.PaymentMethodDAO;
 import com.fyp.hotel.dao.UserHibernateRepo;
+import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
 import com.fyp.hotel.model.*;
@@ -58,6 +60,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private OtpGenerator otpGenerator;
     private DaysChecker daysChecker;
     private HotelRoomDAO hotelRoomDAO;
+    private HotelDAO hotelDAO;
+    private PaymentRepository paymentRepository;
 
     @Autowired
     public UserServiceImplementation(
@@ -75,7 +79,9 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             @Lazy EmailSenderService emailSenderService,
             @Lazy OtpGenerator otpGenerator,
             @Lazy DaysChecker daysChecker,
-            @Lazy HotelRoomDAO hotelRoomDAO
+            @Lazy HotelRoomDAO hotelRoomDAO,
+            @Lazy HotelDAO hotelDAO,
+            @Lazy PaymentRepository paymentRepository
     ) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
@@ -92,6 +98,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         this.otpGenerator = otpGenerator;
         this.daysChecker = daysChecker;
         this.hotelRoomDAO = hotelRoomDAO;
+        this.hotelDAO = hotelDAO;
+        this.paymentRepository = paymentRepository;
     }
 
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
@@ -313,6 +321,9 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         List<HotelRoom> roomDatas = this.hotelRoomRepository.findHotelRoomByHotel_HotelId(hotelId);
         List< RoomImage> roomImages = this.roomImageRepository.findByHotelRoom_RoomId(hotelId);
 
+        //extracting if the hotel room is booked or not
+
+
         for (HotelRoom roomData : roomDatas) {
             for (RoomImage roomImage : roomImages) {
                 if (roomData.getRoomId() == roomImage.getHotelRoom().getRoomId()) {
@@ -404,4 +415,47 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                 size
         );
     }
+
+    @Transactional
+    public List<Hotel> getHotelBasedOnNameOrLocation(
+            String hotelName,
+            String hotelLocation,
+            int page,
+            int size
+    ){
+        return hotelDAO.getHotelsBasedOnCondition(hotelName, hotelLocation, page, size);
+    }
+
+    @Transactional
+    public CheckRoomAvailabilityDto checkRoomAvailability(
+            Long roomId
+    ){
+        //checking first in the booking table
+        List<Booking> bookings = hotelDAO.getBookingsForToday(roomId);
+
+        //checking in the khalti payment table
+
+        //adding in this condition
+        if(bookings.size() > 0){
+            CheckRoomAvailabilityDto checkRoomAvailabilityDto = new CheckRoomAvailabilityDto();
+
+            checkRoomAvailabilityDto.setRoomId(roomId);
+            checkRoomAvailabilityDto.setStatus("Booked");
+            checkRoomAvailabilityDto.setCheckInDate(bookings.get(0).getCheckInDate().toString());
+            checkRoomAvailabilityDto.setCheckOutDate(bookings.get(0).getCheckOutDate().toString());
+
+            return checkRoomAvailabilityDto;
+        }else{
+            CheckRoomAvailabilityDto checkRoomAvailabilityDto = new CheckRoomAvailabilityDto();
+
+            checkRoomAvailabilityDto.setRoomId(roomId);
+            checkRoomAvailabilityDto.setStatus("Available");
+
+            return checkRoomAvailabilityDto;
+        }
+
+
+
+    }
+
 }

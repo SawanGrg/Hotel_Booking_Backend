@@ -114,11 +114,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/user/verifyOtp").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/home").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/test/upload-video").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/user/searchHotel").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/v1/user/hotel").permitAll()
 //                        for dynamic url
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotelRooms/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/filterRooms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "v1/user/checkRoomAvailability/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/v1/user/payment/**").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.GET, "/v1/user/profile").hasAuthority("ROLE_USER")

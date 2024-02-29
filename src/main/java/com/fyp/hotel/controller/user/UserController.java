@@ -3,6 +3,7 @@ package com.fyp.hotel.controller.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.userDto.BookDto;
 import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
 import com.fyp.hotel.dto.userDto.UserProfileDto;
@@ -290,6 +291,43 @@ try {
             return ResponseEntity.status(500).body(errorResponse);
         }
 
+    }
+
+    //search based on hotel name or location
+    @GetMapping("/searchHotel")
+    public ResponseEntity<?> dynamicSearch(
+            @RequestParam(name = "hotelName", required = false) String hotelName,
+            @RequestParam(name = "hotelLocation", required = false) String hotelLocation,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size
+    ){
+        try {
+            List<Hotel> hotelDetails = userServiceImplementation.getHotelBasedOnNameOrLocation(hotelName, hotelLocation, page, size);
+            List<HotelDto> hotelDTOs = valueMapper.mapToHotelDTOs(hotelDetails);
+            System.out.println("hotel details: from controller " + hotelDTOs);
+
+            ApiResponse<List<HotelDto>> response = new ApiResponse<List<HotelDto>>(200, "Success", hotelDTOs);
+            return ResponseEntity.status(200).body(response);
+        } catch (Exception e) {
+            // Handle the exception and return an appropriate response
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/checkRoomAvailability/{roomId}")
+    public ResponseEntity<?> checkRoomAvailability(
+            @PathVariable(name = "roomId") Long roomId
+    ) {
+        try {
+            CheckRoomAvailabilityDto checkRoomAvailabilityDto = userServiceImplementation.checkRoomAvailability(roomId);
+            ApiResponse<CheckRoomAvailabilityDto> response = new ApiResponse<>(200, "Success", checkRoomAvailabilityDto);
+            return ResponseEntity.status(200).body(response);
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+
+        }
     }
 
 

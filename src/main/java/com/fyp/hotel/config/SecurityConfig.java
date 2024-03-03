@@ -114,7 +114,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/user/verifyOtp").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/home").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/test/upload-video").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/user/searchHotel").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/user/searchHotel/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/v1/user/hotel").permitAll()
 //                        for dynamic url
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotelRooms/**").permitAll()
@@ -134,7 +134,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/addHotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelRooms").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/report").hasAnyAuthority("ROLE_VENDOR")
-                        .requestMatchers(HttpMethod.GET, "v1/vendor/hotelDetails").hasAnyAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelDetails").hasAnyAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/v1/vendor/bookings/**").hasAnyAuthority("ROLE_VENDOR")
 
 //                        admin url
                         .requestMatchers(HttpMethod.GET, "/v1/admin/dashboard").hasAuthority("ROLE_ADMIN")

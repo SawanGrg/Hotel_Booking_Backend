@@ -1,6 +1,7 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.vendorDto.ReportDto;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
@@ -184,6 +185,23 @@ public class VendorController {
             ApiResponse<Hotel> apiResponse = new ApiResponse<>(200, "Success", hotel);
             return ResponseEntity.ok(apiResponse);
 
+        }catch (Exception e){
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
+
+    //get all booked or refunded or cancelled bookings
+    @GetMapping("/bookings")
+    public ResponseEntity<?> getBookings(
+            @RequestParam(name = "status", required = false, defaultValue = "") String status
+    ){
+
+        System.out.println("Status : " + status);
+        try {
+            List<CheckRoomAvailabilityDto> bookings = vendorServiceImplementation.getAllBookedDetails(status);
+            ApiResponse<List<CheckRoomAvailabilityDto>> apiResponse = new ApiResponse<>(200, "Success", bookings);
+            return ResponseEntity.ok(apiResponse);
         }catch (Exception e){
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.status(500).body(apiResponse);

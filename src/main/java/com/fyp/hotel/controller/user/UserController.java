@@ -301,24 +301,48 @@ try {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size
     ){
-        try {
-            List<Hotel> hotelDetails = userServiceImplementation.getHotelBasedOnNameOrLocation(hotelName, hotelLocation, page, size);
-            List<HotelDto> hotelDTOs = valueMapper.mapToHotelDTOs(hotelDetails);
-            System.out.println("hotel details: from controller " + hotelDTOs);
+        System.out.println("hotel name: " + hotelName);
+        System.out.println("hotel location: " + hotelLocation);
 
-            ApiResponse<List<HotelDto>> response = new ApiResponse<List<HotelDto>>(200, "Success", hotelDTOs);
-            return ResponseEntity.status(200).body(response);
-        } catch (Exception e) {
-            // Handle the exception and return an appropriate response
-            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
-            return ResponseEntity.status(500).body(errorResponse);
+        if(hotelName.isEmpty() && hotelLocation.isEmpty()){
+            System.out.println("hotel name and location are null");
+            try {
+                List<Hotel> hotelDetails = userServiceImplementation.getAllHotels(page, size);
+                List<HotelDto> hotelDTOs = valueMapper.mapToHotelDTOs(hotelDetails);
+                System.out.println("hotel details: from controller " + hotelDTOs);
+
+                ApiResponse<List<HotelDto>> response = new ApiResponse<>(200, "Success", hotelDTOs);
+                return ResponseEntity.status(200).body(response);
+            } catch (Exception e) {
+                // Handle the exception and return an appropriate response
+                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+                return ResponseEntity.status(500).body(errorResponse);
+            }
+
+        } else {
+            try {
+                System.out.println("hotel name and location are not null");
+                List<Hotel> hotelDetails = userServiceImplementation.getHotelBasedOnNameOrLocation(hotelName, hotelLocation, page, size);
+                List<HotelDto> hotelDTOs = valueMapper.mapToHotelDTOs(hotelDetails);
+                System.out.println("hotel details: from controller " + hotelDTOs);
+
+                ApiResponse<List<HotelDto>> response = new ApiResponse<>(200, "Success", hotelDTOs);
+                return ResponseEntity.status(200).body(response);
+            } catch (Exception e) {
+                // Handle the exception and return an appropriate response
+                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+                return ResponseEntity.status(500).body(errorResponse);
+            }
         }
     }
+
 
     @GetMapping("/checkRoomAvailability/{roomId}")
     public ResponseEntity<?> checkRoomAvailability(
             @PathVariable(name = "roomId") Long roomId
     ) {
+
+
         try {
             CheckRoomAvailabilityDto checkRoomAvailabilityDto = userServiceImplementation.checkRoomAvailability(roomId);
             ApiResponse<CheckRoomAvailabilityDto> response = new ApiResponse<>(200, "Success", checkRoomAvailabilityDto);

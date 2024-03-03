@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.fyp.hotel.dao.HotelDAO;
+import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.vendorDto.VendorDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
@@ -64,6 +66,9 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     @Lazy
     private ReportRepository reportRepository;
+    @Autowired
+    @Lazy
+    private HotelDAO hotelDAO;
 
     @Override
     @Transactional
@@ -391,6 +396,29 @@ public class VendorServiceImplementation implements VendorService {
         }
         return null;
     }
+
+    //get all booked or refunded or cancelled bookings
+    @Transactional
+    public List<CheckRoomAvailabilityDto> getAllBookedDetails(String status) {
+        List<Booking> bookings = hotelDAO.getBookingDetails(status);
+        List<CheckRoomAvailabilityDto> availabilityList = new ArrayList<>();
+
+        for (Booking booking : bookings) {
+            CheckRoomAvailabilityDto availabilityDto = new CheckRoomAvailabilityDto();
+            availabilityDto.setCheckInDate(booking.getCheckInDate().toString());
+            availabilityDto.setCheckOutDate(booking.getCheckOutDate().toString());
+            availabilityDto.setRoomId(booking.getHotelRoom().getRoomId());
+//            availabilityDto.setStatus(booking.getBookingStatus());
+            availabilityDto.setUserName(booking.getUser().getUsername());
+            availabilityDto.setRoomNumber(booking.getHotelRoom().getRoomNumber());
+
+            // Add the CheckRoomAvailabilityDto object to the list
+            availabilityList.add(availabilityDto);
+        }
+
+        return availabilityList;
+    }
+
 
 
 }

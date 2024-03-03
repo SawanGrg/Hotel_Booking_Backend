@@ -441,6 +441,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
             checkRoomAvailabilityDto.setRoomId(roomId);
             checkRoomAvailabilityDto.setStatus("Booked");
+            checkRoomAvailabilityDto.setUserName(bookings.get(0).getUser().getUsername());
             checkRoomAvailabilityDto.setCheckInDate(bookings.get(0).getCheckInDate().toString());
             checkRoomAvailabilityDto.setCheckOutDate(bookings.get(0).getCheckOutDate().toString());
 
@@ -453,9 +454,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
             return checkRoomAvailabilityDto;
         }
-
-
-
     }
 
 }

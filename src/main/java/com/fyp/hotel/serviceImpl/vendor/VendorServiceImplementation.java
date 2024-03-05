@@ -400,24 +400,29 @@ public class VendorServiceImplementation implements VendorService {
     //get all booked or refunded or cancelled bookings
     @Transactional
     public List<CheckRoomAvailabilityDto> getAllBookedDetails(String status) {
-        List<Booking> bookings = hotelDAO.getBookingDetails(status);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User vendor = userRepo.findByUserName(username);
+        Hotel hotel = hotelRepo.findByUser(vendor);
+        List<Booking> bookings = hotelDAO.getBookingDetails(status, hotel.getHotelId());
         List<CheckRoomAvailabilityDto> availabilityList = new ArrayList<>();
 
         for (Booking booking : bookings) {
             CheckRoomAvailabilityDto availabilityDto = new CheckRoomAvailabilityDto();
-            availabilityDto.setCheckInDate(booking.getCheckInDate().toString());
-            availabilityDto.setCheckOutDate(booking.getCheckOutDate().toString());
             availabilityDto.setRoomId(booking.getHotelRoom().getRoomId());
-//            availabilityDto.setStatus(booking.getBookingStatus());
+            if (booking.getCheckInDate() != null)
+                availabilityDto.setCheckInDate(booking.getCheckInDate().toString());
+            if (booking.getCheckOutDate() != null)
+                availabilityDto.setCheckOutDate(booking.getCheckOutDate().toString());
             availabilityDto.setUserName(booking.getUser().getUsername());
             availabilityDto.setRoomNumber(booking.getHotelRoom().getRoomNumber());
 
-            // Add the CheckRoomAvailabilityDto object to the list
             availabilityList.add(availabilityDto);
         }
 
         return availabilityList;
     }
+
 
 
 

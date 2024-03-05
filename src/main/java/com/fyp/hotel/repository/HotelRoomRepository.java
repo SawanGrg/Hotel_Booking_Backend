@@ -27,6 +27,7 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
     // Get hotel rooms details by hotel id with pagination
     Page<HotelRoom> findByHotel_HotelId(Long hotelId, Pageable pageable);
 
+    HotelRoom findByHotel_HotelId(Long hotelId);
     @Transactional
     @Modifying // modify the database
     @Query("DELETE FROM HotelRoom hr WHERE hr.roomId = :wantedRoomId")

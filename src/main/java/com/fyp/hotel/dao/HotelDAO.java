@@ -105,28 +105,32 @@ public class HotelDAO {
 
     //check from payment and booking table if the room is booked or refunded or cancelled
     @Transactional
-    public List<Booking> getBookingDetails(String status) {
-
+    public List<Booking> getBookingDetails(String status, Long hotelId) {
         Session sessionObj = null;
-        try{
+        try {
             sessionObj = this.sessionFactory.openSession();
             sessionObj.beginTransaction();
 
-            StringBuffer hql = new StringBuffer("Select * from booking b");
+            StringBuilder hql = new StringBuilder("SELECT b FROM Booking b ");
+            hql.append("JOIN b.hotelRoom hr ");
+            hql.append("JOIN hr.hotel h ");
+            hql.append("WHERE h.hotelId = :hotelId ");
 
-            if (status.equals("booked") && !status.isEmpty()) {
-                hql.append(" where b.booking_status = 'booked'");
-            } else if (status.equals("refunded")&& !status.isEmpty()) {
-                hql.append(" where b.booking_status = 'refunded'");
-            } else if (status.equals("cancelled")&& !status.isEmpty()) {
-                hql.append(" where b.booking_status = 'cancelled'");
+            if (status != null && !status.isEmpty()) {
+                hql.append("AND b.bookingStatus = :status");
             }
 
-            Query<Booking> query = sessionObj.createNativeQuery(hql.toString(), Booking.class);
-            List<Booking> booking = query.getResultList();
+            Query<Booking> query = sessionObj.createQuery(hql.toString(), Booking.class);
+            query.setParameter("hotelId", hotelId);
 
-            return booking;
-        }catch (Exception e) {
+            if (status != null && !status.isEmpty()) {
+                query.setParameter("status", status);
+            }
+
+            List<Booking> bookings = query.getResultList();
+
+            return bookings;
+        } catch (Exception e) {
             if (sessionObj != null) {
                 sessionObj.getTransaction().rollback();
             }
@@ -137,4 +141,5 @@ public class HotelDAO {
             }
         }
     }
+
 }

@@ -68,6 +68,7 @@ public class HotelRoom {
     @Column(name = "has_wifi", nullable = false, unique = false)
     private Boolean hasWifi;
 
+
     @Column(name = "created_at", nullable = false, unique = false)
     private ZonedDateTime createdAt;
 

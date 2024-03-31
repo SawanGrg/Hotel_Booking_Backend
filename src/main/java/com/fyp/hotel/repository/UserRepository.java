@@ -7,6 +7,7 @@ import com.fyp.hotel.model.User;
 
 @Repository("userRepository") //to avoid bean conflict with user service
 public interface UserRepository extends JpaRepository<User, Long> {
+//    this method is used to find the user by user name
     User findByUserName(String username);
 
     //native query for extracting all the user details and role name from user table and role table of a specific user name

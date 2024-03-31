@@ -1,5 +1,7 @@
 package com.fyp.hotel.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ public class PaymentMethod {
     @Column(name = "payment_method_name", nullable = false, length = 50)
     private String paymentMethodName;
 
+//    @JsonIgnore // JSON ignore is used to ignore the JSON serialization and deserialization of a field
+//    @JsonBackReference //json back reference doesn't allow to serialize the child object
     @OneToMany(mappedBy = "paymentMethod", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 

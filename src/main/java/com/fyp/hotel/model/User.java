@@ -91,7 +91,29 @@ User implements UserDetails {
     @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Report> reports = new ArrayList<>();
-    
+
+    @JsonIgnore
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> ratings = new ArrayList<>(); // One User can have many Rating objects
+
+
+    @JsonIgnore
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>(); // One User can have many Review objects
+
+
+    @JsonIgnore
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Blog> blogs = new ArrayList<>(); // One User can have many Blog objects
+
+    @JsonIgnore
+    @JsonBackReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BlogComment> blogComments = new ArrayList<>(); // One User can have many BlogComment objects
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

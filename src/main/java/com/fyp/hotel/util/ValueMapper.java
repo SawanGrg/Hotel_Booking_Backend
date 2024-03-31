@@ -50,6 +50,7 @@ public class ValueMapper {
         hotel.setHotelContact(hotelDto.getHotelContact());
         hotel.setHotelEmail(hotelDto.getHotelEmail());
         hotel.setHotelPan(hotelDto.getHotelPan());
+        hotel.setHotelDescription(hotelDto.getHotelDescription());
         hotel.setHotelStatus("ACTIVE");
         hotel.setCreatedAt(Instant.now());
         hotel.setUpdatedAt(Instant.now());

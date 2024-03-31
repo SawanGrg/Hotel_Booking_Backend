@@ -1,18 +1,20 @@
 package com.fyp.hotel.serviceImpl.user;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import com.fyp.hotel.dao.HotelDAO;
 import com.fyp.hotel.dao.HotelRoomDAO;
 import com.fyp.hotel.dao.PaymentMethodDAO;
 import com.fyp.hotel.dao.UserHibernateRepo;
+import com.fyp.hotel.dao.user.BlogDAO;
+import com.fyp.hotel.dto.BookingDTO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
-import com.fyp.hotel.dto.userDto.BookDto;
-import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
+import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.*;
@@ -62,6 +64,10 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private HotelRoomDAO hotelRoomDAO;
     private HotelDAO hotelDAO;
     private PaymentRepository paymentRepository;
+    private ReviewRepository hotelReviewRepository;
+    private BlogRepository blogRepository;
+    private BlogDAO blogDAO;
+    private BlogCommentRepository blogCommentRepository;
 
     @Autowired
     public UserServiceImplementation(
@@ -81,7 +87,11 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             @Lazy DaysChecker daysChecker,
             @Lazy HotelRoomDAO hotelRoomDAO,
             @Lazy HotelDAO hotelDAO,
-            @Lazy PaymentRepository paymentRepository
+            @Lazy PaymentRepository paymentRepository,
+            @Lazy ReviewRepository hotelReviewRepository,
+            @Lazy BlogRepository blogRepository,
+            @Lazy BlogDAO blogDAO,
+            @Lazy BlogCommentRepository blogCommentRepository
     ) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
@@ -100,6 +110,10 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         this.hotelRoomDAO = hotelRoomDAO;
         this.hotelDAO = hotelDAO;
         this.paymentRepository = paymentRepository;
+        this.hotelReviewRepository = hotelReviewRepository;
+        this.blogRepository = blogRepository;
+        this.blogDAO = blogDAO;
+        this.blogCommentRepository = blogCommentRepository;
     }
 
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
@@ -190,6 +204,12 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Transactional
     public List<Hotel> getAllHotels(int page, int size) {
         return this.hotelRepo.findAll();
+    }
+
+    //user view all the hotels with amenities
+    @Transactional
+    public List<DisplayHotelWithAmenitiesDto> getAllHotelsWithAmenities(String hotelName, String hotelLocation, int page, int size) {
+        return this.hotelDAO.getHotelWithAmenitiesAndRating(hotelName, hotelLocation);
     }
 
     //update user profile
@@ -375,6 +395,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             booking.setNumberOfGuest(bookDto.getNumberOfGuest());
             booking.setTotalAmount(totalAmount);
             booking.setCreatedAt(Instant.now());
+            booking.setStatus(Status.PENDING);
 
             bookingRepository.save(booking);
 
@@ -454,6 +475,199 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
             return checkRoomAvailabilityDto;
         }
+    }
+
+    //post user review at hotel
+    public String postHotelReview(
+            long hotelId,
+            HotelReviewDTO hotelReviewDTO
+    ) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userName = authentication.getName();
+
+            User user = userRepo.findByUserName(userName);
+
+            Hotel hotel = hotelRepo.findById(hotelId)
+                    .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + hotelId));
+
+            Review review = new Review();
+
+            review.setReviewContent(hotelReviewDTO.getHotelReview());
+            review.setHotel(hotel);
+            review.setUser(user);
+            review.setCreatedDate(Instant.now().toString());
+
+            // Save the review
+            hotelReviewRepository.save(review);
+
+            return "Review posted successfully.";
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle the exception appropriately
+            return "Failed to post review.";
+        }
+    }
+
+    //extract all the review of the specific hotel
+    @Transactional
+    public List<HotelReviewDTO> getAllHotelReviews(Long hotelId) {
+        List<Review> reviews = hotelReviewRepository.findByHotelId(hotelId);
+
+        return reviews.stream()
+                .map(review -> new HotelReviewDTO(
+                        review.getHotel().getHotelId(),
+                        review.getReviewContent(),
+                        review.getUser().getUsername(),
+                        review.getCreatedDate()
+                ))
+                .toList();
+    }
+
+    //post blog by user
+    @Transactional
+    public String postUserBlog(MultipartFile blogImage, BlogDTO blogDTO) {
+        try {
+            boolean isImageUploaded = fileUploaderHelper.fileUploader(blogImage);
+            if (!isImageUploaded) {
+                return "Failed to upload blog image.";
+            }
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userName = authentication.getName();
+
+            User user = userRepo.findByUserName(userName);
+            if (user == null) {
+                return "User not found.";
+            }
+
+            Blog blog = createBlogFromDTO(blogDTO, user, blogImage);
+            blogRepository.save(blog);
+
+            return "Blog posted successfully.";
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle the exception appropriately
+            return "Failed to post blog.";
+        }
+    }
+
+    private Blog createBlogFromDTO(BlogDTO blogDTO, User user, MultipartFile blogImage) {
+        Blog blog = new Blog();
+        blog.setTitle(blogDTO.getTitle());
+        blog.setDescription(blogDTO.getDescription());
+        blog.setCreatedDate(blogDTO.getCreatedDate());
+        blog.setUser(user);
+        blog.setStatus("PENDING");
+        blog.setBlogTag(blogDTO.getBlogTag());
+        blog.setBlogImage("/images/" + blogImage.getOriginalFilename());
+        return blog;
+    }
+
+
+    @Transactional
+    public List<BlogDTO> viewUserBlog() {
+        return blogRepository.findAll().stream()
+                .filter(blog -> "VERIFIED".equals(blog.getStatus()))
+                .map(blog -> new BlogDTO(
+                        blog.getBlogId(),
+                        blog.getTitle(),
+                        blog.getDescription(),
+                        blog.getBlogTag(),
+                        blog.getBlogImage(),
+                        blog.getStatus(),
+                        blog.getCreatedDate(),
+                        blog.getUser()
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public BlogDTO getSpecificBlog(long blogId) {
+        Blog blog = blogRepository.findById(blogId)
+                .orElseThrow(() -> new RuntimeException("Blog not found with id: " + blogId));
+
+        return new BlogDTO(
+                blog.getBlogId(),
+                blog.getTitle(),
+                blog.getDescription(),
+                blog.getBlogTag(),
+                blog.getBlogImage(),
+                blog.getStatus(),
+                blog.getCreatedDate(),
+                blog.getUser()
+        );
+    }
+
+    @Transactional
+    public String postBlogComment(long blogId, BlogCommentDTO blogCommentDTO){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userName = authentication.getName();
+
+            User user = userRepo.findByUserName(userName);
+
+            Blog blog = blogRepository.findById(blogId)
+                    .orElseThrow(() -> new RuntimeException("Blog not found with id: " + blogId));
+
+            BlogComment blogComment = new BlogComment();
+
+            blogComment.setComment(blogCommentDTO.getComment());
+            blogComment.setStatus("VERIFIED");
+            blogComment.setBlog(blog);
+            blogComment.setUser(user);
+            blogComment.setCreatedDate(LocalDate.now());
+
+
+            blogCommentRepository.save(blogComment);
+
+            return "Comment posted successfully.";
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle the exception appropriately
+            return "Failed to post comment.";
+        }
+    }
+
+    @Transactional
+    public List<BlogCommentDTO> getAllBlogCommentSpecificBlog(long blogId){
+        List<BlogComment> blogComments = this.blogCommentRepository.findAllByBlogId(blogId);
+
+        return blogComments.stream()
+                .map(blogComment -> new BlogCommentDTO(
+                        blogComment.getCommentId(),
+                        blogComment.getComment(),
+                        blogComment.getUser(),
+                        blogComment.getCreatedDate().toString()
+                ))
+                .collect(Collectors.toList()); // Collect the mapped BlogCommentDTO objects into a list
+    }
+
+    //get all the booking details of the specific user
+    @Transactional
+    public List<BookingDTO> viewBookingDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        User user = userRepo.findByUserName(userName);
+
+        if (user == null) {
+            // Handle the case when user is not found
+            return Collections.emptyList(); // Or throw an exception
+        }
+
+        List<Booking> bookings = bookingRepository.findByUserWithHotelRoom(user.getUserId());
+
+        return bookings.stream()
+                .map(booking -> new BookingDTO(
+                        booking.getBookingId(),
+                        booking.getCheckInDate(),
+                        booking.getCheckOutDate(),
+                        booking.getBookingDate(),
+                        booking.getStatus(),
+                        booking.getTotalAmount(),
+                        booking.getUser(),
+                        booking.getHotelRoom(),
+                        booking.getPaymentMethod().getPaymentMethodName(),
+                        booking.getCreatedAt()
+                )).toList();
     }
 
 }

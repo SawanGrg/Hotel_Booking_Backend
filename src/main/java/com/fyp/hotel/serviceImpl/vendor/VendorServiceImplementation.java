@@ -1,18 +1,17 @@
 package com.fyp.hotel.serviceImpl.vendor;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fyp.hotel.dao.HotelDAO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
-import com.fyp.hotel.dto.vendorDto.VendorDto;
+import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
+import com.fyp.hotel.util.EmailSenderService;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -26,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fyp.hotel.dto.userDto.UserDto;
-import com.fyp.hotel.dto.vendorDto.HotelDto;
-import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.service.vendor.VendorService;
 import com.fyp.hotel.util.FileUploaderHelper;
 
@@ -69,6 +66,11 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     @Lazy
     private HotelDAO hotelDAO;
+    @Autowired
+    private BookingRepository bookingRepository;
+    @Autowired
+    @Lazy
+    private EmailSenderService emailSenderService;
 
     @Override
     @Transactional
@@ -397,30 +399,138 @@ public class VendorServiceImplementation implements VendorService {
         return null;
     }
 
-    //get all booked or refunded or cancelled bookings
+    //get all booked or refunded or cancelled or pending bookings
     @Transactional
-    public List<CheckRoomAvailabilityDto> getAllBookedDetails(String status) {
+    public List<VendorBookingDTO> getBookings(String status, int page, int size) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String vendorName = authentication.getName();
+
+        User vendor = userRepo.findByUserName(vendorName);
+        Hotel hotel = hotelRepo.findByUser(vendor);
+
+        List<Booking> bookings = hotelDAO.getBookingDetails(status, hotel.getHotelId(), page, size);
+
+        List<VendorBookingDTO> vendorBookingDTOS = new ArrayList<>();
+
+        for (Booking booking : bookings) {
+            VendorBookingDTO vendorBookingDTO = new VendorBookingDTO();
+
+            vendorBookingDTO.setBookingId(booking.getBookingId());
+            vendorBookingDTO.setCheckInDate(booking.getCheckInDate().toString());
+            vendorBookingDTO.setCheckOutDate(booking.getCheckOutDate().toString());
+            vendorBookingDTO.setBookingDate(booking.getBookingDate().toString());
+            vendorBookingDTO.setStatus(booking.getStatus().toString());
+            vendorBookingDTO.setPaymentMethod(booking.getPaymentMethod().getPaymentMethodName());
+            vendorBookingDTO.setTotalAmount(booking.getTotalAmount());
+
+
+            HotelRoom hotelRoom = hotelRoomRepo.findByRoomId(booking.getHotelRoom().getRoomId());
+            vendorBookingDTO.setRoomId(hotelRoom.getRoomId());
+            vendorBookingDTO.setBedCategory(hotelRoom.getRoomBed().toString());
+            vendorBookingDTO.setRoomPrice(hotelRoom.getRoomPrice().toString());
+            vendorBookingDTO.setRoomType(hotelRoom.getRoomType().toString());
+            vendorBookingDTO.setRoomDescription(hotelRoom.getRoomDescription());
+            vendorBookingDTO.setHotelRoomImage(hotelRoom.getMainRoomImage());
+
+            vendorBookingDTO.setBedType(hotelRoom.getRoomBed().toString());
+
+            vendorBookingDTO.setHasAC(hotelRoom.getHasAC());
+            vendorBookingDTO.setHasBalcony(hotelRoom.getHasBalcony());
+            vendorBookingDTO.setHasRefridge(hotelRoom.getHasRefridge());
+            vendorBookingDTO.setHasTV(hotelRoom.getHasTV());
+
+
+            vendorBookingDTO.setUser(booking.getUser());
+
+            vendorBookingDTOS.add(vendorBookingDTO);
+        }
+
+        return vendorBookingDTOS;
+    }
+
+    @Transactional
+    public String updateBooking(long bookingId, long userId, String status) {
+        try {
+            // Update the booking status
+            Boolean updated = this.hotelDAO.updateBookingStatus(bookingId, status);
+
+            // Retrieve user information
+            User user = this.userRepo.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            // If booking status was successfully updated
+            if (updated) {
+
+                //set the value of room status to unavailable
+                if(status.equals("BOOKED")){
+                    Booking booking = bookingRepository.findById(bookingId).get();
+                    HotelRoom hotelRoom = booking.getHotelRoom();
+                    hotelRoom.setRoomStatus("BOOKED");
+                    hotelRoomRepo.save(hotelRoom);
+                }
+
+                String emailSubject = "Booking status updated";
+                String emailBody = "Your booking status has been updated to: " + status;
+
+                emailSenderService.sendEmail(user.getUserEmail(), emailSubject, emailBody);
+
+                // Return success message
+                return "Successfully Changed";
+            } else {
+                // Return null if booking status was not updated
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception for debugging
+            return null; // Return null in case of any error
+        }
+    }
+
+    @Transactional
+    public VendorDashboardAnalyticsDTO getVendorAnalyticsService(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User vendor = userRepo.findByUserName(username);
         Hotel hotel = hotelRepo.findByUser(vendor);
-        List<Booking> bookings = hotelDAO.getBookingDetails(status, hotel.getHotelId());
-        List<CheckRoomAvailabilityDto> availabilityList = new ArrayList<>();
 
-        for (Booking booking : bookings) {
-            CheckRoomAvailabilityDto availabilityDto = new CheckRoomAvailabilityDto();
-            availabilityDto.setRoomId(booking.getHotelRoom().getRoomId());
-            if (booking.getCheckInDate() != null)
-                availabilityDto.setCheckInDate(booking.getCheckInDate().toString());
-            if (booking.getCheckOutDate() != null)
-                availabilityDto.setCheckOutDate(booking.getCheckOutDate().toString());
-            availabilityDto.setUserName(booking.getUser().getUsername());
-            availabilityDto.setRoomNumber(booking.getHotelRoom().getRoomNumber());
+        VendorDashboardAnalyticsDTO vendorDashboardAnalyticsDTO = new VendorDashboardAnalyticsDTO();
 
-            availabilityList.add(availabilityDto);
-        }
+        //get the total number of bookings
+        long totalBookings = hotelDAO.getTotalBookings(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalBookings(totalBookings);
 
-        return availabilityList;
+//        //get the total number of bookings
+        long totalRefunds = hotelDAO.getTotalRefundedBookings(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalRefundedRooms(totalRefunds);
+//
+//        //get the total number of bookings
+        long totalCancelled = hotelDAO.getTotalCancelledsBookings(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalCancelledRooms(totalCancelled);
+//
+//        //get the total number of bookings
+       long totalPending = hotelDAO.getTotalPendingBookings(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalPendingRooms(totalPending);
+
+//        get the total booked number of bookings
+        long totalBooking = hotelDAO.getTotalBookedBookings(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalBookedRooms(totalBooking);
+
+//        get total revenue of the hotel based on the hotel id
+        long totalRevenue = hotelDAO.getHotelTotalRevenue(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalRevenue(totalRevenue);
+
+//       get total number of arriving hotel rooms today
+        long totalArrivingRoomsToday = hotelDAO.getTodayTotalArrivingRooms(hotel.getHotelId(), LocalDate.now());
+        vendorDashboardAnalyticsDTO.setArrivalsToday(totalArrivingRoomsToday);
+
+        // get total number of tomorrow check in date booking
+        long totalArrivingRoomsTomorrow = hotelDAO.getTomorrowTotalArrivingRooms(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setArrivalsTomorrow(totalArrivingRoomsTomorrow);
+
+        long totalAvailableRoom = this.hotelDAO.getTodayAvailableRoom(hotel.getHotelId());
+        vendorDashboardAnalyticsDTO.setTotalAvailableRooms(totalAvailableRoom);
+        
+        return vendorDashboardAnalyticsDTO;
     }
 
 

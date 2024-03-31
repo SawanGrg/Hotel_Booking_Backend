@@ -3,6 +3,8 @@ package com.fyp.hotel.controller.vendor;
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.vendorDto.ReportDto;
+import com.fyp.hotel.dto.vendorDto.VendorBookingDTO;
+import com.fyp.hotel.dto.vendorDto.VendorDashboardAnalyticsDTO;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.model.Report;
@@ -20,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
 
+import java.security.PublicKey;
 import java.util.List;
 
 @RestController
@@ -194,13 +197,15 @@ public class VendorController {
     //get all booked or refunded or cancelled bookings
     @GetMapping("/bookings")
     public ResponseEntity<?> getBookings(
-            @RequestParam(name = "status", required = false, defaultValue = "") String status
+            @RequestParam(name = "status", required = false, defaultValue = "") String status,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ){
 
         System.out.println("Status : " + status);
         try {
-            List<CheckRoomAvailabilityDto> bookings = vendorServiceImplementation.getAllBookedDetails(status);
-            ApiResponse<List<CheckRoomAvailabilityDto>> apiResponse = new ApiResponse<>(200, "Success", bookings);
+            List<VendorBookingDTO> vendorBookingDTOS = vendorServiceImplementation.getBookings(status, page, size);
+            ApiResponse<List<VendorBookingDTO>> apiResponse = new ApiResponse<>(200, "Success", vendorBookingDTOS);
             return ResponseEntity.ok(apiResponse);
         }catch (Exception e){
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
@@ -208,4 +213,45 @@ public class VendorController {
         }
     }
 
+    //setting the booking status as booked and sending the mail to the specific user
+    @PostMapping("/roomStatus/{bookingId}/{userId}")
+    public ResponseEntity<?> changeStatus(
+            @PathVariable(name = "bookingId", required = true) long bookingId,
+            @PathVariable(name = "userId", required = true) long userId,
+            @RequestParam(name = "vendorDecision", required = true, defaultValue = "BOOKED") String status
+    ){
+        try {
+            // Call service to update booking status
+            String response = this.vendorServiceImplementation.updateBooking(bookingId,userId, status);
+
+            // Check if the booking status was successfully changed
+            if ("Successfully Changed".equals(response)) {
+                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Successfully Booked", response);
+                return ResponseEntity.ok().body(apiResponse);
+            } else {
+                // Handle if status update fails
+                ApiResponse<String> apiResponse = new ApiResponse<>(400, "Failed to update status", response);
+                return ResponseEntity.badRequest().body(apiResponse);
+            }
+        } catch (Exception e) {
+            // Handle any exceptions
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Internal Server Error", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
+
+    //get all the anayltic datas
+    @GetMapping("/analytics")
+    public ResponseEntity<?> getVendorAnalytics(){
+        try{
+
+            VendorDashboardAnalyticsDTO vendorDashboardAnalyticsDTO = vendorServiceImplementation.getVendorAnalyticsService();
+            ApiResponse<VendorDashboardAnalyticsDTO> apiResponse = new ApiResponse<>(200, "Success", vendorDashboardAnalyticsDTO);
+            return ResponseEntity.ok(apiResponse);
+        }
+        catch (Exception e){
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
 }

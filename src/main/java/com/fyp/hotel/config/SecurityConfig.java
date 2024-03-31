@@ -79,25 +79,25 @@ public class SecurityConfig {
     and make the filter to be called for specific request for fine grained control
      */
 //    for open api like get all hotels, get all rooms, get all images
-    @Bean
-    public SecurityFilterChain apiTestFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatchers(matchers -> matchers
-//                        .requestMatchers("/api/test/**")
-                        .requestMatchers("/v1/user/hotel")
-                )
-
-                // Configure other security aspects as needed
-                .addFilterBefore(new MyCustomFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomFilter2(), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore( new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling( ex -> ex
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authenticationProvider(authenticationProvider());
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain apiTestFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .securityMatchers(matchers -> matchers
+////                        .requestMatchers("/api/test/**")
+//                        .requestMatchers("/v1/user/hotel")
+//                )
+//
+//                // Configure other security aspects as needed
+//                .addFilterBefore(new MyCustomFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new CustomFilter2(), UsernamePasswordAuthenticationFilter.class)
+////                .addFilterBefore( new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .exceptionHandling( ex -> ex
+//                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        http.authenticationProvider(authenticationProvider());
+//        return http.build();
+//    }
 
 //for all other request which needs authentication and authorization
     @Bean
@@ -115,6 +115,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/user/home").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/test/upload-video").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/searchHotel/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/user/hotel/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "v1/user/hotelReview/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/v1/user/hotel").permitAll()
 //                        for dynamic url
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotelRooms/**").permitAll()
@@ -129,6 +131,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/user/view-user-details").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/v1/user/update-user-details").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/v1/user/d").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "v1/user/review/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/postBlog").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/viewBlog").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/user/viewBlog/{blogId}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/user/postBlogComment/{blogId}").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.GET, "/v1/user/viewPostBlogComment/{blogId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/user/viewBookingDetails").hasAuthority("ROLE_USER")
+
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/dashboard").hasAnyAuthority("ROLE_VENDOR")
 
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/addHotelRooms").hasAnyAuthority("ROLE_VENDOR")
@@ -136,10 +146,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/report").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelDetails").hasAnyAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/bookings/**").hasAnyAuthority("ROLE_VENDOR")
-
+                        .requestMatchers(HttpMethod.POST, "/v1/vendor/roomStatus/**").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/v1/vendor/analytics").hasAuthority("ROLE_VENDOR")
 //                        admin url
                         .requestMatchers(HttpMethod.GET, "/v1/admin/dashboard").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendor/dashboard").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/viewAllUsers").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/viewAllVendors").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/analytics").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/viewAllReport").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "v1/admin/BlogBeforeVerification").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "v1/admin/verifyBlog/**").hasAuthority("ROLE_ADMIN")
 
 
                         .anyRequest().permitAll())

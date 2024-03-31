@@ -24,7 +24,6 @@ public class HotelDto {
     @NotNull(message = "Hotel PAN cannot be null")
     private String hotelPan;
 
-    @NotNull(message = "Hotel image cannot be null")
     private String mainHotelImage;
 
     @NotNull(message = "Hotel image cannot be null")
@@ -38,15 +37,17 @@ public class HotelDto {
     }
 
     public HotelDto(String hotelName, String hotelAddress, String hotelContact, String hotelEmail, String hotelPan,
-                    String createdAt, String updatedAt) {
+                    String hotelDescription, String createdAt, String updatedAt) {
         this.hotelName = hotelName;
         this.hotelAddress = hotelAddress;
         this.hotelContact = hotelContact;
         this.hotelEmail = hotelEmail;
         this.hotelPan = hotelPan;
+        this.hotelDescription = hotelDescription; // Set hotelDescription here
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
 
     public Long getHotelId() {
         return hotelId;

@@ -46,6 +46,9 @@ public class Hotel {
     @Column(name = "hotel_pan", nullable = false, unique = true, length = 10)
     private String hotelPan;
 
+    @Column(name = "hotel_description", nullable = false, unique = false, length = 255)
+    private String hotelDescription;
+
     @Column(name = "created_at", nullable = false, unique = false, length = 50)
     private Instant createdAt;
 
@@ -67,6 +70,15 @@ public class Hotel {
     @JsonBackReference
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HotelRoom> hotelRooms = new ArrayList<>(); // One Hotel can have many HotelRoom objects
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Rating> ratings = new ArrayList<>(); // One Hotel can have many Rating objects
+
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Review> reviews = new ArrayList<>(); // One Hotel can have many Review objects
 
     @Override
     public String toString() {

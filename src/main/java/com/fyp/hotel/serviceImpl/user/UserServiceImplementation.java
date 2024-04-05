@@ -6,26 +6,27 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import com.fyp.hotel.dao.HotelDAO;
-import com.fyp.hotel.dao.HotelRoomDAO;
-import com.fyp.hotel.dao.PaymentMethodDAO;
-import com.fyp.hotel.dao.UserHibernateRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fyp.hotel.config.WebClientConfig;
+import com.fyp.hotel.dao.*;
 import com.fyp.hotel.dao.user.BlogDAO;
 import com.fyp.hotel.dto.BookingDTO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.khalti.CustomerInfo;
+import com.fyp.hotel.dto.khalti.KhaltiInitationRequest;
+import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
 import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,12 +36,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fyp.hotel.service.user.UserService;
 
 import jakarta.transaction.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
@@ -68,6 +71,10 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private BlogRepository blogRepository;
     private BlogDAO blogDAO;
     private BlogCommentRepository blogCommentRepository;
+    private BookingDAO bookingDAO;
+    private WebClientConfig webClientConfig;
+    private WebClient webClient;
+    private KhaltiPayment khaltiPayment;
 
     @Autowired
     public UserServiceImplementation(
@@ -91,7 +98,11 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             @Lazy ReviewRepository hotelReviewRepository,
             @Lazy BlogRepository blogRepository,
             @Lazy BlogDAO blogDAO,
-            @Lazy BlogCommentRepository blogCommentRepository
+            @Lazy BlogCommentRepository blogCommentRepository,
+            @Lazy BookingDAO bookingDAO,
+            @Lazy WebClientConfig webClientConfig,
+            @Lazy KhaltiPayment khaltiPayment
+
     ) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
@@ -114,14 +125,14 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         this.blogRepository = blogRepository;
         this.blogDAO = blogDAO;
         this.blogCommentRepository = blogCommentRepository;
+        this.bookingDAO = bookingDAO;
+        this.webClientConfig = webClientConfig;
+        this.khaltiPayment = khaltiPayment;
     }
 
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceImplementation.class);
 
-//    @Scheduled(cron = "10 * * * * *") // Cron expression 10 seconds
-//    public void execute() {
-//        System.out.println("Cron job running every minute");
-//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -338,7 +349,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     @Transactional
     public List<HotelRoom> getAllRoomsOfHotel(Long hotelId, int page, int size) {
-        List<HotelRoom> roomDatas = this.hotelRoomRepository.findHotelRoomByHotel_HotelId(hotelId);
+        List<HotelRoom> roomDatas = this.hotelRoomRepository.findActiveHotelRoomsByHotelId(hotelId);
         List< RoomImage> roomImages = this.roomImageRepository.findByHotelRoom_RoomId(hotelId);
 
         //extracting if the hotel room is booked or not
@@ -364,6 +375,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     public String hotelPaymentGateWay(
             @Validated BookDto bookDto
     ){
+        System.out.println("in the service implementation for cash or khalti");
         if(bookDto.getPaymentMethod().equals("Cash")){
 
             Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
@@ -401,11 +413,134 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
             return "Payment successful by cash on arrival";
         }
-        if(bookDto.getPaymentMethod().equals("KHALTI")){
-            return "Payment successful by khalti";
-        }
+
         return "Payment failed";
     }
+
+    @Transactional
+    public KhaltiResponseDTO ePaymentGateway(
+            @Validated BookDto bookDto
+    ) {
+        if (bookDto.getPaymentMethod().equals("khalti")) {
+            try {
+                HotelRoom hotelRoom = hotelRoomRepository.findByRoomId(bookDto.getRoomId());
+                Long hotelId = hotelRoom.getHotel().getHotelId();
+                PaymentMethod paymentMethodObject = paymentMethodDAO.getPaymentMethod(bookDto.getPaymentMethod().toUpperCase());
+                Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+                String userName = authenticatedUser.getName();
+
+                Long roomId = hotelRoom.getRoomId();
+                Double roomPrice = hotelRoom.getRoomPrice();
+
+                long daysOfStay = daysChecker.getDays(bookDto.getCheckInDate(), bookDto.getCheckOutDate());
+                long totalAmount = Long.valueOf(roomPrice.intValue() * daysOfStay);
+
+                User user = userRepo.findByUserName(userName);
+
+                String return_url = "http://localhost:3000/hotel/" + hotelId + "/room/" + bookDto.getRoomId() + "/" + hotelRoom.getRoomPrice();
+                String website_url = "http://localhost:3000/";
+
+
+                //save the booking details in the booking table but marking it as pending
+                //nothing changing at the hotel room status attribute
+                Booking booking = new Booking();
+
+
+                booking.setHotelRoom(hotelRoom);
+                booking.setUser(user);
+                booking.setPaymentMethod(paymentMethodObject);
+                booking.setCheckInDate(bookDto.getCheckInDate());
+                booking.setCheckOutDate(bookDto.getCheckOutDate());
+                booking.setBookingDate(bookDto.getBookingDate());
+                booking.setNumberOfGuest(bookDto.getNumberOfGuest());
+                booking.setTotalAmount(totalAmount);
+                booking.setCreatedAt(Instant.now());
+                booking.setStatus(Status.PENDING);
+
+                Booking bookingObj = bookingRepository.save(booking);
+
+                KhaltiInitationRequest khaltiInitiationRequest = new KhaltiInitationRequest();
+
+                khaltiInitiationRequest.setReturn_url(return_url);
+                khaltiInitiationRequest.setWebsite_url(website_url);
+                khaltiInitiationRequest.setAmount(totalAmount);
+                khaltiInitiationRequest.setPurchase_order_id(bookingObj.getBookingId().toString());
+                khaltiInitiationRequest.setPurchase_order_name(hotelRoom.getRoomNumber().toString());
+
+
+
+                CustomerInfo customerInfo = new CustomerInfo(user.getUsername(), user.getUserFirstName(), user.getUserLastName(), user.getUserEmail(), user.getUserPhone(), user.getUserAddress());
+                khaltiInitiationRequest.setCustomerInfo(customerInfo);
+
+                KhaltiResponseDTO res =  this.khaltiPayment.callKhalti(khaltiInitiationRequest);
+                System.out.println(res.getPidx());
+                System.out.println(res.getPayment_url());
+                System.out.println(res.getExpires_at());
+                 return res;
+
+            } catch (JsonProcessingException e) {
+                log.error("Error processing JSON", e);
+                throw new RuntimeException("Error processing JSON", e);
+            } catch (HttpClientErrorException e) {
+                log.error("Error communicating with Khalti API", e);
+                throw new RuntimeException("Error communicating with Khalti API", e);
+            } catch (Exception e) {
+                log.error("Unexpected error", e);
+                throw new RuntimeException("Unexpected error", e);
+            }
+        }
+        return null;
+    }
+
+    @Transactional
+    public String updatePaymentTable(
+            String pidx,
+            String status,
+            String bookingId,
+            long totalAmount
+    ) {
+        try {
+            // Update the hotel room table attribute status to BOOKED
+            HotelRoom hotelRoom = this.hotelRoomRepository.findByBooking_BookingId(Long.parseLong(bookingId));
+            if (hotelRoom != null) {
+                hotelRoom.setRoomStatus("BOOKED");
+                this.hotelRoomRepository.save(hotelRoom);
+            } else {
+                throw new RuntimeException("Hotel room not found for booking ID: " + bookingId);
+            }
+
+            // Update the booking table status to BOOKED
+            Booking booking = this.bookingRepository.findByBookingId(Long.parseLong(bookingId));
+            if (booking != null) {
+                booking.setStatus(Status.BOOKED);
+                this.bookingRepository.save(booking);
+            } else {
+                throw new RuntimeException("Booking not found with ID: " + bookingId);
+            }
+
+            // Insertion of pidx, status, total amount, booking id in the payment table
+            Payment payment = new Payment();
+            payment.setPaymentAmount(totalAmount);
+            payment.setCreatedAt(Instant.now());
+            payment.setBooking(booking);
+            payment.setPaymentStatus(status);
+            payment.setTransactionId(pidx);
+            payment.setPaymentDate(LocalDate.now());
+
+            this.paymentRepository.save(payment);
+
+            return "SuccessFull enter"; // Return success message
+        } catch (NumberFormatException e) {
+            // Handle NumberFormatException (parsing string to long)
+            return "Invalid booking ID format";
+        } catch (Exception e) {
+            // Handle any other exceptions
+            e.printStackTrace(); // Log the exception
+            return "Failed to update payment table"; // Return failure message
+        }
+    }
+
+
 
     public List<HotelRoom> filterRooms(
             Long hotelId,
@@ -461,7 +596,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             CheckRoomAvailabilityDto checkRoomAvailabilityDto = new CheckRoomAvailabilityDto();
 
             checkRoomAvailabilityDto.setRoomId(roomId);
-            checkRoomAvailabilityDto.setStatus("Booked");
+            checkRoomAvailabilityDto.setStatus(bookings.get(0).getStatus().toString());
             checkRoomAvailabilityDto.setUserName(bookings.get(0).getUser().getUsername());
             checkRoomAvailabilityDto.setCheckInDate(bookings.get(0).getCheckInDate().toString());
             checkRoomAvailabilityDto.setCheckOutDate(bookings.get(0).getCheckOutDate().toString());
@@ -669,5 +804,11 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                         booking.getCreatedAt()
                 )).toList();
     }
+
+    //extract all the booking details based on the htoelId
+    @Transactional
+    public  List<BookingStatusDTO> getBookingStatus(Long hotelId) {
+        return bookingDAO.getBookingStatusDetails(hotelId);
+        }
 
 }

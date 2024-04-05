@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fyp.hotel.dao.BookingDAO;
 import com.fyp.hotel.dao.HotelDAO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.vendorDto.*;
@@ -71,6 +72,12 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     @Lazy
     private EmailSenderService emailSenderService;
+    @Lazy
+    @Autowired
+    private BookingDAO bookingDAO;
+    @Lazy
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
 
     @Override
     @Transactional
@@ -145,6 +152,9 @@ public class VendorServiceImplementation implements VendorService {
                 System.out.println("hotel from vendor service before setting the hotel id: " + hotel);
                 hotelRoom.setHotel(hotel);
             }
+            //marking the hotel room as not deleted
+            hotelRoom.setIsDeleted(false);
+
             HotelRoom currentRoom = hotelRoomRepo.save(hotelRoom);
             System.out.println("hotel from vendor service after setting the hotel id: ");
             if (currentRoom == null) {
@@ -238,9 +248,9 @@ public class VendorServiceImplementation implements VendorService {
         try {
             System.out.println("room data: from vendor service " + roomDto);
             System.out.println("main room image: from vendor service " + mainRoomImage.getOriginalFilename());
-            System.out.println("room image 1: " + roomImage1.getOriginalFilename());
-            System.out.println("room image 2: " + roomImage2.getOriginalFilename());
-            System.out.println("room image 3: " + roomImage3.getOriginalFilename());
+//            System.out.println("room image 1: " + roomImage1.getOriginalFilename());
+//            System.out.println("room image 2: " + roomImage2.getOriginalFilename());
+//            System.out.println("room image 3: " + roomImage3.getOriginalFilename());
 
             // Convert DTO to HotelRoom entity
             HotelRoom updatedRoom = valueMapper.conversionToHotelRoom(roomDto);
@@ -273,7 +283,7 @@ public class VendorServiceImplementation implements VendorService {
                     hotelRoomRepo.save(room);
 
                     //update the room image
-                    if (!mainRoomImage.isEmpty()) {
+                    if (!mainRoomImage.isEmpty() || mainRoomImage != null) {
                         boolean isMainRoomImageUploaded = fileUploaderHelper.fileUploader(mainRoomImage);
                         if (isMainRoomImageUploaded) {
                             room.setMainRoomImage(mainRoomImage.getOriginalFilename());
@@ -282,7 +292,7 @@ public class VendorServiceImplementation implements VendorService {
                     }
 
                     //update the side room image
-                    if(!roomImage1.isEmpty()){
+                    if(roomImage1 != null){
                         boolean isRoomImage1Uploaded = fileUploaderHelper.fileUploader(roomImage1);
                         if(isRoomImage1Uploaded){
                             RoomImage roomImageObj = new RoomImage();
@@ -294,7 +304,7 @@ public class VendorServiceImplementation implements VendorService {
                         }
                     }
 
-                    if(!roomImage2.isEmpty()){
+                    if(roomImage2 != null){
                         boolean isRoomImage2Uploaded = fileUploaderHelper.fileUploader(roomImage2);
                         if(isRoomImage2Uploaded){
                             RoomImage roomImageObj = new RoomImage();
@@ -305,7 +315,7 @@ public class VendorServiceImplementation implements VendorService {
                             roomImageRepo.save(roomImageObj);
                         }
                     }
-                    if(!roomImage3.isEmpty()){
+                    if(roomImage3 != null){
                         boolean isRoomImage3Uploaded = fileUploaderHelper.fileUploader(roomImage3);
                         if(isRoomImage3Uploaded){
                             RoomImage roomImageObj = new RoomImage();
@@ -329,40 +339,61 @@ public class VendorServiceImplementation implements VendorService {
         }
     }
 
-
     @Transactional
-    public String deleteRoom(Long roomId) {
+    public  String deleteRoom (long roomId){
         try {
-            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
-            String username = authenticatedUser.getName();
-            if (authenticatedUser.isAuthenticated()) {
-                // Fetch the hotel ID for the given username
-                Long hotelIdFromDb = hotelRepo.findByUser(userRepo.findByUserName(username)).getHotelId();
-                System.out.println("Hotel ID from DB: " + hotelIdFromDb);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.isAuthenticated()) {
+                String username = authentication.getName();
+                User vendor = userRepo.findByUserName(username);
+                Hotel hotel = hotelRepo.findByUser(vendor);
 
-                //delete room images before deleting the room
-                List<RoomImage> roomImages = roomImageRepository.findImageUrlByHotelRoom_RoomId(roomId);
-                System.out.println("Room images: " + roomImages);
-
-                for (RoomImage roomImage : roomImages) {
-                    System.out.println("Room image: " + roomImage);
-                    roomImageRepository.deleteImageUrlByHotelRoom_RoomId(roomId);
-                }
-                // Delete the room and check if the deletion was successful
-                hotelRoomRepo.deleteRoomById(roomId);
-                System.out.println("Deleted room ID: " + roomId);
-
-                Optional<HotelRoom> deletedRoom = hotelRoomRepo.findById(roomId);
-                System.out.println("Deleted room: " + deletedRoom);
+                HotelRoom hotelRoom = hotelRoomRepo.findByRoomId(roomId);
+                hotelRoom.setIsDeleted(true);
+                hotelRoomRepo.save(hotelRoom);
 
                 return "Room deleted successfully";
             }
-            return "user is no authenticated";
+            return "Authentication failed";
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to delete room";
         }
     }
+
+//    @Transactional
+//    public String deleteRoom(Long roomId) {
+//        try {
+//            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
+//            String username = authenticatedUser.getName();
+//            if (authenticatedUser.isAuthenticated()) {
+//                // Fetch the hotel ID for the given username
+//                Long hotelIdFromDb = hotelRepo.findByUser(userRepo.findByUserName(username)).getHotelId();
+//                System.out.println("Hotel ID from DB: " + hotelIdFromDb);
+//
+//                //delete room images before deleting the room
+//                List<RoomImage> roomImages = roomImageRepository.findImageUrlByHotelRoom_RoomId(roomId);
+//                System.out.println("Room images: " + roomImages);
+//
+//                for (RoomImage roomImage : roomImages) {
+//                    System.out.println("Room image: " + roomImage);
+//                    roomImageRepository.deleteImageUrlByHotelRoom_RoomId(roomId);
+//                }
+//                // Delete the room and check if the deletion was successful
+//                hotelRoomRepo.deleteRoomById(roomId);
+//                System.out.println("Deleted room ID: " + roomId);
+//
+//                Optional<HotelRoom> deletedRoom = hotelRoomRepo.findById(roomId);
+//                System.out.println("Deleted room: " + deletedRoom);
+//
+//                return "Room deleted successfully";
+//            }
+//            return "user is no authenticated";
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "Failed to delete room";
+//        }
+//    }
 
     //post report and issue by the vendor
     @Transactional
@@ -534,6 +565,53 @@ public class VendorServiceImplementation implements VendorService {
     }
 
 
+    //get all the review of a specific hotel based on the user id
+    @Transactional
+    public List<ReviewDTO> getHotelReviews() {
+
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication.isAuthenticated()) {
+                String username = authentication.getName();
+                User vendor = userRepo.findByUserName(username);
+                Hotel hotel = hotelRepo.findByUser(vendor);
+
+                return hotelDAO.getHotelReviews(hotel.getHotelId());
+            }
+            return null;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Transactional
+    public VendorRevenueDTO getVendorRevenue() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User vendor = userRepo.findByUserName(username);
+        Hotel hotel = hotelRepo.findByUser(vendor);
+
+        VendorRevenueDTO vendorRevenueDTO = new VendorRevenueDTO();
+
+        PaymentMethod paymentMethod = new PaymentMethod();
+        paymentMethod = this.paymentMethodRepository.findByPaymentMethodName("Cash");
+
+        //extract all the cash on arrival revenue from booking table based on the hotel id
+        long cashOnArrival = this.bookingDAO.getTotalCashOnArrivalRevenue(hotel.getHotelId(), paymentMethod);
+        vendorRevenueDTO.setCashOnArrival(cashOnArrival);
+
+        //extract all the khalti revenue from booking table based on the hotel id
+        PaymentMethod paymentMethod1 = new PaymentMethod();
+        paymentMethod1 = this.paymentMethodRepository.findByPaymentMethodName("KHALTI");
+
+        long khaltiRevenue = this.bookingDAO.getTotalKhaltiRevenue(hotel.getHotelId(), paymentMethod1);
+
+        vendorRevenueDTO.setKhaltiPayment(khaltiRevenue);
+
+        return vendorRevenueDTO;
+    }
 
 
 }

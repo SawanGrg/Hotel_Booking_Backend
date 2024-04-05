@@ -122,4 +122,29 @@ public class HotelRoomDAO {
         }
     }
 
+    //update room status as available based on booking id
+    public void updateRoomStatusAsAvailable(Long bookingId) {
+        try {
+            // Open a session and begin a transaction
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            // Create a query to update the room status to available based on the booking ID
+            Query query = session.createQuery("UPDATE HotelRoom hr SET hr.roomStatus = 'AVAILABLE' WHERE hr.roomId = (SELECT b.hotelRoom.roomId FROM Booking b WHERE b.bookingId = :bookingId)");
+            query.setParameter("bookingId", bookingId);
+
+            // Execute the update query
+            query.executeUpdate();
+
+            // Commit the transaction and close the session
+            session.getTransaction().commit();
+            session.close();
+        } catch (Exception e) {
+            // Handle exceptions and log error messages
+            System.out.println("Error in updateRoomStatusAsAvailable: this is from repo class " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
 }

@@ -15,6 +15,8 @@ public class CustomFilter2 extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         System.out.println("second custom filter is called");
+
+        //SET KHALTI TOKEN
         filterChain.doFilter(request, response);
     }
 }

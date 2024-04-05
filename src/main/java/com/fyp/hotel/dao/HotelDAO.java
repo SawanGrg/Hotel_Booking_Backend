@@ -2,8 +2,10 @@ package com.fyp.hotel.dao;
 
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.vendorDto.ReviewDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.Hotel;
+import com.fyp.hotel.model.Review;
 import com.fyp.hotel.model.Status;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
@@ -82,7 +84,7 @@ public class HotelDAO {
             String hql = "SELECT b FROM Booking b " +
                     "LEFT JOIN FETCH b.user " +
                     "WHERE b.hotelRoom.roomId = :roomId " +
-                    "AND :currentDate BETWEEN b.checkInDate AND b.checkOutDate";
+                    "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate) ";
 
             Query<Booking> query = sessionObj.createQuery(hql, Booking.class);
 
@@ -120,17 +122,11 @@ public class HotelDAO {
             hql.append("JOIN FETCH b.user ");
             hql.append("WHERE h.hotelId = :hotelId ");
 
-            if (status != null && !status.isEmpty()) {
-                hql.append("AND b.status = :status ");
-            }
 
             // Add pagination parameters
             Query<Booking> query = sessionObj.createQuery(hql.toString(), Booking.class);
             query.setParameter("hotelId", hotelId);
 
-            if (status != null && !status.isEmpty()) {
-                query.setParameter("status", status);
-            }
 
             // Set pagination parameters
             if (page >= 0 && size > 0) {
@@ -521,6 +517,35 @@ public class HotelDAO {
             e.printStackTrace();
             return 0;
         } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    //extract all the hotel review details based on the hotel id
+    public List<ReviewDTO> getHotelReviews(long hotelId){
+        Session session = null;
+        try{
+            session = this.sessionFactory.openSession();
+            session.beginTransaction();
+
+            String hql = "SELECT new com.fyp.hotel.dto.vendorDto.ReviewDTO(r.reviewId, r.reviewContent, r.hotel.hotelId, r.user, r.createdDate) FROM Review r WHERE r.hotel.hotelId = :hotelId";
+
+            Query<ReviewDTO> query = session.createQuery(hql, ReviewDTO.class);
+            query.setParameter("hotelId", hotelId);
+
+            List<ReviewDTO> reviews = query.getResultList();
+            return reviews;
+
+        }catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+        finally {
             if (session != null) {
                 session.close();
             }

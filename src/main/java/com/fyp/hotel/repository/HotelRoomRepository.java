@@ -17,8 +17,13 @@ import java.util.List;
 @Repository
 @EnableJpaRepositories
 public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
+
     //get hotel rooms details by hotel id
     List<HotelRoom> findHotelRoomByHotel_HotelId(Long hotelId);
+
+    // Get hotel rooms details by hotel id where is_deleted is false
+    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotel.hotelId = :hotelId AND hr.isDeleted = false")
+    List<HotelRoom> findActiveHotelRoomsByHotelId(@Param("hotelId") Long hotelId);
 
     //get hotel rooms details by hotel id using custom query
 //    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotel.hotelId = :hotelId")
@@ -33,8 +38,13 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
     @Query("DELETE FROM HotelRoom hr WHERE hr.roomId = :wantedRoomId")
     void deleteRoomById(@Param("wantedRoomId") Long roomId);
 
+    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotel.hotelId = :hotelId AND hr.isDeleted = false")
     Page<HotelRoom> findAllByHotel_HotelId(Long hotelId, Pageable pageable);
 
     //get hotel room details by room id
     HotelRoom findByRoomId(Long roomId);
+
+    //get hotel room details by booking id
+    HotelRoom findByBooking_BookingId(Long bookingId);
+
 }

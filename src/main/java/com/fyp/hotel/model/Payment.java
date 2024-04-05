@@ -1,11 +1,15 @@
 package com.fyp.hotel.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
+@Getter
+@Setter
 @RequiredArgsConstructor // generate constructor with all final fields as arguments
 @Entity
 @Table(name = "payment")

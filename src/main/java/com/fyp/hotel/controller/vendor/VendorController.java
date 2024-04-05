@@ -2,12 +2,11 @@ package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
-import com.fyp.hotel.dto.vendorDto.ReportDto;
-import com.fyp.hotel.dto.vendorDto.VendorBookingDTO;
-import com.fyp.hotel.dto.vendorDto.VendorDashboardAnalyticsDTO;
+import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.model.Report;
+import com.fyp.hotel.model.Review;
 import com.fyp.hotel.util.ValueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
 
 import java.security.PublicKey;
@@ -107,29 +105,29 @@ public class VendorController {
     //get
 
     //Update the specific details
-    @PostMapping("/update/{hotelId}")
+    @PostMapping("/updateRoom/{roomId}")
     public ResponseEntity<?> updateRoom(
-            @PathVariable(name = "hotelId") Long hotelId,
+            @PathVariable(name = "roomId") Long roomlId,
             @RequestParam("roomData") String stringRoomData,
             @RequestParam("mainRoomImage") MultipartFile stringHotelImage,
-            @RequestParam("roomImage1") MultipartFile stringHotelImage1,
-            @RequestParam("roomImage2") MultipartFile stringHotelImage2,
-            @RequestParam("roomImage3") MultipartFile stringHotelImage3
+            @RequestParam(value = "roomImage1", required = false) MultipartFile stringHotelImage1,
+            @RequestParam(value = "roomImage2", required = false) MultipartFile stringHotelImage2,
+            @RequestParam(value = "roomImage3", required = false) MultipartFile stringHotelImage3
     ){
         try {
-            logger.info("Attempting to update room with ID: {}", hotelId);
+            logger.info("Attempting to update room with ID: {}", roomlId);
             RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class); // Read the JSON data and convert it into RoomDto
-            String response = vendorServiceImplementation.updateRoom(hotelId, roomDto, stringHotelImage, stringHotelImage1, stringHotelImage2, stringHotelImage3);
+            String response = vendorServiceImplementation.updateRoom(roomlId, roomDto, stringHotelImage, stringHotelImage1, stringHotelImage2, stringHotelImage3);
 
             if ("Room updated successfully".equals(response)) {
-                logger.info("Room updated successfully with ID: {}", hotelId);
+                logger.info("Room updated successfully with ID: {}", roomlId);
                 return ResponseEntity.ok(response);
             } else {
-                logger.error("Failed to update room with ID {}: {}", hotelId, response);
+                logger.error("Failed to update room with ID {}: {}", roomlId, response);
                 return ResponseEntity.status(500).body(response);
             }
         } catch (Exception e) {
-            logger.error("Exception occurred while updating room with ID {}: {}", hotelId, e.getMessage());
+            logger.error("Exception occurred while updating room with ID {}: {}", roomlId, e.getMessage());
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
@@ -199,7 +197,7 @@ public class VendorController {
     public ResponseEntity<?> getBookings(
             @RequestParam(name = "status", required = false, defaultValue = "") String status,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
+            @RequestParam(name = "size", defaultValue = "20") int size
     ){
 
         System.out.println("Status : " + status);
@@ -254,4 +252,33 @@ public class VendorController {
             return ResponseEntity.status(500).body(apiResponse);
         }
     }
+
+    //get the hotel review
+    @GetMapping("/hotelReview")
+    public ResponseEntity<?> getHotelReview() {
+        try {
+            List<ReviewDTO> reviews = vendorServiceImplementation.getHotelReviews();
+            ApiResponse<List<ReviewDTO>> apiResponse = new ApiResponse<>(200, "Success", reviews);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
+
+    //get total revenue from cash on arrival and khalti
+    @GetMapping("/revenue")
+    public ResponseEntity<?> getRevenue(){
+        try {
+            VendorRevenueDTO revenueDTO = vendorServiceImplementation.getVendorRevenue();
+            ApiResponse<VendorRevenueDTO> apiResponse = new ApiResponse<>(200, "Success", revenueDTO);
+            return ResponseEntity.ok(apiResponse);
+        }catch (Exception e){
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
+
 }
+
+

@@ -68,6 +68,10 @@ public class HotelRoom {
     @Column(name = "has_wifi", nullable = false, unique = false)
     private Boolean hasWifi;
 
+    //is room deleted
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isDeleted;
+
 
     @Column(name = "created_at", nullable = false, unique = false)
     private ZonedDateTime createdAt;

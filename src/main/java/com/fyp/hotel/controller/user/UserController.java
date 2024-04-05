@@ -6,6 +6,7 @@ import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.BookingDTO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
 import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
@@ -15,14 +16,17 @@ import com.fyp.hotel.util.ValueMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", maxAge = 3600) 
@@ -180,6 +184,21 @@ public class UserController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
+
+    //extract booking status from hotel id
+    @GetMapping("/bookingStatus/{hotelId}")
+    public ResponseEntity<?> getBookingStatus(
+            @PathVariable(name = "hotelId") Long hotelId
+    ) {
+        try {
+            List<BookingStatusDTO> bookingStatusDtos = userServiceImplementation.getBookingStatus(hotelId);
+            ApiResponse<List<BookingStatusDTO>> response = new ApiResponse<>(200, "Success", bookingStatusDtos);
+            return ResponseEntity.status(200).body(response);
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
     @GetMapping("/view-user-details")
     public ResponseEntity<?> viewUserDetails(){
 try {
@@ -226,6 +245,52 @@ try {
         } catch (Exception e) {
             ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/khalti/payment/{roomId}")
+    public KhaltiResponseDTO processKhaltiPayment(
+            @PathVariable(name = "roomId") Long roomId,
+            @RequestParam(name = "checkInDate") String checkInDate,
+            @RequestParam(name = "checkOutDate") String checkOutDate,
+            @RequestParam(name = "numberOfGuest", required = false, defaultValue = "2") String numberOfGuest,
+            @RequestParam(name = "paymentMethod") String paymentMethod
+    ) {
+        try {
+            // Create a BookDto from the request parameters
+            BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
+            // Call the Khalti payment service method
+            return userServiceImplementation.ePaymentGateway(bookDto);
+        } catch (Exception e) {
+            // Handle any exceptions and return an error response
+            e.printStackTrace();
+            System.out.println("Error occurred in processKhaltiPayment: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    //post req where we get the pidx, status, booking id all the details in this khalti req to save in db
+    @PostMapping("/khalti/update")
+    public ResponseEntity<?> updateKhalti(
+            @RequestParam(name = "pidx") String pidx,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = "bookingId") String bookingId,
+            @RequestParam(name = "totalAmount") long totalAmount
+    ){
+        try {
+            String res = this.userServiceImplementation.updatePaymentTable(pidx, status, bookingId, totalAmount);
+            if (Objects.equals(res, "SuccessFull enter")) {
+                ApiResponse<String> apiResponse = new ApiResponse<>(200, "success", res);
+                return ResponseEntity.ok().body(apiResponse);
+            } else {
+                // Handle the case where the update operation was not successful
+                ApiResponse<String> apiResponse = new ApiResponse<>(400, "failure", "Failed to update payment table");
+                return ResponseEntity.badRequest().body(apiResponse);
+            }
+        } catch (Exception e) {
+            // Handle exceptions
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "error", "An error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
 
@@ -341,8 +406,6 @@ try {
     public ResponseEntity<?> checkRoomAvailability(
             @PathVariable(name = "roomId") Long roomId
     ) {
-
-
         try {
             CheckRoomAvailabilityDto checkRoomAvailabilityDto = userServiceImplementation.checkRoomAvailability(roomId);
             ApiResponse<CheckRoomAvailabilityDto> response = new ApiResponse<>(200, "Success", checkRoomAvailabilityDto);

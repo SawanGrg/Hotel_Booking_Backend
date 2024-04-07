@@ -473,6 +473,7 @@ public class VendorServiceImplementation implements VendorService {
 
 
             vendorBookingDTO.setUser(booking.getUser());
+            vendorBookingDTO.setVendorUpdated(booking.getVendorUpdated());
 
             vendorBookingDTOS.add(vendorBookingDTO);
         }

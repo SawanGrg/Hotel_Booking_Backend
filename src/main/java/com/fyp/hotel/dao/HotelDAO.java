@@ -209,7 +209,6 @@ public class HotelDAO {
     }
 
     //change the booking status to message from the param of specific booking
-
     @Transactional
     public Boolean updateBookingStatus(long bookingId, String status) {
         Session session = null;
@@ -218,7 +217,7 @@ public class HotelDAO {
             session = this.sessionFactory.openSession();
             session.beginTransaction();
 
-            String hql = "UPDATE Booking b SET b.status = :status WHERE b.bookingId = :bookingId";
+            String hql = "UPDATE Booking b SET b.status = :status, b.vendorUpdated = true WHERE b.bookingId = :bookingId";
 
             Query query = session.createQuery(hql);
             query.setParameter("status", Status.valueOf(status));

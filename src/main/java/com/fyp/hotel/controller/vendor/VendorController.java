@@ -197,7 +197,7 @@ public class VendorController {
     public ResponseEntity<?> getBookings(
             @RequestParam(name = "status", required = false, defaultValue = "") String status,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int size
+            @RequestParam(name = "size", defaultValue = "30") int size
     ){
 
         System.out.println("Status : " + status);

@@ -461,6 +461,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                 booking.setTotalAmount(totalAmount);
                 booking.setCreatedAt(Instant.now());
                 booking.setStatus(Status.PENDING);
+                booking.setVendorUpdated(true);
 
                 Booking bookingObj = bookingRepository.save(booking);
 

@@ -25,6 +25,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.DisabledException;
@@ -48,6 +50,7 @@ import reactor.core.publisher.Mono;
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
+@EnableCaching
 public class UserServiceImplementation implements UserService, UserDetailsService {
 
     private UserRepository userRepo;
@@ -219,6 +222,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     //user view all the hotels with amenities
     @Transactional
+    @Cacheable(value = "hotels", key = "#root.methodName")
     public List<DisplayHotelWithAmenitiesDto> getAllHotelsWithAmenities(String hotelName, String hotelLocation, int page, int size) {
         return this.hotelDAO.getHotelWithAmenitiesAndRating(hotelName, hotelLocation);
     }
@@ -408,6 +412,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             booking.setTotalAmount(totalAmount);
             booking.setCreatedAt(Instant.now());
             booking.setStatus(Status.PENDING);
+            booking.setVendorUpdated(false);
 
             bookingRepository.save(booking);
 
@@ -613,7 +618,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     //post user review at hotel
-    public String postHotelReview(
+    public String postHotelReviewByUser(
             long hotelId,
             HotelReviewDTO hotelReviewDTO
     ) {
@@ -698,6 +703,9 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
 
+
+//    #root.methodName is the method name in this case viewUserBlog
+//    @Cacheable(value = "blogCache", key = "#root.methodName")
     @Transactional
     public List<BlogDTO> viewUserBlog() {
         return blogRepository.findAll().stream()

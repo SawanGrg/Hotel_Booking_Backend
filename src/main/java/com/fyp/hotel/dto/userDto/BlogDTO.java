@@ -7,12 +7,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
 @Setter
-public class BlogDTO {
+public class BlogDTO implements Serializable {
+
+private static final long serialVersionUID = 1L;
 
     private long id;
 

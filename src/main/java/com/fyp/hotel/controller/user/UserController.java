@@ -16,6 +16,7 @@ import com.fyp.hotel.util.ValueMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -118,9 +119,6 @@ public class UserController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
-
-
-
 
     //change possword
     @PostMapping("/user-change-password")
@@ -424,7 +422,7 @@ try {
             @RequestBody HotelReviewDTO hotelReviewDTO
     ) {
         try {
-            String response = userServiceImplementation.postHotelReview(hotelId, hotelReviewDTO);
+            String response = userServiceImplementation.postHotelReviewByUser(hotelId, hotelReviewDTO);
 
             if ("Review posted successfully.".equals(response)) { // Check the response message here
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);

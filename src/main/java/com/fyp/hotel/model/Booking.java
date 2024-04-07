@@ -39,6 +39,9 @@ public class Booking {
     @Column(name = "total_amount", nullable = false, length = 50, unique = false)
     private Long totalAmount;
 
+    @Column(name = "vendor_updated", nullable = false, length = 50, unique = false)
+    private Boolean vendorUpdated;
+
     @Column(name = "created_at", nullable = false, length = 50, unique = false)
     private Instant createdAt;
 

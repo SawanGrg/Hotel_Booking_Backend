@@ -15,6 +15,7 @@ import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.EmailSenderService;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -587,6 +588,7 @@ public class VendorServiceImplementation implements VendorService {
     }
 
     @Transactional
+    @Cacheable(value = "vendorRevenue", key = "#root.methodName")
     public VendorRevenueDTO getVendorRevenue() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

@@ -47,6 +47,8 @@ public class VendorBookingDTO {
 
     private Boolean hasRefridge;
 
+    private Boolean vendorUpdated;
+
     public VendorBookingDTO() {
     }
 

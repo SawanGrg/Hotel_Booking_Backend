@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 //@ComponentScan(basePackages = {"com.fyp.hotel"})
 @SpringBootApplication
 @EnableScheduling
-@EnableCaching
+//@EnableCaching
 //@ServletComponentScan
 public class HotelApplication {
 

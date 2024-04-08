@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fyp.hotel.config.WebClientConfig;
 import com.fyp.hotel.dao.*;
 import com.fyp.hotel.dao.user.BlogDAO;
 import com.fyp.hotel.dto.BookingDTO;
@@ -75,7 +74,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private BlogDAO blogDAO;
     private BlogCommentRepository blogCommentRepository;
     private BookingDAO bookingDAO;
-    private WebClientConfig webClientConfig;
     private WebClient webClient;
     private KhaltiPayment khaltiPayment;
 
@@ -103,7 +101,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             @Lazy BlogDAO blogDAO,
             @Lazy BlogCommentRepository blogCommentRepository,
             @Lazy BookingDAO bookingDAO,
-            @Lazy WebClientConfig webClientConfig,
             @Lazy KhaltiPayment khaltiPayment
 
     ) {
@@ -129,7 +126,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         this.blogDAO = blogDAO;
         this.blogCommentRepository = blogCommentRepository;
         this.bookingDAO = bookingDAO;
-        this.webClientConfig = webClientConfig;
         this.khaltiPayment = khaltiPayment;
     }
 
@@ -222,7 +218,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     //user view all the hotels with amenities
     @Transactional
-    @Cacheable(value = "hotels", key = "#root.methodName")
+//    @Cacheable(value = "hotels", key = "#root.methodName")
     public List<DisplayHotelWithAmenitiesDto> getAllHotelsWithAmenities(String hotelName, String hotelLocation, int page, int size) {
         return this.hotelDAO.getHotelWithAmenitiesAndRating(hotelName, hotelLocation);
     }

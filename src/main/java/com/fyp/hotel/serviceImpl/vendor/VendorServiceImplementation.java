@@ -341,7 +341,7 @@ public class VendorServiceImplementation implements VendorService {
     }
 
     @Transactional
-    public  String deleteRoom (long roomId){
+    public  String deleteSpecificRoom (long roomId){
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication.isAuthenticated()) {
@@ -589,7 +589,7 @@ public class VendorServiceImplementation implements VendorService {
     }
 
     @Transactional
-    @Cacheable(value = "vendorRevenue", key = "#root.methodName")
+//    @Cacheable(value = "vendorRevenue", key = "#root.methodName")
     public VendorRevenueDTO getVendorRevenue() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

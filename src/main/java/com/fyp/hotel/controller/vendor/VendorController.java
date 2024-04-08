@@ -133,29 +133,29 @@ public class VendorController {
     }
 
     //delete a specific room
-    @PostMapping("/delete/{hotelId}")
-    public ResponseEntity<?> deleteRoom(
-            @PathVariable(name = "hotelId") Long hotelId
-    ){
-        try {
-            logger.info("Attempting to delete room with ID: {}", hotelId);
-            String response = vendorServiceImplementation.deleteRoom(hotelId);
-
-            if ("Room deleted successfully".equals(response)) {
-                logger.info("Room deleted successfully with ID: {}", hotelId);
-                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
-                return ResponseEntity.ok(apiResponse);
-            } else {
-                logger.error("Failed to delete room with ID {}: {}", hotelId, response);
-                ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", response);
-                return ResponseEntity.status(500).body(apiResponse);
-            }
-        } catch (Exception e) {
-            logger.error("Exception occurred while deleting room with ID {}: {}", hotelId, e.getMessage());
-            return ResponseEntity.status(500).body(e.getMessage());
-        }
-
-    }
+//    @PostMapping("/delete/{hotelId}")
+//    public ResponseEntity<?> deleteRoom(
+//            @PathVariable(name = "hotelId") Long hotelId
+//    ){
+//        try {
+//            logger.info("Attempting to delete room with ID: {}", hotelId);
+//            String response = vendorServiceImplementation.deleteRoom(hotelId);
+//
+//            if ("Room deleted successfully".equals(response)) {
+//                logger.info("Room deleted successfully with ID: {}", hotelId);
+//                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
+//                return ResponseEntity.ok(apiResponse);
+//            } else {
+//                logger.error("Failed to delete room with ID {}: {}", hotelId, response);
+//                ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", response);
+//                return ResponseEntity.status(500).body(apiResponse);
+//            }
+//        } catch (Exception e) {
+//            logger.error("Exception occurred while deleting room with ID {}: {}", hotelId, e.getMessage());
+//            return ResponseEntity.status(500).body(e.getMessage());
+//        }
+//
+//    }
 
     //post report and issue by the vendor
     @PostMapping("/report")
@@ -212,31 +212,31 @@ public class VendorController {
     }
 
     //setting the booking status as booked and sending the mail to the specific user
-    @PostMapping("/roomStatus/{bookingId}/{userId}")
-    public ResponseEntity<?> changeStatus(
-            @PathVariable(name = "bookingId", required = true) long bookingId,
-            @PathVariable(name = "userId", required = true) long userId,
-            @RequestParam(name = "vendorDecision", required = true, defaultValue = "BOOKED") String status
-    ){
-        try {
-            // Call service to update booking status
-            String response = this.vendorServiceImplementation.updateBooking(bookingId,userId, status);
-
-            // Check if the booking status was successfully changed
-            if ("Successfully Changed".equals(response)) {
-                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Successfully Booked", response);
-                return ResponseEntity.ok().body(apiResponse);
-            } else {
-                // Handle if status update fails
-                ApiResponse<String> apiResponse = new ApiResponse<>(400, "Failed to update status", response);
-                return ResponseEntity.badRequest().body(apiResponse);
-            }
-        } catch (Exception e) {
-            // Handle any exceptions
-            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Internal Server Error", e.getMessage());
-            return ResponseEntity.status(500).body(apiResponse);
-        }
-    }
+//    @PostMapping("/roomStatus/{bookingId}/{userId}")
+//    public ResponseEntity<?> changeStatus(
+//            @PathVariable(name = "bookingId", required = true) long bookingId,
+//            @PathVariable(name = "userId", required = true) long userId,
+//            @RequestParam(name = "vendorDecision", required = true, defaultValue = "BOOKED") String status
+//    ){
+//        try {
+//            // Call service to update booking status
+//            String response = this.vendorServiceImplementation.updateBooking(bookingId,userId, status);
+//
+//            // Check if the booking status was successfully changed
+//            if ("Successfully Changed".equals(response)) {
+//                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Successfully Booked", response);
+//                return ResponseEntity.ok().body(apiResponse);
+//            } else {
+//                // Handle if status update fails
+//                ApiResponse<String> apiResponse = new ApiResponse<>(400, "Failed to update status", response);
+//                return ResponseEntity.badRequest().body(apiResponse);
+//            }
+//        } catch (Exception e) {
+//            // Handle any exceptions
+//            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Internal Server Error", e.getMessage());
+//            return ResponseEntity.status(500).body(apiResponse);
+//        }
+//    }
 
     //get all the anayltic datas
     @GetMapping("/analytics")

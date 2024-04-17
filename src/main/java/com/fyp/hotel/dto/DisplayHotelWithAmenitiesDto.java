@@ -25,10 +25,12 @@ public class DisplayHotelWithAmenitiesDto {
     private Boolean hasTV;
     private Boolean hasBalcony;
 
+    private int hotelStar;
+
     public DisplayHotelWithAmenitiesDto() {
     }
 
-    public DisplayHotelWithAmenitiesDto(long hotelId,String hotelName, String hotelContact, String hotelAddress, String hotelEmail, String hotelDescription, String hotelImage, String hotelPan, String hotelStatus, Boolean hasWifi, Boolean hasFridge, Boolean hasAC, Boolean hasTV, Boolean hasBalcony) {
+    public DisplayHotelWithAmenitiesDto(long hotelId,String hotelName, String hotelContact, String hotelAddress, String hotelEmail, String hotelDescription, String hotelImage, String hotelPan, String hotelStatus, Boolean hasWifi, Boolean hasFridge, Boolean hasAC, Boolean hasTV, Boolean hasBalcony, int hotelStar) {
         this.hotelId = hotelId;
         this.hotelName = hotelName;
         this.hotelContact = hotelContact;
@@ -43,6 +45,7 @@ public class DisplayHotelWithAmenitiesDto {
         this.hasAC = hasAC;
         this.hasTV = hasTV;
         this.hasBalcony = hasBalcony;
+        this.hotelStar = hotelStar;
     }
 
     @Override

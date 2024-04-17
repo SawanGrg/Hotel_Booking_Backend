@@ -52,6 +52,7 @@ public class ValueMapper {
         hotel.setHotelPan(hotelDto.getHotelPan());
         hotel.setHotelDescription(hotelDto.getHotelDescription());
         hotel.setHotelStatus("ACTIVE");
+        hotel.setHotelStar(hotelDto.getHotelStar());
         hotel.setCreatedAt(Instant.now());
         hotel.setUpdatedAt(Instant.now());
         return hotel;
@@ -103,8 +104,8 @@ public class ValueMapper {
             hotelDTO.setHotelEmail(hotel.getHotelEmail());
             hotelDTO.setHotelPan(hotel.getHotelPan());
             hotelDTO.setHotelImage(hotel.getHotelImage());
-            //i dont have the hotel description in the hotel table of the database
-//            hotelDTO.setHotelDescription(hotel.getHotelDescription());
+            hotelDTO.setHotelStar(hotel.getHotelStar());
+
 
             hotelDTOs.add(hotelDTO);
         }

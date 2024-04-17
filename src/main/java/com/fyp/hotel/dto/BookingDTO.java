@@ -31,6 +31,8 @@ public class BookingDTO {
 
     private HotelRoom hotelRoom;
 
+    private String hotelRoomName;
+
     private String paymentMethod;
 
     private Instant createdAt;
@@ -47,5 +49,19 @@ public class BookingDTO {
         this.paymentMethod = paymentMethod;
         this.createdAt = createdAt;
     }
+
+    public BookingDTO(Long bookingId, LocalDate checkInDate, LocalDate checkOutDate, LocalDate bookingDate, Status status, Long totalAmount, User user, HotelRoom hotelRoom, PaymentMethod paymentMethod, Instant createdAt) {
+        this.bookingId = bookingId;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+        this.bookingDate = bookingDate;
+        this.status = status;
+        this.totalAmount = totalAmount;
+        this.user = user;
+        this.hotelRoomName = hotelRoom.getRoomNumber();
+        this.paymentMethod = paymentMethod.getPaymentMethodName();
+        this.createdAt = createdAt;
+    }
+
 
 }

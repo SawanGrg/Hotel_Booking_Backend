@@ -17,12 +17,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @Entity
+@Getter
+@Setter
 @Table(name = "hotel")
 public class Hotel {
 
@@ -60,6 +60,12 @@ public class Hotel {
 
     @Column(name = "hotel_image", nullable = false, unique = false, length = 50)
     private String hotelImage;
+
+    @Column(name = "hotel_star", nullable = true, unique = false, length = 50)
+    private int hotelStar;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
     //one user has one hotel relationship
     @JsonManagedReference

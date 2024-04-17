@@ -167,7 +167,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             boolean isImageUploaded = fileUploaderHelper.fileUploader(userImage);
             String imageUrl = isImageUploaded ? "/images/" + userImage.getOriginalFilename() : "/images/default.png";
             user.setUserProfilePicture(imageUrl);
-            user.setUserStatus("ACTIVE");
+            user.setUserStatus("PENDING");
             Role defaultRole = roleRepo.findByRoleName("ROLE_USER");
             if (defaultRole != null) {
                 user.getRoles().add(defaultRole);
@@ -810,10 +810,16 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                 )).toList();
     }
 
-    //extract all the booking details based on the htoelId
+    //extract all the booking details based on the hotel id
     @Transactional
     public  List<BookingStatusDTO> getBookingStatus(Long hotelId) {
         return bookingDAO.getBookingStatusDetails(hotelId);
-        }
+    }
+
+    //get user name of the specific hotel
+    @Transactional
+    public String getUserNameOfHotel(long hotelId) {
+        return hotelDAO.getHotelOwnerName(hotelId);
+    }
 
 }

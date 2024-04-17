@@ -1,6 +1,7 @@
 package com.fyp.hotel.controller.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,19 +30,15 @@ public class LoginController {
         this.jwtUtils = jwtUtils;
         this.userServiceImplementation = userServiceImplementation;
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticate(
             @Validated //validated is used to validate the request body of the request we validate based on the annotations given in the dto class
             @RequestBody
             LoginRequestDto request) {
 
-        System.out.println("came in login controller  step 1 : " + request);
         doAuthenticate(request.getUsername(), request.getPassword());
-        System.out.println("came in login controller  step 2 : " + request);
-
         final User user = (User) userServiceImplementation.loadUserByUsername(request.getUsername());
-        System.out.println("came in login controller  step 4 : " + request);
 
         if (user == null) {
             LoginResponseDto loginResponseDto = new LoginResponseDto();
@@ -50,22 +47,34 @@ public class LoginController {
             loginResponseDto.setRoleName("");
 
             return ResponseEntity.badRequest().body(loginResponseDto);
-            
+
         } else {
 
-            // The generateToken() method is used to generate the JWT token.
-            final String jwtToken = jwtUtils.generateToken(user);
-            
-            LoginResponseDto loginResponseDto = new LoginResponseDto();
-            loginResponseDto.setUsername(user.getUsername());
-            loginResponseDto.setToken(jwtToken);
-            loginResponseDto.setRoleName(user.getRoles().iterator().next().getRoleName());
-            
-            return ResponseEntity.ok().body(loginResponseDto);
-                                    
+            System.out.println("came in login controller  step 4 : " + user.getUsername() + " " + user.getPassword() + " " + user.getRoles().iterator().next().getRoleName() + " " + user.getUserStatus());
+
+            if (user.getUserStatus().equals("PENDING") || user.getUserStatus().equals("UNVERIFIED")) {
+                if (user.getRoles().iterator().next().getRoleName().equals("ROLE_USER")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponseDto("", "user is not verified", ""));
+                } else if (user.getRoles().iterator().next().getRoleName().equals("ROLE_VENDOR")) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponseDto("", "vendor is not verified", ""));
+                }
+            }
+
+                String jwtToken = jwtUtils.generateToken(user);
+
+                LoginResponseDto loginResponseDto = new LoginResponseDto();
+                loginResponseDto.setUsername(user.getUsername());
+                loginResponseDto.setToken(jwtUtils.generateToken(user));
+                loginResponseDto.setRoleName(user.getRoles().iterator().next().getRoleName());
+
+                return ResponseEntity.ok().body(loginResponseDto);
+
+
         }
     }
 
+    //this method checks whether the user is authenticated or not
+    //
     private void doAuthenticate(String username, String password){
         try{
 

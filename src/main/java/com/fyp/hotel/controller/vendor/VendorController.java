@@ -2,6 +2,7 @@ package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
+import com.fyp.hotel.dto.userDto.BookingStatusDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
@@ -37,14 +38,14 @@ public class VendorController {
 
     private static final Logger logger = LoggerFactory.getLogger(VendorController.class);
 
-    public VendorController(ObjectMapper objectMapper, 
-            VendorServiceImplementation vendorServiceImplementation) {
+    public VendorController(ObjectMapper objectMapper,
+                            VendorServiceImplementation vendorServiceImplementation) {
         this.objectMapper = objectMapper;
         this.vendorServiceImplementation = vendorServiceImplementation;
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(){
+    public String dashboard() {
         return "Vendor dashboard";
     }
 
@@ -52,12 +53,12 @@ public class VendorController {
     //insert the hotel rooms 
     @PostMapping("/addHotelRooms")
     public ResponseEntity<ApiResponse<String>> addHotelRooms(
-        @RequestParam("roomData") String stringRoomData,
-        @RequestParam("mainRoomImage") MultipartFile stringHotelImage,
-        @RequestParam(value = "roomImage1", required = false) MultipartFile stringHotelImage1,
-        @RequestParam(value = "roomImage2",required = false) MultipartFile stringHotelImage2,
-        @RequestParam(value = "roomImage3", required = false) MultipartFile stringHotelImage3
-    ){
+            @RequestParam("roomData") String stringRoomData,
+            @RequestParam("mainRoomImage") MultipartFile stringHotelImage,
+            @RequestParam(value = "roomImage1", required = false) MultipartFile stringHotelImage1,
+            @RequestParam(value = "roomImage2", required = false) MultipartFile stringHotelImage2,
+            @RequestParam(value = "roomImage3", required = false) MultipartFile stringHotelImage3
+    ) {
         System.out.println("room Data : " + stringRoomData);
         System.out.println("Hotel Image : " + stringHotelImage);
         System.out.println("Hotel Image 1 : " + stringHotelImage1);
@@ -84,7 +85,7 @@ public class VendorController {
             System.out.println("Error in vendor controller : " + e.getMessage());
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.badRequest().body(apiResponse);
-            
+
         }
     }
 
@@ -113,7 +114,7 @@ public class VendorController {
             @RequestParam(value = "roomImage1", required = false) MultipartFile stringHotelImage1,
             @RequestParam(value = "roomImage2", required = false) MultipartFile stringHotelImage2,
             @RequestParam(value = "roomImage3", required = false) MultipartFile stringHotelImage3
-    ){
+    ) {
         try {
             logger.info("Attempting to update room with ID: {}", roomlId);
             RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class); // Read the JSON data and convert it into RoomDto
@@ -161,7 +162,7 @@ public class VendorController {
     @PostMapping("/report")
     public ResponseEntity<?> postReport(
             @RequestBody ReportDto reportDto
-            ){
+    ) {
         try {
             Report report = valueMapper.conversionToReport(reportDto);
             String response = vendorServiceImplementation.postReport(report);
@@ -180,13 +181,13 @@ public class VendorController {
 
     //get hotel details
     @GetMapping("/hotelDetails")
-    public ResponseEntity<?> getHotelDetails(){
+    public ResponseEntity<?> getHotelDetails() {
         try {
             Hotel hotel = vendorServiceImplementation.getHotelDetails();
             ApiResponse<Hotel> apiResponse = new ApiResponse<>(200, "Success", hotel);
             return ResponseEntity.ok(apiResponse);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.status(500).body(apiResponse);
         }
@@ -198,14 +199,14 @@ public class VendorController {
             @RequestParam(name = "status", required = false, defaultValue = "") String status,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "30") int size
-    ){
+    ) {
 
         System.out.println("Status : " + status);
         try {
             List<VendorBookingDTO> vendorBookingDTOS = vendorServiceImplementation.getBookings(status, page, size);
             ApiResponse<List<VendorBookingDTO>> apiResponse = new ApiResponse<>(200, "Success", vendorBookingDTOS);
             return ResponseEntity.ok(apiResponse);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.status(500).body(apiResponse);
         }
@@ -240,14 +241,13 @@ public class VendorController {
 
     //get all the anayltic datas
     @GetMapping("/analytics")
-    public ResponseEntity<?> getVendorAnalytics(){
-        try{
+    public ResponseEntity<?> getVendorAnalytics() {
+        try {
 
             VendorDashboardAnalyticsDTO vendorDashboardAnalyticsDTO = vendorServiceImplementation.getVendorAnalyticsService();
             ApiResponse<VendorDashboardAnalyticsDTO> apiResponse = new ApiResponse<>(200, "Success", vendorDashboardAnalyticsDTO);
             return ResponseEntity.ok(apiResponse);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.status(500).body(apiResponse);
         }
@@ -268,17 +268,62 @@ public class VendorController {
 
     //get total revenue from cash on arrival and khalti
     @GetMapping("/revenue")
-    public ResponseEntity<?> getRevenue(){
+    public ResponseEntity<?> getRevenue() {
         try {
             VendorRevenueDTO revenueDTO = vendorServiceImplementation.getVendorRevenue();
             ApiResponse<VendorRevenueDTO> apiResponse = new ApiResponse<>(200, "Success", revenueDTO);
             return ResponseEntity.ok(apiResponse);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.status(500).body(apiResponse);
         }
     }
 
-}
+    //view specific hotel room
+    @GetMapping("/viewRoom/{roomId}")
+    public ResponseEntity<?> viewRoom(
+            @PathVariable(name = "roomId") Long roomId
+    ) {
+        try {
+            List<HotelRoom> hotelRoom = vendorServiceImplementation.getRoomDetails(roomId);
+            ApiResponse<List<HotelRoom>> apiResponse = new ApiResponse<>(200, "Success", hotelRoom);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
 
+    //get booking status of specific room
+    @GetMapping("/bookingStatus/{roomId}")
+    public ResponseEntity<?> getBookingStatus(
+            @PathVariable(name = "roomId") long roomId
+    ) {
+        try {
+            List<BookingStatusDTO> bookingStatusDTOS = vendorServiceImplementation.getBookingStatusDetails(roomId);
+            ApiResponse<List<BookingStatusDTO>> apiResponse = new ApiResponse<>(200, "Success", bookingStatusDTOS);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
+
+    //get all the booking details of the specific room
+    @GetMapping("/roomHistory/{roomId}")
+    public ResponseEntity<?> getRoomHistory(
+            @PathVariable(name = "roomId") long roomId
+    ) {
+        try {
+            List<RoomHistoryDTO> bookingStatusDTOS = vendorServiceImplementation.getRoomHistory(roomId);
+            ApiResponse<List<RoomHistoryDTO>> apiResponse = new ApiResponse<>(200, "Success", bookingStatusDTOS);
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
+        }
+    }
+
+
+}
 

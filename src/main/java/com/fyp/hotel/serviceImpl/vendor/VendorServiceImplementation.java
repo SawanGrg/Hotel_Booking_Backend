@@ -8,7 +8,10 @@ import java.util.stream.Collectors;
 
 import com.fyp.hotel.dao.BookingDAO;
 import com.fyp.hotel.dao.HotelDAO;
+import com.fyp.hotel.dao.admin.AdminDAO;
+import com.fyp.hotel.dto.BookingDTO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
+import com.fyp.hotel.dto.userDto.BookingStatusDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
@@ -85,11 +88,8 @@ public class VendorServiceImplementation implements VendorService {
     public String registerVendor(VendorDto vendorDto, MultipartFile userImage, HotelDto hotelDto,
                                  MultipartFile hotelImage) {
 
-        System.out.println("user data in dto :step 3 --> " + vendorDto);
         User userObj = valueMapper.conversionToUser(vendorDto);
-        System.out.println("user data in object :step 4 --> " + userObj);
         Hotel hotelObj = valueMapper.conversionToHotel(hotelDto);
-        System.out.println("hotel data in object :step 5 --> " + hotelObj);
 
         boolean isUserImageUploaded = fileUploaderHelper.fileUploader(userImage);
         boolean isHotelImageUploaded = fileUploaderHelper.fileUploader(hotelImage);
@@ -101,6 +101,7 @@ public class VendorServiceImplementation implements VendorService {
 
             Role vendorRole = roleRepo.findByRoleName("ROLE_VENDOR");
             userObj.getRoles().add(vendorRole);
+            userObj.setUserStatus("PENDING");
 
             User currentUser = userRepo.save(userObj);
 
@@ -614,6 +615,41 @@ public class VendorServiceImplementation implements VendorService {
         vendorRevenueDTO.setKhaltiPayment(khaltiRevenue);
 
         return vendorRevenueDTO;
+    }
+
+    @Transactional
+    public List<HotelRoom> getRoomDetails(Long roomId) {
+        HotelRoom hotelRooms = hotelRoomRepo.findByRoomId(roomId);
+        List<HotelRoom> room = new ArrayList<>();
+        room.add(hotelRooms);
+        return room;
+    }
+
+
+    @Transactional
+    public List<BookingStatusDTO> getBookingStatusDetails(long roomId) {
+        return bookingDAO.getBookingStatusDetailsByRoomId(roomId);
+    }
+
+    //get all the booking details of a specific room
+    @Transactional
+    public List<RoomHistoryDTO> getRoomHistory(long roomId) {
+        List<Booking> bookings = bookingRepository.findByHotelRoom_RoomId(roomId);
+        List<RoomHistoryDTO> roomHistoryDTOs = new ArrayList<>();
+        for (Booking booking : bookings) {
+            RoomHistoryDTO roomHistoryDTO = new RoomHistoryDTO();
+
+            roomHistoryDTO.setCheckInDate(booking.getCheckInDate());
+            roomHistoryDTO.setCheckOutDate(booking.getCheckOutDate());
+            roomHistoryDTO.setBookingDate(booking.getBookingDate());
+            roomHistoryDTO.setStatus(booking.getStatus());
+            roomHistoryDTO.setPaymentMethod(booking.getPaymentMethod().getPaymentMethodName());
+            roomHistoryDTO.setTotalAmount(booking.getTotalAmount());
+            roomHistoryDTO.setUserName(booking.getUser().getUsername());
+
+            roomHistoryDTOs.add(roomHistoryDTO);
+        }
+        return roomHistoryDTOs;
     }
 
 

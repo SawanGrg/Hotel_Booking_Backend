@@ -1,5 +1,9 @@
 package com.fyp.hotel.controller.user;
 
+import jakarta.validation.constraints.NotEmpty;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,12 +34,15 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", maxAge = 3600)
 @RequestMapping("/v1/user")
+@Validated // Add @Validated annotation to enable method-level validation
 public class BlogController {
 
     @Autowired
@@ -48,17 +55,12 @@ public class BlogController {
     private ObjectMapper objectMapper;
 
     //post blog by user
+    // Post blog by user
     @PostMapping("/postBlog")
     public ResponseEntity<?> postBlog(
             @RequestParam("blogImage") MultipartFile blogImage,
-            @RequestParam("blogDTO") String blogDTOJson
+            @RequestParam("blogDTO") @Valid BlogDTO blogDTO // Add @Valid annotation directly to the DTO parameter
     ) {
-        BlogDTO blogDTO = null;
-        try {
-            blogDTO = objectMapper.readValue(blogDTOJson, BlogDTO.class); // Convert the JSON string to BlogDTO object
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         try {
             String response = userServiceImplementation.postUserBlog(blogImage, blogDTO);
             ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
@@ -67,6 +69,19 @@ public class BlogController {
             ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
+    }
+
+    // Exception handler for handling MethodArgumentNotValidException
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String message = error.getDefaultMessage();
+            errors.put(fieldName, message);
+        });
+        ApiResponse<Map<String, String>> errorResponse = new ApiResponse<>(400, "Validation Error", errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
 }

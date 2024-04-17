@@ -17,7 +17,7 @@
 //    @Autowired
 //    private HotelRoomDAO hotelRoomDAO;
 //
-//    @Scheduled(cron = "* 23 * * * *")
+//    @Scheduled(cron = "59 * * * * *")
 //    public void cronJob() {
 //        System.out.println("Cron job is running");
 //

@@ -363,7 +363,7 @@ try {
             @RequestParam(name = "hotelName", required = false) String hotelName,
             @RequestParam(name = "hotelLocation", required = false) String hotelLocation,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size
+            @RequestParam(name = "size", defaultValue = "10") int size
     ){
         System.out.println("hotel name: " + hotelName);
         System.out.println("hotel location: " + hotelLocation);
@@ -549,6 +549,21 @@ try {
             return ResponseEntity.status(404).body(errorResponse);
         }
     }
+
+    @GetMapping("/hotelUserName/{hotelId}")
+    public ResponseEntity<?> getHotelUserName(
+            @PathVariable(name = "hotelId") long hotelId
+    ){
+        try {
+            String hotelUserName = userServiceImplementation.getUserNameOfHotel(hotelId);
+            ApiResponse<String> response = new ApiResponse<>(200, "Success", hotelUserName);
+            return ResponseEntity.status(200).body(response);
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = new ApiResponse<>(404, "Not found", e.getMessage());
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
 
 
 }

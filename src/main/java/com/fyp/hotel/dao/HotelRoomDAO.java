@@ -145,6 +145,4 @@ public class HotelRoomDAO {
             e.printStackTrace();
         }
     }
-
-
 }

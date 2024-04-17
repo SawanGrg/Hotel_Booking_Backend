@@ -123,13 +123,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/filterRooms/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/user/checkRoomAvailability/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/user/hotelUserName/**").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/v1/user/payment/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/payment/**").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/user/profile").hasAuthority("ROLE_USER")
-                        .requestMatchers(HttpMethod.POST, "v1/user/user-change-password").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "v1/user/user-change-password").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR", "ROLE_ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/v1/user/view-user-details").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
-                        .requestMatchers(HttpMethod.POST, "/v1/user/update-user-details").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.GET, "/v1/user/view-user-details").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/update-user-details").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/user/d").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "v1/user/review/**").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.POST, "/v1/user/postBlog").hasAuthority("ROLE_USER")
@@ -137,10 +138,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/user/viewBlog/{blogId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user/postBlogComment/{blogId}").hasAuthority("ROLE_USER")
                         .requestMatchers(HttpMethod.GET, "/v1/user/viewPostBlogComment/{blogId}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/user/viewBookingDetails").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.GET, "/v1/user/viewBookingDetails").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/user/bookingStatus/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/v1/user/khalti/**").hasAuthority("ROLE_USER")
-                        .requestMatchers(HttpMethod.POST, "/v1/user/khalti/update").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/khalti/**").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.POST, "/v1/user/khalti/update").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
 
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/dashboard").hasAnyAuthority("ROLE_VENDOR")
 
@@ -154,6 +155,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/v1/vendor/updateRoom/**").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/hotelReview").hasAuthority("ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/vendor/revenue").hasAuthority("ROLE_VENDOR")
+                        .requestMatchers(HttpMethod.GET, "/v1/vendor/viewRoom/**").hasAuthority("ROLE_VENDOR")
 //                        admin url
                         .requestMatchers(HttpMethod.GET, "/v1/admin/dashboard").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/vendor/dashboard").hasAuthority("ROLE_ADMIN")
@@ -163,6 +165,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/admin/viewAllReport").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "v1/admin/BlogBeforeVerification").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "v1/admin/verifyBlog/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/viewAllHotels").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/getUserProfile/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/specificBlog/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/admin/unverifyUser/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/admin/unverifyVendor/**").hasAuthority("ROLE_ADMIN")
 
 
                         .anyRequest().permitAll())

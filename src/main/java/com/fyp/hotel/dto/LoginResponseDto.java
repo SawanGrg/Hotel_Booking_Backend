@@ -10,6 +10,7 @@ public class LoginResponseDto {
     private String username;
     private String token;
     private String roleName;
+    private String message;
 
     public LoginResponseDto() {
     }
@@ -19,6 +20,8 @@ public class LoginResponseDto {
         this.token = token;
         this.roleName = role;
     }
+
+
 
 
 }

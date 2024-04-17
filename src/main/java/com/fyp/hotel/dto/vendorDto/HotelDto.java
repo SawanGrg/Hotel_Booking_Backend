@@ -29,6 +29,11 @@ public class HotelDto {
     @NotNull(message = "Hotel image cannot be null")
     private String hotelDescription;
 
+    private int hotelStar;
+
+    private Boolean isDeleted;
+
+
     private String createdAt;
 
     private String updatedAt;
@@ -36,19 +41,40 @@ public class HotelDto {
     public HotelDto() {
     }
 
-    public HotelDto(String hotelName, String hotelAddress, String hotelContact, String hotelEmail, String hotelPan,
-                    String hotelDescription, String createdAt, String updatedAt) {
+//    public HotelDto(String hotelName, String hotelAddress, String hotelContact, String hotelEmail, String hotelPan,
+//                    String hotelDescription, String createdAt, String updatedAt) {
+//        this.hotelName = hotelName;
+//        this.hotelAddress = hotelAddress;
+//        this.hotelContact = hotelContact;
+//        this.hotelEmail = hotelEmail;
+//        this.hotelPan = hotelPan;
+//        this.hotelDescription = hotelDescription; // Set hotelDescription here
+//        this.createdAt = createdAt;
+//        this.updatedAt = updatedAt;
+//    }
+
+    public HotelDto(Long hotelId, String hotelName, String hotelAddress, String hotelContact, String hotelEmail, String hotelPan,
+                    String hotelDescription, int hotelStar, Boolean isDeleted, String createdAt, String updatedAt) {
+        this.hotelId = hotelId;
         this.hotelName = hotelName;
         this.hotelAddress = hotelAddress;
         this.hotelContact = hotelContact;
         this.hotelEmail = hotelEmail;
         this.hotelPan = hotelPan;
-        this.hotelDescription = hotelDescription; // Set hotelDescription here
+        this.hotelDescription = hotelDescription;
+        this.hotelStar = hotelStar;
+        this.isDeleted = isDeleted;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
+    public int getHotelStar() {
+        return hotelStar;
+    }
 
+    public void setHotelStar(int hotelStar) {
+        this.hotelStar = hotelStar;
+    }
     public Long getHotelId() {
         return hotelId;
     }
@@ -133,5 +159,13 @@ public class HotelDto {
     }
     public void setHotelDescription(String hotelDescription) {
         this.hotelDescription = hotelDescription;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

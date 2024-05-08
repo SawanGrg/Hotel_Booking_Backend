@@ -42,6 +42,18 @@ public class UserRegisterController {
             // Convert string to user object
             User user = this.objectMapper.readValue(stringUserData, User.class);
             System.out.println("this is user data" + user.getPassword());
+
+            if (this.userServiceImplementation.checkUserExist(user.getUsername())) {
+
+                RegisterDto registerDto = new RegisterDto();
+
+                registerDto.setMessage("User already exist");
+                registerDto.setStatus(HttpStatus.BAD_REQUEST);
+
+                return new ResponseEntity<>(registerDto, HttpStatus.BAD_REQUEST);
+
+            }
+
             // Move image upload and default role assignment to the service
             String registerStatus = this.userServiceImplementation.registerUser(user, stringUserImage);
 

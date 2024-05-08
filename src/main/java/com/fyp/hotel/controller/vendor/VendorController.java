@@ -70,8 +70,22 @@ public class VendorController {
             RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class);
             System.out.println("Hotel DTO : " + roomDto);
 
+            //check if the room number is already registered or not
+            if (vendorServiceImplementation.checkRoomExistsOrNot(roomDto.getRoomNumber())) {
+                ApiResponse<String> apiResponse = new ApiResponse<>(400, "Room Number already exists", "Room Number already exists");
+                return ResponseEntity.badRequest().body(apiResponse);
+            }
+
+            System.out.println("Room DTO before service: " + roomDto);
+            System.out.println("Hotel Image : " + stringHotelImage);
+            System.out.println("Hotel Image 1 : " + stringHotelImage1);
+            System.out.println("Hotel Image 2 : " + stringHotelImage2);
+            System.out.println("Hotel Image 3 : " + stringHotelImage3);
+
             String roomStatus = this.vendorServiceImplementation.addRooms(roomDto, stringHotelImage, stringHotelImage1, stringHotelImage2, stringHotelImage3);
 
+            System.out.println("Room Status : " + roomStatus)
+            ;
             if ("Room Registered Successfully".equals(roomStatus)) {
                 logger.info("Room Registered Successfully");
                 ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", roomStatus);
@@ -93,7 +107,7 @@ public class VendorController {
     @GetMapping("/hotelRooms")
     public ResponseEntity<Page<HotelRoom>> getHotelRooms(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size) {
+            @RequestParam(name = "size", defaultValue = "20") int size) {
         try {
             Page<HotelRoom> hotelRooms = vendorServiceImplementation.getHotelRooms(page, size);
             return ResponseEntity.ok(hotelRooms);
@@ -122,14 +136,17 @@ public class VendorController {
 
             if ("Room updated successfully".equals(response)) {
                 logger.info("Room updated successfully with ID: {}", roomlId);
-                return ResponseEntity.ok(response);
+                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
+                return ResponseEntity.ok(apiResponse);
             } else {
                 logger.error("Failed to update room with ID {}: {}", roomlId, response);
-                return ResponseEntity.status(500).body(response);
+                ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", response);
+                return ResponseEntity.status(500).body(apiResponse);
             }
         } catch (Exception e) {
             logger.error("Exception occurred while updating room with ID {}: {}", roomlId, e.getMessage());
-            return ResponseEntity.status(500).body(e.getMessage());
+            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
+            return ResponseEntity.status(500).body(apiResponse);
         }
     }
 
@@ -183,7 +200,7 @@ public class VendorController {
     @GetMapping("/hotelDetails")
     public ResponseEntity<?> getHotelDetails() {
         try {
-            Hotel hotel = vendorServiceImplementation.getHotelDetails();
+            Hotel hotel = vendorServiceImplementation.getHotelDetailsService();
             ApiResponse<Hotel> apiResponse = new ApiResponse<>(200, "Success", hotel);
             return ResponseEntity.ok(apiResponse);
 

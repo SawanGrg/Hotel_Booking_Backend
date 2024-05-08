@@ -83,6 +83,14 @@ public class VendorServiceImplementation implements VendorService {
     @Autowired
     private PaymentMethodRepository paymentMethodRepository;
 
+    @Transactional
+    public Boolean checkHotelPanExist(String hotelPan) {
+        if(hotelDAO.existByHotelPan(hotelPan)){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     @Transactional
     public String registerVendor(VendorDto vendorDto, MultipartFile userImage, HotelDto hotelDto,
@@ -98,6 +106,7 @@ public class VendorServiceImplementation implements VendorService {
 
             userObj.setUserProfilePicture("/images/" + userImage.getOriginalFilename());
             hotelObj.setHotelImage(hotelImage.getOriginalFilename());
+            hotelObj.setIsDeleted(false);
 
             Role vendorRole = roleRepo.findByRoleName("ROLE_VENDOR");
             userObj.getRoles().add(vendorRole);
@@ -422,7 +431,7 @@ public class VendorServiceImplementation implements VendorService {
 
     //get hotel details only
     @Transactional
-    public Hotel getHotelDetails(){
+    public Hotel getHotelDetailsService(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.isAuthenticated()) {
             String username = authentication.getName();
@@ -652,5 +661,12 @@ public class VendorServiceImplementation implements VendorService {
         return roomHistoryDTOs;
     }
 
+    //check if the room is already registered or not
+    @Transactional
+    public Boolean checkRoomExistsOrNot(String roomNumber) {
+        String vendorName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Hotel hotel = hotelRepo.findByUser(userRepo.findByUserName(vendorName));
+        return hotelDAO.RoomExistOrNot(roomNumber, hotel.getHotelId());
+    }
 
 }

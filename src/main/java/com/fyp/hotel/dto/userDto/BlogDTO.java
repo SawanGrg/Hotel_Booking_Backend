@@ -26,17 +26,14 @@ private static final long serialVersionUID = 1L;
     private long id;
 
     @NotEmpty(message = "Title is required")
-    @NotNull(message = "Title is required")
     @Length(min = 20, message = "Title must be at least 20 characters")
     private String title;
 
     @NotEmpty(message = "Description is required")
-    @NotNull(message = "Description is required")
     @Length(min = 100, message = "Description must be at least 100 characters")
     private String description;
 
     @NotEmpty(message = "Blog tag is required")
-    @NotNull(message = "Blog tag is required")
     private String blogTag;
 
     private String blogImage;

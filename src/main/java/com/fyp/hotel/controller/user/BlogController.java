@@ -55,21 +55,33 @@ public class BlogController {
     private ObjectMapper objectMapper;
 
     //post blog by user
-    // Post blog by user
     @PostMapping("/postBlog")
     public ResponseEntity<?> postBlog(
             @RequestParam("blogImage") MultipartFile blogImage,
-            @RequestParam("blogDTO") @Valid BlogDTO blogDTO // Add @Valid annotation directly to the DTO parameter
+            @RequestParam("blogDTO") String blogDTOJson // Receive BlogDTO as JSON string
     ) {
         try {
+            // Convert JSON string to BlogDTO object using ObjectMapper
+            BlogDTO blogDTO = objectMapper.readValue(blogDTOJson, BlogDTO.class);
+
+            // Call the service method with the MultipartFile and BlogDTO object
             String response = userServiceImplementation.postUserBlog(blogImage, blogDTO);
+
+            // Prepare success response
             ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
             return ResponseEntity.status(200).body(successResponse);
+        } catch (IOException e) {
+            // Handle JSON parsing exception
+            ApiResponse<String> errorResponse = new ApiResponse<>(400, "Bad Request", "Invalid JSON format for BlogDTO");
+            return ResponseEntity.status(400).body(errorResponse);
         } catch (Exception e) {
+            // Handle other exceptions
             ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
+
+
 
     // Exception handler for handling MethodArgumentNotValidException
     @ExceptionHandler(MethodArgumentNotValidException.class)

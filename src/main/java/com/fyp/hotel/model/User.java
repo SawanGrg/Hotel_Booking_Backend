@@ -45,7 +45,7 @@ User implements UserDetails {
     @Column(name = "user_last_name", nullable = false)
     private String userLastName;
 
-    @Column(name = "user_email", nullable = false, unique = true)
+    @Column(name = "user_email", nullable = false, unique = false)
     private String userEmail;
 
     @Column(name = "user_phone", nullable = true)

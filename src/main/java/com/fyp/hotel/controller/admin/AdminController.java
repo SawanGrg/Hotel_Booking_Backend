@@ -2,6 +2,7 @@ package com.fyp.hotel.controller.admin;
 
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.BookingDTO;
+import com.fyp.hotel.dto.UserMessageDTO;
 import com.fyp.hotel.dto.admin.AdminAnalyticsDto;
 import com.fyp.hotel.dto.admin.AdminRevenueDTO;
 import com.fyp.hotel.dto.userDto.BlogDTO;
@@ -233,22 +234,49 @@ public class AdminController {
         }
     }
 
+    //get specific hotel details based on the user id
+     @GetMapping("/getSpecificHotel/{userId}")
+    public ResponseEntity<?> getSpecificHotel(
+            @PathVariable("userId") long userId
+    ){
+        try{
+            HotelDto hotelDto = this.adminServiceImlementation.getHotelProfile(userId);
+            ApiResponse<HotelDto> apiResponse = new ApiResponse<>(200, "Success", hotelDto);
+            return ResponseEntity.ok(apiResponse);
+        }catch (Exception e){
+            ApiResponse<String> apiResponse = new ApiResponse<>(400, e.getMessage(), "Error");
+            return ResponseEntity.ok(apiResponse);
+        }
+     }
 
+    //admin verified the vendor
+    @PostMapping("/verifyVendor/{userId}")
+    public ResponseEntity<?> unverifyVendor(
+            @PathVariable("userId") long userId,
+            @RequestParam(value = "status", defaultValue = "VERIFIED") String status
+    ){
+        try{
+            String response = this.adminServiceImlementation.verifyVendor(userId, status);
+            ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
+            return ResponseEntity.ok(apiResponse);
+        }catch (Exception e){
+            ApiResponse<String> apiResponse = new ApiResponse<>(400, e.getMessage(), "Error");
+            return ResponseEntity.ok(apiResponse);
+        }
+    }
 
-    //admin unverified the vendor
-//    @PostMapping("/unverifyVendor/{userId}")
-//    public ResponseEntity<?> unverifyVendor(
-//            @PathVariable("userId") long userId,
-//            @RequestParam(value = "status", defaultValue = "UNVERIFIED") String status
-//    ){
-//        try{
-//            String response = this.adminServiceImlementation.unVerifyVendor(userId, status);
-//            ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
-//            return ResponseEntity.ok(apiResponse);
-//        }catch (Exception e){
-//            ApiResponse<String> apiResponse = new ApiResponse<>(400, e.getMessage(), "Error");
-//            return ResponseEntity.ok(apiResponse);
-//        }
-//    }
+    //admin view all user message
+    @GetMapping("/viewUserMessage")
+    public ResponseEntity<?> getUserMessage(){
+        try{
+            List<UserMessageDTO> userMessageDTO = this.adminServiceImlementation.getAllUserMessages();
+            ApiResponse<List<UserMessageDTO>> apiResponse = new ApiResponse<>(200, "Success", userMessageDTO);
+            return ResponseEntity.ok(apiResponse);
+
+        }catch (Exception e){
+            ApiResponse<String> apiResponse = new ApiResponse<>(400, e.getMessage(), "Error");
+            return ResponseEntity.ok(apiResponse);
+        }
+    }
 
 }

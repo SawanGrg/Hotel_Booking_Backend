@@ -3,6 +3,7 @@ package com.fyp.hotel.serviceImpl.admin;
 import com.fyp.hotel.dao.HotelDAO;
 import com.fyp.hotel.dao.admin.AdminDAO;
 import com.fyp.hotel.dto.BookingDTO;
+import com.fyp.hotel.dto.UserMessageDTO;
 import com.fyp.hotel.dto.admin.AdminAnalyticsDto;
 import com.fyp.hotel.dto.admin.AdminRevenueDTO;
 import com.fyp.hotel.dto.userDto.BlogCommentDTO;
@@ -12,10 +13,7 @@ import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.model.Blog;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.User;
-import com.fyp.hotel.repository.BlogRepository;
-import com.fyp.hotel.repository.HotelRepository;
-import com.fyp.hotel.repository.HotelRoomRepository;
-import com.fyp.hotel.repository.UserRepository;
+import com.fyp.hotel.repository.*;
 import jakarta.persistence.Id;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,8 @@ public class AdminServiceImlementation {
     private HotelRepository hotelRepository;
     @Autowired
     private HotelDAO hotelDAO;
+    @Autowired
+    private UserMessageRepository userMessageRepository;
 
     @Transactional
     public List<User> getAllUserFilter(String userName, boolean ascending, int page, int size){
@@ -136,7 +136,8 @@ public class AdminServiceImlementation {
                     hotel.getHotelStar(),
                     hotel.getIsDeleted(),
                     hotel.getCreatedAt().toString(),
-                    hotel.getUpdatedAt().toString()
+                    hotel.getUpdatedAt().toString(),
+                    hotel.getHotelImage()
             ));
         });
         return hotelDtos;
@@ -222,12 +223,21 @@ public class AdminServiceImlementation {
     }
 
 
+    @Transactional
+    public HotelDto getHotelProfile(long userId){
 
+        Hotel hotel = hotelRepository.findByUser(adminDAO.getUserProfile(userId));
 
+        return new HotelDto(hotel.getHotelId(), hotel.getHotelName(), hotel.getHotelAddress(),
+                hotel.getHotelContact(), hotel.getHotelEmail(), hotel.getHotelPan(),
+                hotel.getHotelDescription(), hotel.getHotelStar(), hotel.getIsDeleted(),
+                hotel.getCreatedAt().toString(), hotel.getUpdatedAt().toString(),
+                hotel.getHotelImage());
 
+    }
 
     @Transactional
-    public String unVerifyVendor(long userId, String status){
+    public String verifyVendor(long userId, String status){
         User user = adminDAO.getUserProfile(userId);
         if(user != null){
             user.setUserStatus(status);
@@ -236,6 +246,20 @@ public class AdminServiceImlementation {
         }else{
             return "Vendor not found";
         }
+    }
+
+    @Transactional
+    public List<UserMessageDTO> getAllUserMessages(){
+        return userMessageRepository.findAll().stream()
+                .map(userMessage -> new UserMessageDTO(
+                        userMessage.getMessageId(),
+                        userMessage.getFirstName(),
+                        userMessage.getLastName(),
+                        userMessage.getEmail(),
+                        userMessage.getMessage(),
+                        userMessage.getCreatedAt().toString()
+                ))
+                .toList();
     }
 
 

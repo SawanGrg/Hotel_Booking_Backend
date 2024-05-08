@@ -54,7 +54,7 @@ public class HotelDto {
 //    }
 
     public HotelDto(Long hotelId, String hotelName, String hotelAddress, String hotelContact, String hotelEmail, String hotelPan,
-                    String hotelDescription, int hotelStar, Boolean isDeleted, String createdAt, String updatedAt) {
+                    String hotelDescription, int hotelStar, Boolean isDeleted, String createdAt, String updatedAt, String mainHotelImage) {
         this.hotelId = hotelId;
         this.hotelName = hotelName;
         this.hotelAddress = hotelAddress;
@@ -66,6 +66,7 @@ public class HotelDto {
         this.isDeleted = isDeleted;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.mainHotelImage = mainHotelImage;
     }
 
     public int getHotelStar() {

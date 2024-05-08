@@ -681,6 +681,67 @@ public class HotelDAO {
         }
     }
 
+    @Transactional
+    public Boolean existByHotelPan(String hotelPan){
+        Session session = null;
+        try {
+            session = this.sessionFactory.openSession();
+            session.beginTransaction();
+
+            String hql = "SELECT COUNT(h.hotelId) FROM Hotel h WHERE h.hotelPan = :hotelPan";
+
+            Query query = session.createQuery(hql);
+            query.setParameter("hotelPan", hotelPan);
+
+            long count = (long) query.getSingleResult();
+
+            session.getTransaction().commit();
+            return count > 0;
+        }catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    //Check if the room is already exist or not based on the hotel id
+    @Transactional
+    public Boolean RoomExistOrNot(String roomNumber, long hotelId){
+        Session session = null;
+        try {
+            session = this.sessionFactory.openSession();
+            session.beginTransaction();
+
+            String hql = "SELECT COUNT(hr.roomId) FROM HotelRoom hr WHERE hr.roomNumber = :roomNumber AND hr.hotel.hotelId = :hotelId";
+
+            Query query = session.createQuery(hql);
+            query.setParameter("roomNumber", roomNumber);
+            query.setParameter("hotelId", hotelId);
+
+            long count = (long) query.getSingleResult();
+
+            session.getTransaction().commit();
+            return count > 0;
+        }catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+
 
 
 

@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fyp.hotel.dao.*;
 import com.fyp.hotel.dao.user.BlogDAO;
+import com.fyp.hotel.dao.user.UserDAO;
 import com.fyp.hotel.dto.BookingDTO;
 import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.UserMessageDTO;
 import com.fyp.hotel.dto.khalti.CustomerInfo;
 import com.fyp.hotel.dto.khalti.KhaltiInitationRequest;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
@@ -76,6 +78,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private BookingDAO bookingDAO;
     private WebClient webClient;
     private KhaltiPayment khaltiPayment;
+    private UserDAO userDAO;
+    private UserMessageRepository userMessageRepository;
 
     @Autowired
     public UserServiceImplementation(
@@ -101,7 +105,9 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             @Lazy BlogDAO blogDAO,
             @Lazy BlogCommentRepository blogCommentRepository,
             @Lazy BookingDAO bookingDAO,
-            @Lazy KhaltiPayment khaltiPayment
+            @Lazy KhaltiPayment khaltiPayment,
+            @Lazy UserDAO userDAO,
+            @Lazy UserMessageRepository userMessageRepository
 
     ) {
         this.userRepo = userRepo;
@@ -127,11 +133,24 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         this.blogCommentRepository = blogCommentRepository;
         this.bookingDAO = bookingDAO;
         this.khaltiPayment = khaltiPayment;
+        this.userDAO = userDAO;
+        this.userMessageRepository = userMessageRepository;
     }
 
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceImplementation.class);
 
+
+    @Transactional
+    public boolean checkUserExist(String userName) {
+        if(userDAO.isUserExist(userName)){
+            System.out.println("User exist");
+            return true;
+        }
+        System.out.println("User does not exist");
+        //false if user does not exist
+        return false;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -820,6 +839,28 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     @Transactional
     public String getUserNameOfHotel(long hotelId) {
         return hotelDAO.getHotelOwnerName(hotelId);
+    }
+
+    //post user message
+    @Transactional
+    public String postUserMessage(UserMessageDTO userMessageDTO) {
+        try {
+
+            UserMessage userMessage = new UserMessage();
+
+            userMessage.setFirstName(userMessageDTO.getFirstName());
+            userMessage.setLastName(userMessageDTO.getLastName());
+            userMessage.setEmail(userMessageDTO.getEmail());
+            userMessage.setMessage(userMessageDTO.getMessage());
+            userMessage.setCreatedAt(LocalDate.now());
+
+            userMessageRepository.save(userMessage);
+
+            return "Message posted successfully.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to post message.";
+        }
     }
 
 }

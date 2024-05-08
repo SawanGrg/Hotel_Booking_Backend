@@ -124,6 +124,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/user/filterRooms/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "v1/user/checkRoomAvailability/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/user/hotelUserName/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/user/getInTouch/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/v1/user/payment/**").hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
                         .requestMatchers(HttpMethod.GET, "/v1/user/profile").hasAuthority("ROLE_USER")
@@ -170,6 +171,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/admin/specificBlog/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/admin/unverifyUser/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/admin/unverifyVendor/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/admin/viewUserMessage").hasAuthority("ROLE_ADMIN")
 
 
                         .anyRequest().permitAll())

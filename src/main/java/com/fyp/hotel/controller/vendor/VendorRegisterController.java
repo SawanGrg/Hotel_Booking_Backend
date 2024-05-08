@@ -1,6 +1,7 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.vendorDto.VendorDto;
+import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,13 +26,16 @@ public class VendorRegisterController {
 
     private ObjectMapper objectMapper;
     private VendorServiceImplementation vendorServiceImplementation;
+    private UserServiceImplementation userServiceImplementation;
 
     public VendorRegisterController(
             ObjectMapper objectMapper,
-            VendorServiceImplementation vendorServiceImplementation
+            VendorServiceImplementation vendorServiceImplementation,
+            UserServiceImplementation userServiceImplementation
     ) {
         this.objectMapper = objectMapper;
         this.vendorServiceImplementation = vendorServiceImplementation;
+        this.userServiceImplementation = userServiceImplementation;
 
     }
     @PostMapping("/register")
@@ -52,6 +56,30 @@ public class VendorRegisterController {
             //object mapper conversion in to java object 
             VendorDto vendorDto = this.objectMapper.readValue(stringVendorData, VendorDto.class);
             HotelDto hotel = this.objectMapper.readValue(stringHotelData, HotelDto.class);
+
+
+            if (this.userServiceImplementation.checkUserExist(vendorDto.getUserName())) {
+
+                RegisterDto registerDto = new RegisterDto();
+
+                registerDto.setMessage("User already exist");
+                registerDto.setStatus(HttpStatus.BAD_REQUEST);
+
+                return new ResponseEntity<>(registerDto, HttpStatus.BAD_REQUEST);
+
+            }
+
+            //check if the hotel pan is already exist
+            if (this.vendorServiceImplementation.checkHotelPanExist(hotel.getHotelPan())) {
+
+                RegisterDto registerDto = new RegisterDto();
+
+                registerDto.setMessage("Hotel PAN already exist");
+                registerDto.setStatus(HttpStatus.BAD_REQUEST);
+
+                return new ResponseEntity<>(registerDto, HttpStatus.BAD_REQUEST);
+
+            }
 
             String registerStatus = this.vendorServiceImplementation.registerVendor(vendorDto, stringVendorImage, hotel, stringHotelImage);
 

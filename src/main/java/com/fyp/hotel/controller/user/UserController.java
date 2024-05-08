@@ -2,10 +2,7 @@ package com.fyp.hotel.controller.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.ApiResponse;
-import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
-import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.*;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
 import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
@@ -561,6 +558,21 @@ try {
         } catch (Exception e) {
             ApiResponse<String> errorResponse = new ApiResponse<>(404, "Not found", e.getMessage());
             return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
+    //user post message for getting in touch
+    @PostMapping("/getInTouch")
+    public ResponseEntity<?> getInTouch(
+            @RequestBody UserMessageDTO userMessageDTO
+    ) {
+        try {
+            String response = userServiceImplementation.postUserMessage(userMessageDTO);
+            ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
+            return ResponseEntity.status(200).body(successResponse);
+        } catch (Exception e) {
+            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
 

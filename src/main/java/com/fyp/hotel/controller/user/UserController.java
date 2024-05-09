@@ -251,6 +251,7 @@ try {
             @RequestParam(name = "numberOfGuest", required = false, defaultValue = "2") String numberOfGuest,
             @RequestParam(name = "paymentMethod") String paymentMethod
     ) {
+
         try {
             // Create a BookDto from the request parameters
             BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);

@@ -143,7 +143,6 @@ public class ValueMapper {
            Long roomId,
            String checkInDate,
            String checkOutDate,
-//           String daysOfStay,
            String numberOfGuest,
            String paymentMethod
     ){
@@ -153,8 +152,8 @@ public class ValueMapper {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         bookDto.setRoomId(roomId);
-        bookDto.setCheckInDate(LocalDate.parse(checkInDate, formatter));  //convert string to local date
-        bookDto.setCheckOutDate(LocalDate.parse(checkOutDate, formatter));
+        bookDto.setCheckInDate(LocalDate.parse(checkInDate, formatter).plusDays(1));  //convert string to local date
+        bookDto.setCheckOutDate(LocalDate.parse(checkOutDate, formatter).plusDays(1));
         bookDto.setNumberOfGuest(Long.parseLong(numberOfGuest)); //convert string to long
         bookDto.setBookingDate(LocalDate.now()); //get the current date
         bookDto.setPaymentMethod(paymentMethod);

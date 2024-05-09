@@ -484,9 +484,13 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
                 khaltiInitiationRequest.setReturn_url(return_url);
                 khaltiInitiationRequest.setWebsite_url(website_url);
-                khaltiInitiationRequest.setAmount(totalAmount);
+                long khaltiTotalAmount = totalAmount * 100;
+                khaltiInitiationRequest.setAmount(khaltiTotalAmount);
                 khaltiInitiationRequest.setPurchase_order_id(bookingObj.getBookingId().toString());
                 khaltiInitiationRequest.setPurchase_order_name(hotelRoom.getRoomNumber().toString());
+
+                System.out.println("khalti set amount " + khaltiInitiationRequest.getAmount());
+
 
 
 

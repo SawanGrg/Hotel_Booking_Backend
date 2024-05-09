@@ -64,7 +64,8 @@ public class RoomBookingController {
             @RequestParam(name = "paymentMethod") String paymentMethod
     ) {
         try {
-
+            System.out.println("check in date " + checkInDate);
+            System.out.println("check out date " + checkOutDate);
             System.out.println("step 1");
             BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
             System.out.println("step 2");

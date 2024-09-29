@@ -156,7 +156,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = this.userRepo.findByUserName(username);
         // Extract roles of a user based on the user details
-        Set<Role> roles = this.roleRepo.findRolesByUser(user); // Corrected method name
+        Set<Role> roles = this.roleRepo.findRolesByUser(user);
         user.setRoles(roles);
         if (!user.isEnabled()) {
             throw new DisabledException("User is disabled");
@@ -164,14 +164,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         return user;
     }
 
-    @Transactional
-    public User getUserWithRoles(String username) {
-        User user = userRepo.findByUserName(username);
-        // Accessing roles should work within the transaction.
-        user.getRoles().size(); // This fetches the roles from the database.
-
-        return user;
-    }
 
     @Transactional
     public String registerUser(User user, MultipartFile userImage) {
@@ -446,6 +438,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                 HotelRoom hotelRoom = hotelRoomRepository.findByRoomId(bookDto.getRoomId());
                 Long hotelId = hotelRoom.getHotel().getHotelId();
                 PaymentMethod paymentMethodObject = paymentMethodDAO.getPaymentMethod(bookDto.getPaymentMethod().toUpperCase());
+
                 Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
                 String userName = authenticatedUser.getName();
 

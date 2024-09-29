@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-@EnableJpaRepositories
+@EnableJpaRepositories //to enable jpa repositories
 public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
 
     //get hotel rooms details by hotel id
@@ -24,19 +24,6 @@ public interface HotelRoomRepository extends JpaRepository<HotelRoom, Long>{
     // Get hotel rooms details by hotel id where is_deleted is false
     @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotel.hotelId = :hotelId AND hr.isDeleted = false")
     List<HotelRoom> findActiveHotelRoomsByHotelId(@Param("hotelId") Long hotelId);
-
-    //get hotel rooms details by hotel id using custom query
-//    @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotel.hotelId = :hotelId")
-//    List<HotelRoom> findHotelRoomsByHotelId(@Param("hotelId") Long hotelId);
-
-    // Get hotel rooms details by hotel id with pagination
-    Page<HotelRoom> findByHotel_HotelId(Long hotelId, Pageable pageable);
-
-    HotelRoom findByHotel_HotelId(Long hotelId);
-    @Transactional
-    @Modifying // modify the database
-    @Query("DELETE FROM HotelRoom hr WHERE hr.roomId = :wantedRoomId")
-    void deleteRoomById(@Param("wantedRoomId") Long roomId);
 
     @Query("SELECT hr FROM HotelRoom hr WHERE hr.hotel.hotelId = :hotelId AND hr.isDeleted = false")
     Page<HotelRoom> findAllByHotel_HotelId(Long hotelId, Pageable pageable);

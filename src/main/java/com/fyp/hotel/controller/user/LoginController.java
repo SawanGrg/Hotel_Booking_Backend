@@ -33,7 +33,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticate(
-            @Validated //validated is used to validate the request body of the request we validate based on the annotations given in the dto class
+            @Validated
             @RequestBody
             LoginRequestDto request) {
 
@@ -60,8 +60,6 @@ public class LoginController {
                 }
             }
 
-                String jwtToken = jwtUtils.generateToken(user);
-
                 LoginResponseDto loginResponseDto = new LoginResponseDto();
                 loginResponseDto.setUsername(user.getUsername());
                 loginResponseDto.setToken(jwtUtils.generateToken(user));
@@ -73,22 +71,14 @@ public class LoginController {
         }
     }
 
-    //this method checks whether the user is authenticated or not
-    //
     private void doAuthenticate(String username, String password){
         try{
 
             System.out.println("came in login controller  step 5 : " );
 
-            //token is created with the help of username and password
-            //UsernamePasswordAuthenticationToken is useful when we want to authenticate a user with a username and password.
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-            System.out.println(" from username password authentication token:------------------> " + token);
-            
-            //authenticate method makes sure that the user is authenticated or not
+
             authenticationManager.authenticate(token);
-            //if the user is authenticated then it will return true
-            //else it will throw an exception
         }
         catch(BadCredentialsException e){
             throw new BadCredentialsException ("Invalid credentials, please check your username and password");

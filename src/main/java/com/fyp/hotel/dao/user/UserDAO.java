@@ -23,11 +23,14 @@ public class UserDAO {
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
+
             Long count = (Long) session.createQuery("SELECT COUNT(*) FROM User u WHERE u.userName = :username")
                     .setParameter("username", username)
                     .uniqueResult();
+
             session.getTransaction().commit();
             return count > 0;
+
         } catch (Exception e) {
             if (session != null) {
                 session.getTransaction().rollback();

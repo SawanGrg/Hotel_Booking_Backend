@@ -341,6 +341,63 @@ public class VendorController {
         }
     }
 
+    @PostMapping("/updateHotelDetails")
+    public ResponseEntity<?> updateHotelDetails(
+            @RequestParam("hotelData") String hotelDataJson,
+            @RequestParam(value = "mainHotelImage", required = false) MultipartFile mainHotelImage
+    ) {
+        try {
+            // Deserialize JSON string to HotelDto object
+            HotelDto hotelDtoDetails = null;
+            if (hotelDataJson != null) {
+                hotelDtoDetails = objectMapper.readValue(hotelDataJson, HotelDto.class);
+            }
+
+            // Get the original filename of the main hotel image
+            String hotelMainImage = mainHotelImage != null ? mainHotelImage.getOriginalFilename() : null;
+
+            // Logging hotel details for debugging purposes
+            logHotelDetails(hotelDtoDetails, hotelMainImage);
+
+            // Call service method to update hotel details
+            String response = vendorServiceImplementation.updateHotelDetails(
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelName() : null,
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelAddress() : null,
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelContact() : null,
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelEmail() : null,
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelPan() : null,
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelDescription() : null,
+                    hotelDtoDetails != null ? hotelDtoDetails.getHotelStar() : 0,
+                    mainHotelImage != null ? mainHotelImage : null
+            );
+
+            // Return appropriate response based on the service method result
+            if ("Hotel details updated successfully".equals(response)) {
+                return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
+            } else {
+                return ResponseEntity.status(500).body(new ApiResponse<>(500, "An error occurred", response));
+            }
+        } catch (Exception e) {
+            // Handle other exceptions
+            return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal Server Error", e.getMessage()));
+        }
+    }
+
+    private void logHotelDetails(HotelDto hotelDto, String mainImageFileName) {
+        if (hotelDto != null) {
+            System.out.println("Hotel DTO : " + hotelDto.getHotelId());
+            System.out.println("Hotel name : " + hotelDto.getHotelName());
+            System.out.println("Hotel address : " + hotelDto.getHotelAddress());
+            System.out.println("Hotel contact : " + hotelDto.getHotelContact());
+            System.out.println("Hotel email : " + hotelDto.getHotelEmail());
+            System.out.println("Hotel PAN : " + hotelDto.getHotelPan());
+            System.out.println("Hotel description : " + hotelDto.getHotelDescription());
+            System.out.println("Hotel star : " + hotelDto.getHotelStar());
+        }
+        System.out.println("Main hotel image : " + mainImageFileName);
+    }
+
+
 
 }
 

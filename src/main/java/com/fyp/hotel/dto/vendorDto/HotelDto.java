@@ -33,7 +33,6 @@ public class HotelDto {
 
     private Boolean isDeleted;
 
-
     private String createdAt;
 
     private String updatedAt;

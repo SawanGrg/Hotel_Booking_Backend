@@ -1,6 +1,5 @@
 package com.fyp.hotel.config;
 
-//import com.fyp.hotel.filter.MyCustomFilter;
 import com.fyp.hotel.filter.*;
 import com.fyp.hotel.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,32 +71,7 @@ public class SecurityConfig {
         return provider;
     }
 
-    /*
-    using @component makes the filter to be called for all the request as it is registered as a bean
-    it is register in default filter chain of spring security
-    but we remove @component
-    and make the filter to be called for specific request for fine grained control
-     */
-//    for open api like get all hotels, get all rooms, get all images
-//    @Bean
-//    public SecurityFilterChain apiTestFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .securityMatchers(matchers -> matchers
-////                        .requestMatchers("/api/test/**")
-//                        .requestMatchers("/v1/user/hotel")
-//                )
-//
-//                // Configure other security aspects as needed
-//                .addFilterBefore(new MyCustomFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(new CustomFilter2(), UsernamePasswordAuthenticationFilter.class)
-////                .addFilterBefore( new JwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling( ex -> ex
-//                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        http.authenticationProvider(authenticationProvider());
-//        return http.build();
-//    }
+
 
 //for all other request which needs authentication and authorization
     @Bean

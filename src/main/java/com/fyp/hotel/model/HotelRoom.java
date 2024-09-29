@@ -27,7 +27,7 @@ public class HotelRoom {
     private Long roomId;
 
     @Column(name = "room_number", nullable = false, unique = false)
-    @Basic // to avoid lazy initialization exception
+    @Basic //basic is used to avoid lazy initialization exception
     private String roomNumber;
 
     @Enumerated(EnumType.STRING)

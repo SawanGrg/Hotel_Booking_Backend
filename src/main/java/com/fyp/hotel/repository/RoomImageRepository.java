@@ -13,16 +13,6 @@ import java.util.List;
 @Repository
 public interface RoomImageRepository extends JpaRepository<RoomImage, Long> {
 
-    List<RoomImage> findImageUrlByHotelRoom_RoomId(Long roomId);
-
-//    @Modifying
-//   @Query()
-//    void deleteImageUrlByHotelRoom_RoomId(long roomId);
-
-    @Modifying
-    @Query("DELETE FROM RoomImage r WHERE r.hotelRoom.roomId = :roomId")
-    void deleteImageUrlByHotelRoom_RoomId(long roomId);
-
     List<RoomImage> findByHotelRoom(HotelRoom room);
 
 

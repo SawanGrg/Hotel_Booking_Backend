@@ -59,7 +59,7 @@ public class RoomBookingController {
             @PathVariable(name = "roomId") Long roomId,
             @RequestParam(name = "checkInDate") String checkInDate,
             @RequestParam(name = "checkOutDate") String checkOutDate,
-//            @Validated @RequestParam(name = "daysOfStay") String daysOfStay,
+            @Validated @RequestParam(name = "daysOfStay", required = false) String daysOfStay,
             @RequestParam(name = "numberOfGuest", required = false, defaultValue = "2") String numberOfGuest,
             @RequestParam(name = "paymentMethod") String paymentMethod
     ) {

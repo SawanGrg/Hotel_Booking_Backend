@@ -85,7 +85,7 @@ public class VendorServiceImplementation implements VendorService {
 
     @Transactional
     public Boolean checkHotelPanExist(String hotelPan) {
-        if(hotelDAO.existByHotelPan(hotelPan)){
+        if (hotelDAO.existByHotelPan(hotelPan)) {
             return true;
         }
         return false;
@@ -227,7 +227,7 @@ public class VendorServiceImplementation implements VendorService {
         // Fetch all room images for each room
         for (HotelRoom room : hotelRooms) {
             List<RoomImage> roomImages = roomImageRepo.findByHotelRoom(room);
-            for(RoomImage roomImage : roomImages){
+            for (RoomImage roomImage : roomImages) {
                 System.out.println("Room image first : " + roomImages);
                 System.out.println("Room image second iteration: " + roomImage);
                 room.setRoomImages(roomImages);
@@ -236,6 +236,7 @@ public class VendorServiceImplementation implements VendorService {
         System.out.println("Hotel rooms final: " + hotelRooms);
         return hotelRooms;
     }
+
     @Transactional
     public List<RoomImage> getRoomImagesOfRoom(Long roomId) {
         // Fetch the specific room based on roomId
@@ -303,9 +304,9 @@ public class VendorServiceImplementation implements VendorService {
                     }
 
                     //update the side room image
-                    if(roomImage1 != null){
+                    if (roomImage1 != null) {
                         boolean isRoomImage1Uploaded = fileUploaderHelper.fileUploader(roomImage1);
-                        if(isRoomImage1Uploaded){
+                        if (isRoomImage1Uploaded) {
                             RoomImage roomImageObj = new RoomImage();
                             roomImageObj.setImageUrl(roomImage1.getOriginalFilename());
                             roomImageObj.setHotelRoom(room);
@@ -315,9 +316,9 @@ public class VendorServiceImplementation implements VendorService {
                         }
                     }
 
-                    if(roomImage2 != null){
+                    if (roomImage2 != null) {
                         boolean isRoomImage2Uploaded = fileUploaderHelper.fileUploader(roomImage2);
-                        if(isRoomImage2Uploaded){
+                        if (isRoomImage2Uploaded) {
                             RoomImage roomImageObj = new RoomImage();
                             roomImageObj.setImageUrl(roomImage2.getOriginalFilename());
                             roomImageObj.setHotelRoom(room);
@@ -326,9 +327,9 @@ public class VendorServiceImplementation implements VendorService {
                             roomImageRepo.save(roomImageObj);
                         }
                     }
-                    if(roomImage3 != null){
+                    if (roomImage3 != null) {
                         boolean isRoomImage3Uploaded = fileUploaderHelper.fileUploader(roomImage3);
-                        if(isRoomImage3Uploaded){
+                        if (isRoomImage3Uploaded) {
                             RoomImage roomImageObj = new RoomImage();
                             roomImageObj.setImageUrl(roomImage3.getOriginalFilename());
                             roomImageObj.setHotelRoom(room);
@@ -351,7 +352,7 @@ public class VendorServiceImplementation implements VendorService {
     }
 
     @Transactional
-    public  String deleteSpecificRoom (long roomId){
+    public String deleteSpecificRoom(long roomId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication.isAuthenticated()) {
@@ -408,7 +409,7 @@ public class VendorServiceImplementation implements VendorService {
 
     //post report and issue by the vendor
     @Transactional
-    public String postReport(Report report){
+    public String postReport(Report report) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication.isAuthenticated()) {
@@ -431,7 +432,7 @@ public class VendorServiceImplementation implements VendorService {
 
     //get hotel details only
     @Transactional
-    public Hotel getHotelDetailsService(){
+    public Hotel getHotelDetailsService() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.isAuthenticated()) {
             String username = authentication.getName();
@@ -505,7 +506,7 @@ public class VendorServiceImplementation implements VendorService {
             if (updated) {
 
                 //set the value of room status to unavailable
-                if(status.equals("BOOKED")){
+                if (status.equals("BOOKED")) {
                     Booking booking = bookingRepository.findById(bookingId).get();
                     HotelRoom hotelRoom = booking.getHotelRoom();
                     hotelRoom.setRoomStatus("BOOKED");
@@ -530,7 +531,7 @@ public class VendorServiceImplementation implements VendorService {
     }
 
     @Transactional
-    public VendorDashboardAnalyticsDTO getVendorAnalyticsService(){
+    public VendorDashboardAnalyticsDTO getVendorAnalyticsService() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User vendor = userRepo.findByUserName(username);
@@ -551,7 +552,7 @@ public class VendorServiceImplementation implements VendorService {
         vendorDashboardAnalyticsDTO.setTotalCancelledRooms(totalCancelled);
 //
 //        //get the total number of bookings
-       long totalPending = hotelDAO.getTotalPendingBookings(hotel.getHotelId());
+        long totalPending = hotelDAO.getTotalPendingBookings(hotel.getHotelId());
         vendorDashboardAnalyticsDTO.setTotalPendingRooms(totalPending);
 
 //        get the total booked number of bookings
@@ -572,7 +573,7 @@ public class VendorServiceImplementation implements VendorService {
 
         long totalAvailableRoom = this.hotelDAO.getTodayAvailableRoom(hotel.getHotelId());
         vendorDashboardAnalyticsDTO.setTotalAvailableRooms(totalAvailableRoom);
-        
+
         return vendorDashboardAnalyticsDTO;
     }
 
@@ -591,8 +592,7 @@ public class VendorServiceImplementation implements VendorService {
                 return hotelDAO.getHotelReviews(hotel.getHotelId());
             }
             return null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -667,6 +667,77 @@ public class VendorServiceImplementation implements VendorService {
         String vendorName = SecurityContextHolder.getContext().getAuthentication().getName();
         Hotel hotel = hotelRepo.findByUser(userRepo.findByUserName(vendorName));
         return hotelDAO.RoomExistOrNot(roomNumber, hotel.getHotelId());
+    }
+
+    @Transactional
+    public Hotel getHotelDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            User vendor = userRepo.findByUserName(username);
+            return hotelRepo.findByUser(vendor);
+        }
+        return null;
+    }
+
+    @Transactional
+    public String updateHotelDetails(
+            String hotelName,
+            String hotelAddress,
+            String hotelContact,
+            String hotelEmail,
+            String hotelPan,
+            String hotelDescription,
+            int hotelStar,
+            MultipartFile hotelImage
+    ) {
+        System.out.println("hotel update service");
+
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userName = authentication.getName();
+
+            User vendor = userRepo.findByUserName(userName);
+
+            Hotel hotel = hotelRepo.findByUser(vendor);
+
+            if (hotelImage != null) {
+                boolean isHotelImageUploaded = fileUploaderHelper.fileUploader(hotelImage);
+                if (isHotelImageUploaded) {
+                    hotel.setHotelImage(hotelImage.getOriginalFilename());
+                }
+            }
+
+            if (hotelName != null) {
+                hotel.setHotelName(hotelName);
+            }
+            if (hotelAddress != null) {
+                hotel.setHotelAddress(hotelAddress);
+            }
+            if (hotelContact != null) {
+                hotel.setHotelContact(hotelContact);
+            }
+            if (hotelEmail != null) {
+                hotel.setHotelEmail(hotelEmail);
+            }
+            if (hotelPan != null) {
+                hotel.setHotelPan(hotelPan);
+            }
+            if (hotelDescription != null) {
+                hotel.setHotelDescription(hotelDescription);
+            }
+            if (hotelStar != 0) {
+                hotel.setHotelStar(hotelStar);
+            }
+
+            hotel.setUpdatedAt(Instant.now());
+            hotelRepo.save(hotel);
+
+            return "Hotel details updated successfully";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to update hotel details";
+        }
     }
 
 }

@@ -17,40 +17,6 @@ public class UserHibernateRepo {
     @Autowired
     private SessionFactory sessionFactory;
 
-    public void saveOrUpdateUser(User user) {
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.saveOrUpdate(user);
-        session.getTransaction().commit();
-        session.close();
-    }
-
-    public User getUserById(int userId) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        User user = session.get(User.class, userId); // get method is used to get the data from the database
-        session.close();
-        return user;
-    }
-
-    public List<User> getAllUsers() {
-        Session session = sessionFactory.openSession();
-        TypedQuery<User> query = session.createQuery("FROM User", User.class);
-        List<User> userList = query.getResultList();
-        session.close();
-        return userList;
-    }
-
-    public void deleteUser(int userId) {
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        User user = session.get(User.class, userId);
-        if (user != null) {
-            session.delete(user);
-        }
-        session.getTransaction().commit();
-        session.close();
-    }
 
     //    extract user details based on username
     public User getUserByUsername(String username) {

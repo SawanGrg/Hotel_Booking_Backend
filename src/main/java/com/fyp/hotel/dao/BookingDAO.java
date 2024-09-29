@@ -31,8 +31,10 @@ public class BookingDAO {
             session.beginTransaction();
 
             String hql = "FROM Booking b WHERE b.checkOutDate = :checkOutDate";
+
             Query<Booking> query = session.createQuery(hql, Booking.class);
             query.setParameter("checkOutDate", LocalDate.now());
+
             return query.list();
 
         }catch (Exception e) {
@@ -59,11 +61,12 @@ public class BookingDAO {
                     "AND b.hotelRoom.roomStatus = :status " + // Add space after :status
                     "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate)";
 
-
             Query<BookingStatusDTO> query = session.createQuery(hql, BookingStatusDTO.class);
-            query.setParameter("hotelId", hotelId); // Set hotelId parameter
+
+            query.setParameter("hotelId", hotelId);
             query.setParameter("status", "BOOKED");
             query.setParameter("currentDate", LocalDate.now());
+
             return query.list();
 
         } catch (Exception e) {
@@ -84,9 +87,12 @@ public class BookingDAO {
             session.beginTransaction();
 
             String hql = "SELECT SUM(b.totalAmount) FROM Booking b WHERE b.hotelRoom.hotel.hotelId = :hotelId AND b.paymentMethod = :paymentMethod AND b.status = 'BOOKED'";
+
             Query query = session.createQuery(hql);
+
             query.setParameter("hotelId", hotelId);
             query.setParameter("paymentMethod", paymentMethod);
+
             return (long) query.uniqueResult();
 
         } catch (Exception e) {
@@ -107,9 +113,12 @@ public class BookingDAO {
             session.beginTransaction();
 
             String hql = "SELECT SUM(b.totalAmount) FROM Booking b WHERE b.hotelRoom.hotel.hotelId = :hotelId AND b.paymentMethod = :paymentMethod AND b.status = 'BOOKED'";
+
             Query query = session.createQuery(hql);
+
             query.setParameter("hotelId", hotelId);
             query.setParameter("paymentMethod", paymentMethod);
+
             return (long) query.uniqueResult();
 
         } catch (Exception e) {
@@ -131,15 +140,17 @@ public class BookingDAO {
 
             String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
                     "FROM Booking b " +
-                    "WHERE b.hotelRoom.roomId = :roomId " + // Add condition for room ID
-                    "AND b.hotelRoom.roomStatus = :status " + // Add space after :status
+                    "WHERE b.hotelRoom.roomId = :roomId " +
+                    "AND b.hotelRoom.roomStatus = :status " +
                     "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate)";
 
 
             Query<BookingStatusDTO> query = session.createQuery(hql, BookingStatusDTO.class);
+
             query.setParameter("roomId", (Long) roomId); // Set roomId parameter
             query.setParameter("status", "BOOKED");
             query.setParameter("currentDate", LocalDate.now());
+
             return query.list();
 
         } catch (Exception e) {

@@ -125,7 +125,7 @@ public class HotelRoomDAO {
     //update room status as available based on booking id
     public void updateRoomStatusAsAvailable(Long bookingId) {
         try {
-            // Open a session and begin a transaction
+
             Session session = sessionFactory.openSession();
             session.beginTransaction();
 
@@ -133,10 +133,8 @@ public class HotelRoomDAO {
             Query query = session.createQuery("UPDATE HotelRoom hr SET hr.roomStatus = 'AVAILABLE' WHERE hr.roomId = (SELECT b.hotelRoom.roomId FROM Booking b WHERE b.bookingId = :bookingId)");
             query.setParameter("bookingId", bookingId);
 
-            // Execute the update query
             query.executeUpdate();
 
-            // Commit the transaction and close the session
             session.getTransaction().commit();
             session.close();
         } catch (Exception e) {

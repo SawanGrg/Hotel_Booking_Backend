@@ -33,6 +33,8 @@ public class KhaltiPayment {
     }
 
     public KhaltiResponseDTO callKhalti(KhaltiInitationRequest request) throws JsonProcessingException {
+
+        // Convert the request object to JSON
         String formDataJson = objectMapper.writeValueAsString(request);
 
         HttpHeaders headers = new HttpHeaders();

@@ -1,16 +1,10 @@
 package com.fyp.hotel.dao;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import com.fyp.hotel.model.HotelRoom;
-import com.fyp.hotel.model.HotelRoomType;
-import com.fyp.hotel.model.HotelRoomCategory;
-import com.fyp.hotel.model.HotelBedType;
 
 import java.util.List;
 

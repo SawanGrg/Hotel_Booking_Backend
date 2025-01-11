@@ -50,7 +50,6 @@ public class VendorController {
     }
 
 
-    //insert the hotel rooms 
     @PostMapping("/addHotelRooms")
     public ResponseEntity<ApiResponse<String>> addHotelRooms(
             @RequestParam("roomData") String stringRoomData,
@@ -59,33 +58,16 @@ public class VendorController {
             @RequestParam(value = "roomImage2", required = false) MultipartFile stringHotelImage2,
             @RequestParam(value = "roomImage3", required = false) MultipartFile stringHotelImage3
     ) {
-        System.out.println("room Data : " + stringRoomData);
-        System.out.println("Hotel Image : " + stringHotelImage);
-        System.out.println("Hotel Image 1 : " + stringHotelImage1);
-        System.out.println("Hotel Image 2 : " + stringHotelImage2);
-        System.out.println("Hotel Image 3 : " + stringHotelImage3);
-
         try {
-            //read the json data and convert it into room dto
             RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class);
-            System.out.println("Hotel DTO : " + roomDto);
 
-            //check if the room number is already registered or not
             if (vendorServiceImplementation.checkRoomExistsOrNot(roomDto.getRoomNumber())) {
                 ApiResponse<String> apiResponse = new ApiResponse<>(400, "Room Number already exists", "Room Number already exists");
                 return ResponseEntity.badRequest().body(apiResponse);
             }
 
-            System.out.println("Room DTO before service: " + roomDto);
-            System.out.println("Hotel Image : " + stringHotelImage);
-            System.out.println("Hotel Image 1 : " + stringHotelImage1);
-            System.out.println("Hotel Image 2 : " + stringHotelImage2);
-            System.out.println("Hotel Image 3 : " + stringHotelImage3);
-
             String roomStatus = this.vendorServiceImplementation.addRooms(roomDto, stringHotelImage, stringHotelImage1, stringHotelImage2, stringHotelImage3);
 
-            System.out.println("Room Status : " + roomStatus)
-            ;
             if ("Room Registered Successfully".equals(roomStatus)) {
                 logger.info("Room Registered Successfully");
                 ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", roomStatus);
@@ -96,14 +78,12 @@ public class VendorController {
                 return ResponseEntity.badRequest().body(apiResponse);
             }
         } catch (Exception e) {
-            System.out.println("Error in vendor controller : " + e.getMessage());
+            logger.error("Error in vendor controller : {}", e.getMessage());
             ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", e.getMessage());
             return ResponseEntity.badRequest().body(apiResponse);
-
         }
     }
 
-    //get all the hotel rooms
     @GetMapping("/hotelRooms")
     public ResponseEntity<Page<HotelRoom>> getHotelRooms(
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -112,14 +92,11 @@ public class VendorController {
             Page<HotelRoom> hotelRooms = vendorServiceImplementation.getHotelRooms(page, size);
             return ResponseEntity.ok(hotelRooms);
         } catch (Exception e) {
-            e.printStackTrace(); // Print the exception for debugging
+            logger.error("Error fetching hotel rooms: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    //get
-
-    //Update the specific details
     @PostMapping("/updateRoom/{roomId}")
     public ResponseEntity<?> updateRoom(
             @PathVariable(name = "roomId") Long roomlId,
@@ -131,7 +108,7 @@ public class VendorController {
     ) {
         try {
             logger.info("Attempting to update room with ID: {}", roomlId);
-            RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class); // Read the JSON data and convert it into RoomDto
+            RoomDto roomDto = this.objectMapper.readValue(stringRoomData, RoomDto.class);
             String response = vendorServiceImplementation.updateRoom(roomlId, roomDto, stringHotelImage, stringHotelImage1, stringHotelImage2, stringHotelImage3);
 
             if ("Room updated successfully".equals(response)) {
@@ -150,32 +127,6 @@ public class VendorController {
         }
     }
 
-    //delete a specific room
-//    @PostMapping("/delete/{hotelId}")
-//    public ResponseEntity<?> deleteRoom(
-//            @PathVariable(name = "hotelId") Long hotelId
-//    ){
-//        try {
-//            logger.info("Attempting to delete room with ID: {}", hotelId);
-//            String response = vendorServiceImplementation.deleteRoom(hotelId);
-//
-//            if ("Room deleted successfully".equals(response)) {
-//                logger.info("Room deleted successfully with ID: {}", hotelId);
-//                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Success", response);
-//                return ResponseEntity.ok(apiResponse);
-//            } else {
-//                logger.error("Failed to delete room with ID {}: {}", hotelId, response);
-//                ApiResponse<String> apiResponse = new ApiResponse<>(500, "Failed", response);
-//                return ResponseEntity.status(500).body(apiResponse);
-//            }
-//        } catch (Exception e) {
-//            logger.error("Exception occurred while deleting room with ID {}: {}", hotelId, e.getMessage());
-//            return ResponseEntity.status(500).body(e.getMessage());
-//        }
-//
-//    }
-
-    //post report and issue by the vendor
     @PostMapping("/report")
     public ResponseEntity<?> postReport(
             @RequestBody ReportDto reportDto
@@ -196,7 +147,6 @@ public class VendorController {
         }
     }
 
-    //get hotel details
     @GetMapping("/hotelDetails")
     public ResponseEntity<?> getHotelDetails() {
         try {
@@ -210,15 +160,12 @@ public class VendorController {
         }
     }
 
-    //get all booked or refunded or cancelled bookings
     @GetMapping("/bookings")
     public ResponseEntity<?> getBookings(
             @RequestParam(name = "status", required = false, defaultValue = "") String status,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "30") int size
     ) {
-
-        System.out.println("Status : " + status);
         try {
             List<VendorBookingDTO> vendorBookingDTOS = vendorServiceImplementation.getBookings(status, page, size);
             ApiResponse<List<VendorBookingDTO>> apiResponse = new ApiResponse<>(200, "Success", vendorBookingDTOS);
@@ -229,38 +176,9 @@ public class VendorController {
         }
     }
 
-    //setting the booking status as booked and sending the mail to the specific user
-//    @PostMapping("/roomStatus/{bookingId}/{userId}")
-//    public ResponseEntity<?> changeStatus(
-//            @PathVariable(name = "bookingId", required = true) long bookingId,
-//            @PathVariable(name = "userId", required = true) long userId,
-//            @RequestParam(name = "vendorDecision", required = true, defaultValue = "BOOKED") String status
-//    ){
-//        try {
-//            // Call service to update booking status
-//            String response = this.vendorServiceImplementation.updateBooking(bookingId,userId, status);
-//
-//            // Check if the booking status was successfully changed
-//            if ("Successfully Changed".equals(response)) {
-//                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Successfully Booked", response);
-//                return ResponseEntity.ok().body(apiResponse);
-//            } else {
-//                // Handle if status update fails
-//                ApiResponse<String> apiResponse = new ApiResponse<>(400, "Failed to update status", response);
-//                return ResponseEntity.badRequest().body(apiResponse);
-//            }
-//        } catch (Exception e) {
-//            // Handle any exceptions
-//            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Internal Server Error", e.getMessage());
-//            return ResponseEntity.status(500).body(apiResponse);
-//        }
-//    }
-
-    //get all the anayltic datas
     @GetMapping("/analytics")
     public ResponseEntity<?> getVendorAnalytics() {
         try {
-
             VendorDashboardAnalyticsDTO vendorDashboardAnalyticsDTO = vendorServiceImplementation.getVendorAnalyticsService();
             ApiResponse<VendorDashboardAnalyticsDTO> apiResponse = new ApiResponse<>(200, "Success", vendorDashboardAnalyticsDTO);
             return ResponseEntity.ok(apiResponse);
@@ -352,12 +270,8 @@ public class VendorController {
             if (hotelDataJson != null) {
                 hotelDtoDetails = objectMapper.readValue(hotelDataJson, HotelDto.class);
             }
-
             // Get the original filename of the main hotel image
             String hotelMainImage = mainHotelImage != null ? mainHotelImage.getOriginalFilename() : null;
-
-            // Logging hotel details for debugging purposes
-            logHotelDetails(hotelDtoDetails, hotelMainImage);
 
             // Call service method to update hotel details
             String response = vendorServiceImplementation.updateHotelDetails(
@@ -382,22 +296,6 @@ public class VendorController {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal Server Error", e.getMessage()));
         }
     }
-
-    private void logHotelDetails(HotelDto hotelDto, String mainImageFileName) {
-        if (hotelDto != null) {
-            System.out.println("Hotel DTO : " + hotelDto.getHotelId());
-            System.out.println("Hotel name : " + hotelDto.getHotelName());
-            System.out.println("Hotel address : " + hotelDto.getHotelAddress());
-            System.out.println("Hotel contact : " + hotelDto.getHotelContact());
-            System.out.println("Hotel email : " + hotelDto.getHotelEmail());
-            System.out.println("Hotel PAN : " + hotelDto.getHotelPan());
-            System.out.println("Hotel description : " + hotelDto.getHotelDescription());
-            System.out.println("Hotel star : " + hotelDto.getHotelStar());
-        }
-        System.out.println("Main hotel image : " + mainImageFileName);
-    }
-
-
 
 }
 

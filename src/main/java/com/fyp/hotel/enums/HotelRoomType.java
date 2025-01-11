@@ -1,4 +1,4 @@
-package com.fyp.hotel.model;
+package com.fyp.hotel.enums;
 
 public enum HotelRoomType {
     SUITE, 

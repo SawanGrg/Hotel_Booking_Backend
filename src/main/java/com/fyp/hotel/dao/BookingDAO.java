@@ -1,11 +1,8 @@
 package com.fyp.hotel.dao;
 
-import com.fyp.hotel.dto.BookingDTO;
 import com.fyp.hotel.dto.userDto.BookingStatusDTO;
-import com.fyp.hotel.dto.vendorDto.RoomHistoryDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.PaymentMethod;
-import com.fyp.hotel.model.Status;
 import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -162,28 +158,6 @@ public class BookingDAO {
             }
         }
     }
-
-//    public List<BookingDTO> getRoomHistory(long roomId) {
-//        Session session = null;
-//        try {
-//            session = sessionFactory.openSession();
-//            session.beginTransaction();
-//
-//            String hql = "SELECT new com.fyp.hotel.dto.BookingDTO(b.bookingId, b.checkInDate, b.checkOutDate, b.totalAmount, b.paymentMethod, b.bookingDate, b.status) " +
-//                    "FROM Booking b " +
-//                    "WHERE b.hotelRoom.roomId = :roomId ";
-//
-//            Query<BookingDTO> query = session.createQuery(hql, BookingDTO.class);
-//            query.setParameter("roomId", roomId);
-//            return query.list();
-//
-//        } finally {
-//            if (session != null) {
-//                session.close();
-//            }
-//        }
-//    }
-
 
 
 }

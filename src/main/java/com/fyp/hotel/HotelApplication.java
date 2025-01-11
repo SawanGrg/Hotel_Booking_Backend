@@ -6,11 +6,9 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-//@ComponentScan(basePackages = {"com.fyp.hotel"})
 @SpringBootApplication
 @EnableScheduling
-//@EnableCaching
-//@ServletComponentScan
+@EnableCaching
 public class HotelApplication {
 
 	public static void main(String[] args) {

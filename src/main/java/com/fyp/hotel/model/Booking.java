@@ -1,6 +1,7 @@
 package com.fyp.hotel.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fyp.hotel.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter

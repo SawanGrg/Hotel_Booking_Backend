@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fyp.hotel.enums.HotelBedType;
+import com.fyp.hotel.enums.HotelRoomCategory;
+import com.fyp.hotel.enums.HotelRoomType;
 import jakarta.persistence.*;
 import lombok.Data;
 

@@ -68,7 +68,6 @@ public class AdminController {
             @RequestParam(value = "size", defaultValue = "10") int size
     ){
 
-        System.out.println("username: " + username + " ascending: " + ascending + " page: " + page + " size: " + size);
         try{
             List<User> user = this.adminServiceImlementation.getAllVendorFilter(username, ascending, page, size);
             ApiResponse<List<User>> apiResponse = new ApiResponse<List<User>>(200, "Success", user);

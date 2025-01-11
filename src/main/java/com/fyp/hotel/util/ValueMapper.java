@@ -1,11 +1,13 @@
 package com.fyp.hotel.util;
 
 import com.fyp.hotel.dto.userDto.BookDto;
-import com.fyp.hotel.dto.userDto.UserDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.dto.vendorDto.ReportDto;
 import com.fyp.hotel.dto.vendorDto.RoomDto;
 import com.fyp.hotel.dto.vendorDto.VendorDto;
+import com.fyp.hotel.enums.HotelBedType;
+import com.fyp.hotel.enums.HotelRoomCategory;
+import com.fyp.hotel.enums.HotelRoomType;
 import com.fyp.hotel.model.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;

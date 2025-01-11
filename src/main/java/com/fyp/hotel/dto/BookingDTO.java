@@ -2,9 +2,8 @@ package com.fyp.hotel.dto;
 
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.model.PaymentMethod;
-import com.fyp.hotel.model.Status;
+import com.fyp.hotel.enums.Status;
 import com.fyp.hotel.model.User;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

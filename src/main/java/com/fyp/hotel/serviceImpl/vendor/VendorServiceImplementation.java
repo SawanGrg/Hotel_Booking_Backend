@@ -373,40 +373,6 @@ public class VendorServiceImplementation implements VendorService {
         }
     }
 
-//    @Transactional
-//    public String deleteRoom(Long roomId) {
-//        try {
-//            Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
-//            String username = authenticatedUser.getName();
-//            if (authenticatedUser.isAuthenticated()) {
-//                // Fetch the hotel ID for the given username
-//                Long hotelIdFromDb = hotelRepo.findByUser(userRepo.findByUserName(username)).getHotelId();
-//                System.out.println("Hotel ID from DB: " + hotelIdFromDb);
-//
-//                //delete room images before deleting the room
-//                List<RoomImage> roomImages = roomImageRepository.findImageUrlByHotelRoom_RoomId(roomId);
-//                System.out.println("Room images: " + roomImages);
-//
-//                for (RoomImage roomImage : roomImages) {
-//                    System.out.println("Room image: " + roomImage);
-//                    roomImageRepository.deleteImageUrlByHotelRoom_RoomId(roomId);
-//                }
-//                // Delete the room and check if the deletion was successful
-//                hotelRoomRepo.deleteRoomById(roomId);
-//                System.out.println("Deleted room ID: " + roomId);
-//
-//                Optional<HotelRoom> deletedRoom = hotelRoomRepo.findById(roomId);
-//                System.out.println("Deleted room: " + deletedRoom);
-//
-//                return "Room deleted successfully";
-//            }
-//            return "user is no authenticated";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "Failed to delete room";
-//        }
-//    }
-
     //post report and issue by the vendor
     @Transactional
     public String postReport(Report report) {

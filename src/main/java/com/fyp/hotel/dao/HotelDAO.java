@@ -1,14 +1,10 @@
 package com.fyp.hotel.dao;
 
-import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
 import com.fyp.hotel.dto.vendorDto.ReviewDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.model.Review;
-import com.fyp.hotel.model.Status;
-import jakarta.persistence.TypedQuery;
-import jakarta.transaction.Transaction;
+import com.fyp.hotel.enums.Status;
 import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -19,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Repository

@@ -1,6 +1,6 @@
 package com.fyp.hotel.dto.userDto;
 
-import com.fyp.hotel.model.Status;
+import com.fyp.hotel.enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 

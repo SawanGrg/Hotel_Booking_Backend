@@ -18,15 +18,14 @@ import com.fyp.hotel.dto.khalti.CustomerInfo;
 import com.fyp.hotel.dto.khalti.KhaltiInitationRequest;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
 import com.fyp.hotel.dto.userDto.*;
+import com.fyp.hotel.enums.Status;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
@@ -46,7 +45,6 @@ import com.fyp.hotel.service.user.UserService;
 
 import jakarta.transaction.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor

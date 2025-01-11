@@ -1,7 +1,6 @@
 package com.fyp.hotel.dto.vendorDto;
 
-import com.fyp.hotel.model.PaymentMethod;
-import com.fyp.hotel.model.Status;
+import com.fyp.hotel.enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 

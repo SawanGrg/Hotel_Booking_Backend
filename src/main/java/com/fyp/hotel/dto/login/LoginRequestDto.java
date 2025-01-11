@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto;
+package com.fyp.hotel.dto.login;
 
 import org.hibernate.validator.constraints.Length;
 import jakarta.validation.constraints.NotBlank;

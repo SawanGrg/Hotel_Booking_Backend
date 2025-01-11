@@ -1,4 +1,4 @@
-package com.fyp.hotel.dao;
+package com.fyp.hotel.dao.hotel;
 
 import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
 import com.fyp.hotel.dto.vendorDto.ReviewDTO;

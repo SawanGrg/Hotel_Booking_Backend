@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto;
+package com.fyp.hotel.dto.userDto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -9,8 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.fyp.hotel.dto.LoginRequestDto;
-import com.fyp.hotel.dto.LoginResponseDto;
+import com.fyp.hotel.dto.login.LoginRequestDto;
+import com.fyp.hotel.dto.login.LoginResponseDto;
 import com.fyp.hotel.model.User;
 import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 import com.fyp.hotel.util.JwtUtils;

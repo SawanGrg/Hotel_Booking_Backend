@@ -1,4 +1,4 @@
-package com.fyp.hotel.dao;
+package com.fyp.hotel.dao.hotel;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;

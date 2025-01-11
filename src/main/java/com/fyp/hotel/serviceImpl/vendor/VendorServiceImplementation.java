@@ -4,13 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import com.fyp.hotel.dao.BookingDAO;
-import com.fyp.hotel.dao.HotelDAO;
-import com.fyp.hotel.dao.admin.AdminDAO;
-import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
+import com.fyp.hotel.dao.booking.BookingDAO;
+import com.fyp.hotel.dao.hotel.HotelDAO;
 import com.fyp.hotel.dto.userDto.BookingStatusDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.*;
@@ -18,7 +14,6 @@ import com.fyp.hotel.repository.*;
 import com.fyp.hotel.util.EmailSenderService;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fyp.hotel.dto.userDto.UserDto;
 import com.fyp.hotel.service.vendor.VendorService;
 import com.fyp.hotel.util.FileUploaderHelper;
 

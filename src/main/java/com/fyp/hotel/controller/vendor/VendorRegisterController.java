@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.RegisterDto;
-import com.fyp.hotel.dto.userDto.UserDto;
+import com.fyp.hotel.dto.login.RegisterDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
 

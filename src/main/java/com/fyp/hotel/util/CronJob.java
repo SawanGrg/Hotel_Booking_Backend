@@ -1,7 +1,7 @@
 package com.fyp.hotel.util;
 
-import com.fyp.hotel.dao.BookingDAO;
-import com.fyp.hotel.dao.HotelRoomDAO;
+import com.fyp.hotel.dao.booking.BookingDAO;
+import com.fyp.hotel.dao.hotel.HotelRoomDAO;
 import com.fyp.hotel.model.Booking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

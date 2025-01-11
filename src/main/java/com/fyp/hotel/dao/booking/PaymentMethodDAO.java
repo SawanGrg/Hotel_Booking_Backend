@@ -1,6 +1,5 @@
-package com.fyp.hotel.dao;
+package com.fyp.hotel.dao.booking;
 
-import com.fyp.hotel.model.Payment;
 import com.fyp.hotel.model.PaymentMethod;
 import jakarta.transaction.Transactional;
 import org.hibernate.Session;

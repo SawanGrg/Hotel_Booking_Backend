@@ -1,12 +1,11 @@
 package com.fyp.hotel.serviceImpl.admin;
 
-import com.fyp.hotel.dao.HotelDAO;
+import com.fyp.hotel.dao.hotel.HotelDAO;
 import com.fyp.hotel.dao.admin.AdminDAO;
 import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.UserMessageDTO;
+import com.fyp.hotel.dto.userDto.UserMessageDTO;
 import com.fyp.hotel.dto.admin.AdminAnalyticsDto;
 import com.fyp.hotel.dto.admin.AdminRevenueDTO;
-import com.fyp.hotel.dto.userDto.BlogCommentDTO;
 import com.fyp.hotel.dto.userDto.BlogDTO;
 import com.fyp.hotel.dto.userDto.IssueReportDTO;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
@@ -14,7 +13,6 @@ import com.fyp.hotel.model.Blog;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.User;
 import com.fyp.hotel.repository.*;
-import jakarta.persistence.Id;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

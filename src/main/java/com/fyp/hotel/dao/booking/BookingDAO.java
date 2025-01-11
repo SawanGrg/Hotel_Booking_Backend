@@ -1,4 +1,4 @@
-package com.fyp.hotel.dao;
+package com.fyp.hotel.dao.booking;
 
 import com.fyp.hotel.dto.userDto.BookingStatusDTO;
 import com.fyp.hotel.model.Booking;

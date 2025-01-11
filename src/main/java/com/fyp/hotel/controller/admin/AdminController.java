@@ -2,13 +2,12 @@ package com.fyp.hotel.controller.admin;
 
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.UserMessageDTO;
+import com.fyp.hotel.dto.userDto.UserMessageDTO;
 import com.fyp.hotel.dto.admin.AdminAnalyticsDto;
 import com.fyp.hotel.dto.admin.AdminRevenueDTO;
 import com.fyp.hotel.dto.userDto.BlogDTO;
 import com.fyp.hotel.dto.userDto.IssueReportDTO;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
-import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.User;
 import com.fyp.hotel.serviceImpl.admin.AdminServiceImlementation;
 import jakarta.persistence.EntityNotFoundException;

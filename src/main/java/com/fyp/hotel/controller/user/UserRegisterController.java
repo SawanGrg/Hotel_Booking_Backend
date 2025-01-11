@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.RegisterDto;
+import com.fyp.hotel.dto.login.RegisterDto;
 import com.fyp.hotel.model.User;
 import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
 

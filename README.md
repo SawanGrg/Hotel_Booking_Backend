@@ -1,8 +1,9 @@
+
 🌟 Annapurna Hotel Booking System
 
 📄 Overview
-The Annapurna Hotel Booking System is a web application developed as a final year project (FYP) by Sawan Gurung. The system allows users to book rooms at Annapurna Hotel with secure login, room management, and email notifications.
-It is built using Spring Boot for backend development and integrates with a MySQL database to store data about users, rooms, bookings, and more.
+
+The Annapurna Hotel Booking System is a web application developed as a final year project (FYP) by Sawan Gurung. The system allows users to book rooms at Annapurna Hotel with secure login, room management, and email notifications. It is built using Spring Boot for backend development and integrates with a MySQL database to store data about users, rooms, bookings, and more.
 
 🏷️ Features
 
@@ -32,10 +33,8 @@ Ensure you have the following installed:
 JDK 17 or later
 MySQL 8.0.32 or later
 Maven 3.6 or later
-Setup
-Clone the repository:
 
-bash
+Clone the repository:
 git clone https://github.com/your-username/annapurna-hotel-booking.git
 
 📦 Dependencies
@@ -60,11 +59,7 @@ Mobile app integration for easier access and room booking.
 Real-time availability updates using WebSockets.
 Payment gateway integration for booking payments.
 
-👨‍💻 Authors
+👨‍💻 Author
 
-Sawan Gurung – Final Year Project Developer
-
-📜 License
-
-This project is licensed under the MIT License.
+Sawan Gurung
 

@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# folders to ignore
+src/main/resources/static/
+src/main/resources/application.properties

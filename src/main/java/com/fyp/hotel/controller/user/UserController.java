@@ -56,7 +56,6 @@ public class UserController {
             List<DisplayHotelWithAmenitiesDto> hotelDetails = userServiceImplementation.getAllHotelsWithAmenities(hotelName, hotelLocation, page, size);
 
             ApiResponse<List<DisplayHotelWithAmenitiesDto>> response = new ApiResponse<List<DisplayHotelWithAmenitiesDto>>(200, "Success", hotelDetails);
-            System.out.println(" new hotel details: from controller  ---------->" + hotelDetails);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
             // Handle the exception and return an appropriate response
@@ -78,16 +77,6 @@ public class UserController {
             }
 
             String userProfileImageFilename = userProfileImage != null ? userProfileImage.getOriginalFilename() : null;
-
-            // Log userUpgradingDetails and userProfileImageFilename
-            System.out.println("user name : " + userUpgradingDetails.getUserName());
-            System.out.println("user first name : " + userUpgradingDetails.getUserFirstName());
-            System.out.println("user last name : " + userUpgradingDetails.getUserLastName());
-            System.out.println("user email : " + userUpgradingDetails.getUserEmail());
-            System.out.println("user phone : " + userUpgradingDetails.getUserPhone());
-            System.out.println("user address : " + userUpgradingDetails.getUserAddress());
-            System.out.println("user date of birth : " + userUpgradingDetails.getDateOfBirth());
-            System.out.println("user profile image : " + userProfileImageFilename);
 
             System.out.println("before calling the service method step 1");
             // Call the service method to update user details, passing null for userProfileImage if not provided
@@ -214,35 +203,6 @@ try {
         }
     }
 
-    //payment gateway for booking room of a hotel
-//    @PostMapping("/payment/{roomId}")
-//    public ResponseEntity<?> paymentGateway(
-//            @PathVariable(name = "roomId") Long roomId,
-//            @RequestParam(name = "checkInDate") String checkInDate,
-//            @RequestParam(name = "checkOutDate") String checkOutDate,
-////            @Validated @RequestParam(name = "daysOfStay") String daysOfStay,
-//            @RequestParam(name = "numberOfGuest", required = false, defaultValue = "2") String numberOfGuest,
-//            @RequestParam(name = "paymentMethod") String paymentMethod
-//    ) {
-//        try {
-//
-//            System.out.println("step 1");
-//            BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
-//            System.out.println("step 2");
-//            String response = userServiceImplementation.hotelPaymentGateWay(bookDto);
-//            if ("Payment successful by cash on arrival".equals(response) || "Payment successful by khalti".equals(response)) {
-//                ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
-//                return ResponseEntity.status(200).body(successResponse);
-//            } else {
-//                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", response);
-//                return ResponseEntity.status(500).body(errorResponse);
-//            }
-//        } catch (Exception e) {
-//            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
-//            return ResponseEntity.status(500).body(errorResponse);
-//        }
-//    }
-
     @PostMapping("/khalti/payment/{roomId}")
     public KhaltiResponseDTO processKhaltiPayment(
             @PathVariable(name = "roomId") Long roomId,
@@ -289,71 +249,6 @@ try {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
-
-    //filter controller
-//    @GetMapping("/filterRooms")
-//    public ResponseEntity<?> filterRoom(
-//            @RequestParam(name = "hotelId", required = true) Long hotelId,
-//            @RequestParam(name = "roomType", required = false) String roomType,
-//            @RequestParam(name = "roomCategory", required = false) String roomCategory,
-//            @RequestParam(name = "bedType", required = false) String roomBedType,
-//            @RequestParam(name = "minRoomPrice", required = false) String minRoomPrice,
-//            @RequestParam(name = "maxRoomPrice", required = false) String maxRoomPrice,
-//            @RequestParam(name = "hasAC", required = false) Boolean hasAC,
-//            @RequestParam(name = "hasBalcony", required = false) Boolean hasBalcony,
-//            @RequestParam(name = "hasRefridge", required = false) Boolean hasRefridge,
-//            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-//            @RequestParam(name = "size", required = false, defaultValue = "5") int size
-//    ) {
-//        System.out.println("hotel id: " + hotelId);
-//        System.out.println("room type: " + roomType);
-//        System.out.println("room category: " + roomCategory);
-//        System.out.println("room bed type: " + roomBedType);
-//        System.out.println("min room price: " + minRoomPrice);
-//        System.out.println("max room price: " + maxRoomPrice);
-//        System.out.println("has AC: " + hasAC);
-//        System.out.println("has balcony: " + hasBalcony);
-//        System.out.println("has fridge: " + hasRefridge);
-//        System.out.println("page: " + page);
-//        System.out.println("size: " + size);
-//        try {
-//
-//            if(roomType != null && roomType.isEmpty()){
-//                roomType = null;
-//            }
-//            if(roomCategory != null && roomCategory.isEmpty()){
-//                roomCategory = null;
-//            }
-//            if(roomBedType != null && roomBedType.isEmpty()){
-//                roomBedType = null;
-//            }
-//
-//            List<HotelRoom> hotelRooms = userServiceImplementation.filterRooms(
-//                    hotelId,
-//                    roomType,
-//                    roomCategory,
-//                    roomBedType,
-//                    minRoomPrice,
-//                    maxRoomPrice,
-//                    hasAC,
-//                    hasBalcony,
-//                    hasRefridge,
-//                    page,
-//                    size
-//            );
-//
-//            System.out.println("hotel details: from controller " + hotelRooms);
-//
-//            ApiResponse<List<HotelRoom>> response = new ApiResponse<>(200, "Success", hotelRooms);
-//            return ResponseEntity.status(200).body(response);
-//        }
-//        catch (Exception e) {
-//            // Handle other exceptions and return an appropriate response
-//            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred in filter spring boot", e.getMessage());
-//            return ResponseEntity.status(500).body(errorResponse);
-//        }
-//
-//    }
 
     //search based on hotel name or location
     @GetMapping("/searchHotel")
@@ -413,28 +308,6 @@ try {
         }
     }
 
-    // user post reviews the specific hotel
-//    @PostMapping("/review/{hotelId}")
-//    public ResponseEntity<?> postHotelReview(
-//            @PathVariable(name = "hotelId") long hotelId,
-//            @RequestBody HotelReviewDTO hotelReviewDTO
-//    ) {
-//        try {
-//            String response = userServiceImplementation.postHotelReviewByUser(hotelId, hotelReviewDTO);
-//
-//            if ("Review posted successfully.".equals(response)) { // Check the response message here
-//                ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
-//                return ResponseEntity.status(200).body(successResponse);
-//            } else {
-//                ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", response);
-//                return ResponseEntity.status(500).body(errorResponse);
-//            }
-//        } catch (Exception e) {
-//            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
-//            return ResponseEntity.status(500).body(errorResponse);
-//        }
-//    }
-
     //user view all the review of specific hotel
     @GetMapping("/hotelReview/{hotelId}")
     public ResponseEntity<?> viewHotelReview(
@@ -449,29 +322,6 @@ try {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
-
-    //post blog by user
-//    @PostMapping("/postBlog")
-//    public ResponseEntity<?> postBlog(
-//            @RequestParam("blogImage") MultipartFile blogImage,
-//            @RequestParam("blogDTO") String blogDTOJson
-//    ) {
-//        BlogDTO blogDTO = null;
-//        try {
-//            blogDTO = objectMapper.readValue(blogDTOJson, BlogDTO.class); // Convert the JSON string to BlogDTO object
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            String response = userServiceImplementation.postUserBlog(blogImage, blogDTO);
-//            ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
-//            return ResponseEntity.status(200).body(successResponse);
-//        } catch (Exception e) {
-//            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred", e.getMessage());
-//            return ResponseEntity.status(500).body(errorResponse);
-//        }
-//    }
-
 
     //view all blog
     @GetMapping("/viewBlog")

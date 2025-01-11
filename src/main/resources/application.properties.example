@@ -1,0 +1,76 @@
+# Define the server port
+server.port=
+
+# Define the server context path
+# server.servlet.context-path=
+
+# Define the active profile
+spring.profiles.active=
+
+# Define the datasource
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+spring.datasource.driver-class-name=
+
+# Define the JPA properties
+spring.jpa.database-platform=
+spring.jpa.generate-ddl=
+spring.jpa.hibernate.ddl-auto=
+#spring.jpa.show-sql=
+#spring.jpa.properties.hibernate.format_sql=
+logging.level.org.hibernate.SQL=
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=
+
+# Define the logging level
+logging.level.org.springframework.web=
+
+# Image properties
+# Enable multipart uploads
+spring.servlet.multipart.enabled=
+# Threshold after which files are written to the disk
+# spring.servlet.multipart.file-size-threshold=
+# Max file size
+spring.servlet.multipart.max-file-size=
+# Set the maximum request size
+spring.servlet.multipart.max-request-size=
+
+# Secret key for AES advanced encryption standard algorithm
+security.key=
+
+# Setting up the mail sender configuration
+spring.mail.host=
+spring.mail.port=
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=
+spring.mail.properties.mail.smtp.starttls.enable=
+spring.mail.properties.mail.smtp.starttls.required=
+spring.mail.properties.mail.smtp.ssl.trust=
+
+# Exposing the endpoint of actuator
+management.endpoints.web.exposure.include=
+# To show the details of health endpoint
+management.endpoint.health.show-details=
+
+# Khalti test key
+khalti.api.url=
+khalti.api.key=
+
+# Redis configuration
+#redis.host=
+#redis.port=
+
+# Hikari connection pool configuration
+spring.datasource.hikari.connection-timeout=
+spring.datasource.hikari.minimum-idle=
+spring.datasource.hikari.max-lifetime=
+spring.datasource.hikari.maximum-pool-size=
+spring.datasource.hikari.idle-timeout=
+spring.datasource.hikari.auto-commit=
+
+# Additional logging configurations
+logging.level.com.zaxxer.hikari=
+logging.level.org.springframework.web.cors=
+logging.level.com.fasterxml.jackson.databind=
+#logging.level.org.hibernate=

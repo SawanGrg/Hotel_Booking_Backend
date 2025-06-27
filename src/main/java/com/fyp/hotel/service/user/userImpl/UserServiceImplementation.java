@@ -1,4 +1,4 @@
-package com.fyp.hotel.serviceImpl.user;
+package com.fyp.hotel.service.user.userImpl;
 
 import java.time.Instant;
 import java.time.LocalDate;

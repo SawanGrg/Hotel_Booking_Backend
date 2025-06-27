@@ -1,13 +1,11 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.ApiResponse;
-import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.userDto.BookingStatusDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.model.Report;
-import com.fyp.hotel.model.Review;
 import com.fyp.hotel.util.ValueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
+import com.fyp.hotel.service.vendor.vendorImpl.VendorServiceImplementation;
 
-import java.security.PublicKey;
 import java.util.List;
 
 @RestController

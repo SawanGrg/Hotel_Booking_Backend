@@ -1,7 +1,7 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
+import com.fyp.hotel.service.vendor.vendorImpl.VendorServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

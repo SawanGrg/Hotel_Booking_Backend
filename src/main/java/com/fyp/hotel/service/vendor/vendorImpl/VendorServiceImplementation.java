@@ -1,4 +1,4 @@
-package com.fyp.hotel.serviceImpl.vendor;
+package com.fyp.hotel.service.vendor.vendorImpl;
 
 import java.time.Instant;
 import java.time.LocalDate;

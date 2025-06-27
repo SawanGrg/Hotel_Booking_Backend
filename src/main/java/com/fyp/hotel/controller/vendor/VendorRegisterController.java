@@ -1,7 +1,7 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.vendorDto.VendorDto;
-import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.login.RegisterDto;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
-import com.fyp.hotel.serviceImpl.vendor.VendorServiceImplementation;
+import com.fyp.hotel.service.vendor.vendorImpl.VendorServiceImplementation;
 
 import jakarta.validation.Valid;
 

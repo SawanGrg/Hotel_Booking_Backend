@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.login.RegisterDto;
 import com.fyp.hotel.model.User;
-import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)

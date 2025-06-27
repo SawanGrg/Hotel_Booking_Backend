@@ -6,7 +6,7 @@ import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
 import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.model.*;
-import com.fyp.hotel.serviceImpl.user.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
 import com.fyp.hotel.util.ValueMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

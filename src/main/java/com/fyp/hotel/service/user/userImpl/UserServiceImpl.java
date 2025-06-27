@@ -54,7 +54,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AllArgsConstructor
 @NoArgsConstructor
 @EnableCaching
-public class UserServiceImplementation implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private UserRepository userRepo;
     private RoleRepository roleRepo;
@@ -84,7 +84,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private UserMessageRepository userMessageRepository;
 
     @Autowired
-    public UserServiceImplementation(
+    public UserServiceImpl(
             @Qualifier("userRepository") @Lazy UserRepository userRepo,
             @Qualifier("roleRepository") @Lazy RoleRepository roleRepo,
             @Lazy FileUploaderHelper fileUploaderHelper,
@@ -140,7 +140,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     private Map<String, String> storeOtpAndUserName = new ConcurrentHashMap<>();
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceImplementation.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceImpl.class);
 
 
     @Transactional

@@ -6,7 +6,7 @@ import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
 import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.dto.vendorDto.HotelDto;
 import com.fyp.hotel.model.*;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.util.Objects;
 public class UserController {
 
     @Autowired
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private  UserProfileDto userProfileDto;
     @Autowired
@@ -45,7 +45,7 @@ public class UserController {
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
         try {
-            List<DisplayHotelWithAmenitiesDto> hotelDetails = userServiceImplementation.getAllHotelsWithAmenities(hotelName, hotelLocation, page, size);
+            List<DisplayHotelWithAmenitiesDto> hotelDetails = userServiceImpl.getAllHotelsWithAmenities(hotelName, hotelLocation, page, size);
 
             ApiResponse<List<DisplayHotelWithAmenitiesDto>> response = new ApiResponse<List<DisplayHotelWithAmenitiesDto>>(200, "Success", hotelDetails);
             return ResponseEntity.status(200).body(response);
@@ -72,7 +72,7 @@ public class UserController {
 
             System.out.println("before calling the service method step 1");
             // Call the service method to update user details, passing null for userProfileImage if not provided
-            String response = userServiceImplementation.updateDetails(
+            String response = userServiceImpl.updateDetails(
                     userUpgradingDetails != null ? userUpgradingDetails.getUserName() : null,
                     userUpgradingDetails != null ? userUpgradingDetails.getUserFirstName() : null,
                     userUpgradingDetails != null ? userUpgradingDetails.getUserLastName() : null,
@@ -110,7 +110,7 @@ public class UserController {
             System.out.println("userChangePasswordDto: " + userChangePasswordDto.getNewPassword());
             System.out.println("userChangePasswordDto: " + userChangePasswordDto.getOldPassword());
 
-            String response = userServiceImplementation.changePassword(userChangePasswordDto);
+            String response = userServiceImpl.changePassword(userChangePasswordDto);
             if ("Password changed successfully".equals(response)) {
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
                 return ResponseEntity.status(200).body(successResponse);
@@ -126,7 +126,7 @@ public class UserController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(){
-        String response = userServiceImplementation.clearOutJwtToken();
+        String response = userServiceImpl.clearOutJwtToken();
         if ("User logged out successfully".equals(response)) {
             ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
             return ResponseEntity.status(200).body(successResponse);
@@ -146,7 +146,7 @@ public class UserController {
     ) {
         System.out.println("hotel id: " + hotelId);
         try {
-            List<HotelRoom> hotelRooms = userServiceImplementation.getAllRoomsOfHotel(hotelId, page, size);
+            List<HotelRoom> hotelRooms = userServiceImpl.getAllRoomsOfHotel(hotelId, page, size);
 //            List<RoomDto> hotelRoomDTOS = valueMapper.mapToHotelRoom(hotelRooms);
 //
 //            System.out.println("hotel details: from controller " + hotelRoomDTOS);
@@ -167,7 +167,7 @@ public class UserController {
             @PathVariable(name = "hotelId") Long hotelId
     ) {
         try {
-            List<BookingStatusDTO> bookingStatusDtos = userServiceImplementation.getBookingStatus(hotelId);
+            List<BookingStatusDTO> bookingStatusDtos = userServiceImpl.getBookingStatus(hotelId);
             ApiResponse<List<BookingStatusDTO>> response = new ApiResponse<>(200, "Success", bookingStatusDtos);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -178,7 +178,7 @@ public class UserController {
     @GetMapping("/view-user-details")
     public ResponseEntity<?> viewUserDetails(){
 try {
-            User user = userServiceImplementation.getUserById();
+            User user = userServiceImpl.getUserById();
     if (user.getUsername() != null && !user.getUsername().isEmpty()) {
         // Username is not empty or null
         ApiResponse<User> successResponse = new ApiResponse<>(200, "Success", user);
@@ -208,7 +208,7 @@ try {
             // Create a BookDto from the request parameters
             BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
             // Call the Khalti payment service method
-            return userServiceImplementation.ePaymentGateway(bookDto);
+            return userServiceImpl.ePaymentGateway(bookDto);
         } catch (Exception e) {
             // Handle any exceptions and return an error response
             e.printStackTrace();
@@ -226,7 +226,7 @@ try {
             @RequestParam(name = "totalAmount") long totalAmount
     ){
         try {
-            String res = this.userServiceImplementation.updatePaymentTable(pidx, status, bookingId, totalAmount);
+            String res = this.userServiceImpl.updatePaymentTable(pidx, status, bookingId, totalAmount);
             if (Objects.equals(res, "SuccessFull enter")) {
                 ApiResponse<String> apiResponse = new ApiResponse<>(200, "success", res);
                 return ResponseEntity.ok().body(apiResponse);
@@ -256,7 +256,7 @@ try {
         if(hotelName.isEmpty() && hotelLocation.isEmpty()){
             System.out.println("hotel name and location are null");
             try {
-                List<Hotel> hotelDetails = userServiceImplementation.getAllHotels(page, size);
+                List<Hotel> hotelDetails = userServiceImpl.getAllHotels(page, size);
                 List<HotelDto> hotelDTOs = valueMapper.mapToHotelDTOs(hotelDetails);
                 System.out.println("hotel details: from controller " + hotelDTOs);
 
@@ -271,7 +271,7 @@ try {
         } else {
             try {
                 System.out.println("hotel name and location are not null");
-                List<Hotel> hotelDetails = userServiceImplementation.getHotelBasedOnNameOrLocation(hotelName, hotelLocation, page, size);
+                List<Hotel> hotelDetails = userServiceImpl.getHotelBasedOnNameOrLocation(hotelName, hotelLocation, page, size);
                 List<HotelDto> hotelDTOs = valueMapper.mapToHotelDTOs(hotelDetails);
                 System.out.println("hotel details: from controller " + hotelDTOs);
 
@@ -290,7 +290,7 @@ try {
             @PathVariable(name = "roomId") Long roomId
     ) {
         try {
-            CheckRoomAvailabilityDto checkRoomAvailabilityDto = userServiceImplementation.checkRoomAvailability(roomId);
+            CheckRoomAvailabilityDto checkRoomAvailabilityDto = userServiceImpl.checkRoomAvailability(roomId);
             ApiResponse<CheckRoomAvailabilityDto> response = new ApiResponse<>(200, "Success", checkRoomAvailabilityDto);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -306,7 +306,7 @@ try {
             @PathVariable(name = "hotelId") long hotelId
     ) {
         try {
-            List<HotelReviewDTO> reviews = userServiceImplementation.getAllHotelReviews(hotelId);
+            List<HotelReviewDTO> reviews = userServiceImpl.getAllHotelReviews(hotelId);
             ApiResponse<List<HotelReviewDTO>> response = new ApiResponse<>(200, "Success", reviews);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -319,7 +319,7 @@ try {
     @GetMapping("/viewBlog")
     public ResponseEntity<?> viewBlog() {
         try {
-            List<BlogDTO> blogs = userServiceImplementation.viewUserBlog();
+            List<BlogDTO> blogs = userServiceImpl.viewUserBlog();
             ApiResponse<List<BlogDTO>> response = new ApiResponse<>(200, "Success", blogs);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -334,7 +334,7 @@ try {
             @PathVariable(name = "blogId") long blogId
     ){
         try {
-            BlogDTO blog = userServiceImplementation.getSpecificBlog(blogId);
+            BlogDTO blog = userServiceImpl.getSpecificBlog(blogId);
             ApiResponse<BlogDTO> response = new ApiResponse<>(200, "Success", blog);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -353,7 +353,7 @@ try {
         System.out.println("blog id: " + blogId);
         System.out.println("blog comment: " + blogCommentDTO.getComment());
         try {
-            String response = userServiceImplementation.postBlogComment(blogId, blogCommentDTO);
+            String response = userServiceImpl.postBlogComment(blogId, blogCommentDTO);
             ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
             return ResponseEntity.status(200).body(successResponse);
         } catch (Exception e) {
@@ -368,7 +368,7 @@ try {
             @PathVariable(name = "blogId") long blogId
     ){
         try {
-            List<BlogCommentDTO> blogCommentDTOs = this.userServiceImplementation.getAllBlogCommentSpecificBlog(blogId);
+            List<BlogCommentDTO> blogCommentDTOs = this.userServiceImpl.getAllBlogCommentSpecificBlog(blogId);
             ApiResponse<List<BlogCommentDTO>> blogCommentResponse = new ApiResponse<>(200, "success" , blogCommentDTOs);
             return ResponseEntity.status(200).body(blogCommentResponse);
         } catch (Exception e) {
@@ -381,7 +381,7 @@ try {
     @GetMapping("/viewBookingDetails")
     public ResponseEntity<?> viewBookingDetails(){
         try {
-            List<BookingDTO> bookingDtos = userServiceImplementation.viewBookingDetails();
+            List<BookingDTO> bookingDtos = userServiceImpl.viewBookingDetails();
             ApiResponse<List<BookingDTO>> response = new ApiResponse<>(200, "Success", bookingDtos);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -395,7 +395,7 @@ try {
             @PathVariable(name = "hotelId") long hotelId
     ){
         try {
-            String hotelUserName = userServiceImplementation.getUserNameOfHotel(hotelId);
+            String hotelUserName = userServiceImpl.getUserNameOfHotel(hotelId);
             ApiResponse<String> response = new ApiResponse<>(200, "Success", hotelUserName);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
@@ -410,7 +410,7 @@ try {
             @RequestBody UserMessageDTO userMessageDTO
     ) {
         try {
-            String response = userServiceImplementation.postUserMessage(userMessageDTO);
+            String response = userServiceImpl.postUserMessage(userMessageDTO);
             ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
             return ResponseEntity.status(200).body(successResponse);
         } catch (Exception e) {

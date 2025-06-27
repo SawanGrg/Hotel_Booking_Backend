@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.fyp.hotel.dto.login.LoginRequestDto;
 import com.fyp.hotel.dto.login.LoginResponseDto;
 import com.fyp.hotel.model.User;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.JwtUtils;
 
 @RestController
@@ -22,13 +22,13 @@ public class LoginController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final UserServiceImplementation userServiceImplementation;
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public LoginController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserServiceImplementation userServiceImplementation) {
+    public LoginController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserServiceImpl userServiceImpl) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        this.userServiceImplementation = userServiceImplementation;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @PostMapping("/login")
@@ -38,7 +38,7 @@ public class LoginController {
             LoginRequestDto request) {
 
         doAuthenticate(request.getUsername(), request.getPassword());
-        final User user = (User) userServiceImplementation.loadUserByUsername(request.getUsername());
+        final User user = (User) userServiceImpl.loadUserByUsername(request.getUsername());
 
         if (user == null) {
             LoginResponseDto loginResponseDto = new LoginResponseDto();

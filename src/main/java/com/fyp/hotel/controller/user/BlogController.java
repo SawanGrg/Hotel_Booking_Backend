@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.userDto.*;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class BlogController {
 
     @Autowired
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private  UserProfileDto userProfileDto;
     @Autowired
@@ -48,7 +48,7 @@ public class BlogController {
             BlogDTO blogDTO = objectMapper.readValue(blogDTOJson, BlogDTO.class);
 
             // Call the service method with the MultipartFile and BlogDTO object
-            String response = userServiceImplementation.postUserBlog(blogImage, blogDTO);
+            String response = userServiceImpl.postUserBlog(blogImage, blogDTO);
 
             // Prepare success response
             ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);

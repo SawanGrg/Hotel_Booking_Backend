@@ -1,7 +1,7 @@
 package com.fyp.hotel.controller.vendor;
 
 import com.fyp.hotel.dto.vendorDto.VendorDto;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,16 +25,16 @@ public class VendorRegisterController {
 
     private ObjectMapper objectMapper;
     private VendorServiceImplementation vendorServiceImplementation;
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
 
     public VendorRegisterController(
             ObjectMapper objectMapper,
             VendorServiceImplementation vendorServiceImplementation,
-            UserServiceImplementation userServiceImplementation
+            UserServiceImpl userServiceImpl
     ) {
         this.objectMapper = objectMapper;
         this.vendorServiceImplementation = vendorServiceImplementation;
-        this.userServiceImplementation = userServiceImplementation;
+        this.userServiceImpl = userServiceImpl;
 
     }
     @PostMapping("/register")
@@ -57,7 +57,7 @@ public class VendorRegisterController {
             HotelDto hotel = this.objectMapper.readValue(stringHotelData, HotelDto.class);
 
 
-            if (this.userServiceImplementation.checkUserExist(vendorDto.getUserName())) {
+            if (this.userServiceImpl.checkUserExist(vendorDto.getUserName())) {
 
                 RegisterDto registerDto = new RegisterDto();
 

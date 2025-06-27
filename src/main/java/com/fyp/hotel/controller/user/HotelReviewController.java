@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.userDto.*;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class HotelReviewController {
 
     @Autowired
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private  UserProfileDto userProfileDto;
     @Autowired
@@ -34,7 +34,7 @@ public class HotelReviewController {
             @RequestBody HotelReviewDTO hotelReviewDTO
     ) {
         try {
-            String response = userServiceImplementation.postHotelReviewByUser(hotelId, hotelReviewDTO);
+            String response = userServiceImpl.postHotelReviewByUser(hotelId, hotelReviewDTO);
 
             if ("Review posted successfully.".equals(response)) { // Check the response message here
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);

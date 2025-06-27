@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.login.RegisterDto;
 import com.fyp.hotel.model.User;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
@@ -18,16 +18,16 @@ import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
 public class UserRegisterController {
 
     private ObjectMapper objectMapper;
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
     private OtpMailSender otpMailSender;
 
     public UserRegisterController(
             ObjectMapper objectMapper,
-            UserServiceImplementation userServiceImplementation,
+            UserServiceImpl userServiceImpl,
             OtpMailSender otpMailSender
     ) {
         this.objectMapper = objectMapper;
-        this.userServiceImplementation = userServiceImplementation;
+        this.userServiceImpl = userServiceImpl;
         this.otpMailSender = otpMailSender;
     }
 
@@ -43,7 +43,7 @@ public class UserRegisterController {
             User user = this.objectMapper.readValue(stringUserData, User.class);
             System.out.println("this is user data" + user.getPassword());
 
-            if (this.userServiceImplementation.checkUserExist(user.getUsername())) {
+            if (this.userServiceImpl.checkUserExist(user.getUsername())) {
 
                 RegisterDto registerDto = new RegisterDto();
 
@@ -55,7 +55,7 @@ public class UserRegisterController {
             }
 
             // Move image upload and default role assignment to the service
-            String registerStatus = this.userServiceImplementation.registerUser(user, stringUserImage);
+            String registerStatus = this.userServiceImpl.registerUser(user, stringUserImage);
 
             RegisterDto registerDto = new RegisterDto();
             registerDto.setMessage(registerStatus);
@@ -79,7 +79,7 @@ public class UserRegisterController {
     ){
         System.out.println("OTP : " + OTP);
         try{
-            String status = this.userServiceImplementation.verifyOtp(OTP);
+            String status = this.userServiceImpl.verifyOtp(OTP);
             if(status.equals("verified successfully")) {
                 System.out.println("OTP verified");
                 ApiResponse<String> apiResponse = new ApiResponse(200, "successfully registered user with OTP", status);

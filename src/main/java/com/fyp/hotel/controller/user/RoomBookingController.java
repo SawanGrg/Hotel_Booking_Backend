@@ -2,7 +2,7 @@ package com.fyp.hotel.controller.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.userDto.UserProfileDto;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/user")
 public class RoomBookingController {
     @Autowired
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private UserProfileDto userProfileDto;
     @Autowired
@@ -46,7 +46,7 @@ public class RoomBookingController {
             System.out.println("step 1");
             BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
             System.out.println("step 2");
-            String response = userServiceImplementation.hotelPaymentGateWay(bookDto);
+            String response = userServiceImpl.hotelPaymentGateWay(bookDto);
             if ("Payment successful by cash on arrival".equals(response) || "Payment successful by khalti".equals(response)) {
                 ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
                 return ResponseEntity.status(200).body(successResponse);

@@ -60,12 +60,4 @@ public class ApiRateLimit extends OncePerRequestFilter {
         }
         return remoteAddr;
     }
-
-//    @Scheduled(cron = "0 * * * * *") // Cron expression for running every minute
-//    protected void clearExpiredEntries() {
-//        long currentTimeSeconds = Instant.now().getEpochSecond();
-//        ipAddressMap.values().forEach(map -> map.entrySet().removeIf(entry ->
-//                Duration.between(Instant.ofEpochSecond(entry.getKey()), Instant.ofEpochSecond(currentTimeSeconds))
-//                        .getSeconds() >= WINDOW_SIZE_SECONDS));
-//    }
 }

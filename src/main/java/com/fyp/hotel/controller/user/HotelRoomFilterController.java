@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.ApiResponse;
 import com.fyp.hotel.dto.userDto.*;
 import com.fyp.hotel.model.*;
-import com.fyp.hotel.service.user.userImpl.UserServiceImplementation;
+import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.List;
 public class HotelRoomFilterController {
 
     @Autowired
-    private UserServiceImplementation userServiceImplementation;
+    private UserServiceImpl userServiceImpl;
     @Autowired
     private  UserProfileDto userProfileDto;
     @Autowired
@@ -67,7 +67,7 @@ public class HotelRoomFilterController {
                 roomBedType = null;
             }
 
-            List<HotelRoom> hotelRooms = userServiceImplementation.filterRooms(
+            List<HotelRoom> hotelRooms = userServiceImpl.filterRooms(
                     hotelId,
                     roomType,
                     roomCategory,

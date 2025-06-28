@@ -13,7 +13,6 @@ import com.fyp.hotel.model.User;
 import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
 @RequestMapping("/v1/user")
 public class UserRegisterController {
 
@@ -34,64 +33,33 @@ public class UserRegisterController {
     @PostMapping("/register")
     public ResponseEntity<RegisterDto> userRegister(
             @RequestParam("userData") String stringUserData,
-            @RequestParam("userImage") MultipartFile stringUserImage) {
-
-        System.out.println(
-                stringUserData + " " + stringUserImage.getOriginalFilename() + " " + stringUserImage.getSize());
-        try {
-            // Convert string to user object
-            User user = this.objectMapper.readValue(stringUserData, User.class);
-            System.out.println("this is user data" + user.getPassword());
-
-            if (this.userServiceImpl.checkUserExist(user.getUsername())) {
-
-                RegisterDto registerDto = new RegisterDto();
-
-                registerDto.setMessage("User already exist");
-                registerDto.setStatus(HttpStatus.BAD_REQUEST);
-
-                return new ResponseEntity<>(registerDto, HttpStatus.BAD_REQUEST);
-
-            }
-
-            // Move image upload and default role assignment to the service
-            String registerStatus = this.userServiceImpl.registerUser(user, stringUserImage);
-
+            @RequestParam("userImage") MultipartFile stringUserImage)
+            throws Exception
+    {
+        User user = this.objectMapper.readValue(stringUserData, User.class);
+        if (this.userServiceImpl.checkUserExist(user.getUsername())) {
             RegisterDto registerDto = new RegisterDto();
-            registerDto.setMessage(registerStatus);
-            registerDto.setStatus(HttpStatus.OK);
-
-            return new ResponseEntity<>(registerDto, HttpStatus.OK);
-
-        } catch (Exception e) {
-
-            System.out.println("Error in user register controller : " + e.getMessage());
-            RegisterDto registerDto = new RegisterDto();
-            registerDto.setMessage(e.getMessage());
+            registerDto.setMessage("User already exist");
             registerDto.setStatus(HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(registerDto, HttpStatus.BAD_REQUEST);
         }
+        String registerStatus = this.userServiceImpl.registerUser(user, stringUserImage);
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setMessage(registerStatus);
+        registerDto.setStatus(HttpStatus.OK);
+        return new ResponseEntity<>(registerDto, HttpStatus.OK);
     }
 
     @PostMapping("/verifyOtp")
     public ResponseEntity<?> verifyOtp(
             @RequestParam("OTP") String OTP
-    ){
-        System.out.println("OTP : " + OTP);
-        try{
-            String status = this.userServiceImpl.verifyOtp(OTP);
-            if(status.equals("verified successfully")) {
-                System.out.println("OTP verified");
-                ApiResponse<String> apiResponse = new ApiResponse(200, "successfully registered user with OTP", status);
-                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-            }else{
-                System.out.println("OTP not verified");
-                ApiResponse<String> apiResponse = new ApiResponse(400, "Error in verify OTP", status);
-                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-            }
-        }catch (Exception e){
-            System.out.println("Error in verify OTP : " + e.getMessage());
-            ApiResponse<String> apiResponse = new ApiResponse(400, "Error in verify OTP", e.getMessage());
+    ) {
+        String status = this.userServiceImpl.verifyOtp(OTP);
+        if(status.equals("verified successfully")) {
+            ApiResponse<String> apiResponse = new ApiResponse(200, "successfully registered user with OTP", status);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            ApiResponse<String> apiResponse = new ApiResponse(400, "Error in verify OTP", status);
             return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
         }
     }

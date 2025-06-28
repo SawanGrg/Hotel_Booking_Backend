@@ -16,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtUtils jwtUtils;
@@ -51,10 +50,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                // Log user details and authorities
-                System.out.println("User details: " + userDetails);
-                System.out.println("User authorities: " + userDetails.getAuthorities());
-                System.out.println("jwt authentication is done successfully");
                 filterChain.doFilter(request, response);
                 return;
             }

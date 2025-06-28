@@ -6,17 +6,14 @@ import com.fyp.hotel.util.ValueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.fyp.hotel.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", maxAge = 3600) // maxage used to cache where the browser will not send the preflight request
 @RequestMapping("/v1/vendor")
 public class VerifyBookingController {
 
@@ -34,24 +31,14 @@ public class VerifyBookingController {
             @PathVariable(name = "bookingId", required = true) long bookingId,
             @PathVariable(name = "userId", required = true) long userId,
             @RequestParam(name = "vendorDecision", required = true, defaultValue = "BOOKED") String status
-    ){
-        try {
-            // Call service to update booking status
-            String response = this.vendorServiceImplementation.updateBooking(bookingId,userId, status);
-
-            // Check if the booking status was successfully changed
-            if ("Successfully Changed".equals(response)) {
-                ApiResponse<String> apiResponse = new ApiResponse<>(200, "Successfully Booked", response);
-                return ResponseEntity.ok().body(apiResponse);
-            } else {
-                // Handle if status update fails
-                ApiResponse<String> apiResponse = new ApiResponse<>(400, "Failed to update status", response);
-                return ResponseEntity.badRequest().body(apiResponse);
-            }
-        } catch (Exception e) {
-            // Handle any exceptions
-            ApiResponse<String> apiResponse = new ApiResponse<>(500, "Internal Server Error", e.getMessage());
-            return ResponseEntity.status(500).body(apiResponse);
+    ) {
+        String response = this.vendorServiceImplementation.updateBooking(bookingId, userId, status);
+        if ("Successfully Changed".equals(response)) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(200, "Successfully Booked", response);
+            return ResponseEntity.ok().body(apiResponse);
+        } else {
+            ApiResponse<String> apiResponse = new ApiResponse<>(400, "Failed to update status", response);
+            return ResponseEntity.badRequest().body(apiResponse);
         }
     }
 }

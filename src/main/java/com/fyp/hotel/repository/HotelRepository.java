@@ -12,8 +12,6 @@ import java.util.List;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
-
     Hotel findByUser(User user);
     Hotel findHotelByHotelId(Long hotelId);
-
 }

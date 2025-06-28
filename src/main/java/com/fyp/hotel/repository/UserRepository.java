@@ -5,8 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.fyp.hotel.model.User;
 
-@Repository("userRepository") //to avoid bean conflict with user service
+@Repository("userRepository")
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUserName(String username);
- 
 }

@@ -43,19 +43,6 @@ public class HotelRoomFilterController {
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "5") int size
     ) {
-        System.out.println("hotel id: " + hotelId);
-        System.out.println("room type: " + roomType);
-        System.out.println("room category: " + roomCategory);
-        System.out.println("room bed type: " + roomBedType);
-        System.out.println("min room price: " + minRoomPrice);
-        System.out.println("max room price: " + maxRoomPrice);
-        System.out.println("has AC: " + hasAC);
-        System.out.println("has balcony: " + hasBalcony);
-        System.out.println("has fridge: " + hasRefridge);
-        System.out.println("page: " + page);
-        System.out.println("size: " + size);
-        try {
-
             if(roomType != null && roomType.isEmpty()){
                 roomType = null;
             }
@@ -79,18 +66,7 @@ public class HotelRoomFilterController {
                     page,
                     size
             );
-
-            System.out.println("hotel details: from controller " + hotelRooms);
-
             ApiResponse<List<HotelRoom>> response = new ApiResponse<>(200, "Success", hotelRooms);
             return ResponseEntity.status(200).body(response);
-        }
-        catch (Exception e) {
-            // Handle other exceptions and return an appropriate response
-            ApiResponse<String> errorResponse = new ApiResponse<>(500, "An error occurred in filter spring boot", e.getMessage());
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-
     }
-
 }

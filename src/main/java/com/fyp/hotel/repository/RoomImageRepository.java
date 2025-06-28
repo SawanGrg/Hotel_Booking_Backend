@@ -12,9 +12,6 @@ import java.util.List;
 
 @Repository
 public interface RoomImageRepository extends JpaRepository<RoomImage, Long> {
-
     List<RoomImage> findByHotelRoom(HotelRoom room);
-
-
     List<RoomImage> findByHotelRoom_RoomId(Long hotelId);
 }

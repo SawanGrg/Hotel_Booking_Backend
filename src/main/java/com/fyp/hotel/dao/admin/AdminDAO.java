@@ -1,20 +1,15 @@
 package com.fyp.hotel.dao.admin;
 
 import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.admin.AdminAnalyticsDto;
 import com.fyp.hotel.dto.userDto.IssueReportDTO;
 import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.model.PaymentMethod;
 import com.fyp.hotel.model.Role;
 import com.fyp.hotel.model.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import jakarta.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +17,11 @@ import java.util.List;
 @Repository
 public class AdminDAO {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public List<User> getAllUserFilter(String userName, boolean ascending, int page, int size) {
-
         StringBuilder query = new StringBuilder("SELECT u FROM User u WHERE 1=1");
-
-//        query.append(" AND u.userStatus = 'VERIFIED'");
 
         if (!userName.isEmpty()) {
             query.append(" AND u.userName LIKE :userName");
@@ -41,24 +33,16 @@ public class AdminDAO {
             query.append(" ORDER BY u.userName DESC");
         }
 
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
+        TypedQuery<User> userQuery = entityManager.createQuery(query.toString(), User.class);
 
-        Query<User> userQuery = session.createQuery(query.toString(), User.class);
-
-        if(!userName.isEmpty()){
+        if(!userName.isEmpty()) {
             userQuery.setParameter("userName", "%" + userName + "%");
         }
-        List<User> users = userQuery.getResultList();
 
-        session.getTransaction().commit();
-        session.close();
-
-        return users;
+        return userQuery.getResultList();
     }
 
     public List<User> getAllVendorFilter(String userName, boolean ascending, int page, int size) {
-
         StringBuilder query = new StringBuilder("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.roleName = 'ROLE_VENDOR' AND 1=1");
 
         if (!userName.isEmpty()) {
@@ -71,19 +55,13 @@ public class AdminDAO {
             query.append(" ORDER BY u.userName DESC");
         }
 
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
+        TypedQuery<User> userQuery = entityManager.createQuery(query.toString(), User.class);
 
-        Query<User> userQuery = session.createQuery(query.toString(), User.class);
-
-        if(!userName.isEmpty()){
+        if(!userName.isEmpty()) {
             userQuery.setParameter("userName", "%" + userName + "%");
         }
+
         List<User> users = userQuery.getResultList();
-
-        session.getTransaction().commit();
-        session.close();
-
         List<User> filteredUsers = new ArrayList<>();
 
         // Filter out users who have the role ROLE_USER
@@ -101,190 +79,99 @@ public class AdminDAO {
 
     @Transactional
     public List<Hotel> getAllActiveHotels(int page, int size) {
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+        TypedQuery<Hotel> query = entityManager.createQuery(
+                "SELECT h FROM Hotel h WHERE h.isDeleted = false", Hotel.class);
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
 
-            Query<Hotel> query = session.createQuery("SELECT h FROM Hotel h WHERE h.isDeleted = false", Hotel.class);
-            query.setFirstResult((page - 1) * size);
-            query.setMaxResults(size);
-
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        return query.getResultList();
     }
 
-
-    @Transactional()
+    @Transactional
     public long getTotalUsers() {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        Query<Long> query = session.createQuery("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.roleName = 'ROLE_USER'", Long.class);
-        long totalUsers = query.getSingleResult();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return totalUsers;
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.roleName = 'ROLE_USER'", Long.class);
+        return query.getSingleResult();
     }
 
-    @Transactional()
+    @Transactional
     public long getTotalVendors() {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        Query<Long> query = session.createQuery("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.roleName = 'ROLE_VENDOR'", Long.class);
-        long totalVendors = query.getSingleResult();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return totalVendors;
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.roleName = 'ROLE_VENDOR'", Long.class);
+        return query.getSingleResult();
     }
 
-    @Transactional()
+    @Transactional
     public long getTotalBookings() {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        Query<Long> query = session.createQuery("SELECT COUNT(b) FROM Booking b WHERE b.status = 'BOOKED'", Long.class);
-        long totalBookings = query.getSingleResult();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return totalBookings;
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(b) FROM Booking b WHERE b.status = 'BOOKED'", Long.class);
+        return query.getSingleResult();
     }
 
-    @Transactional()
+    @Transactional
     public long getTotalHotels() {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        Query<Long> query = session.createQuery("SELECT COUNT(h) FROM Hotel h", Long.class);
-        long totalHotels = query.getSingleResult();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return totalHotels;
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(h) FROM Hotel h", Long.class);
+        return query.getSingleResult();
     }
 
-    @Transactional()
+    @Transactional
     public long getTotalRooms() {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        Query<Long> query = session.createQuery("SELECT COUNT(hr) FROM HotelRoom hr", Long.class);
-        long totalRooms = query.getSingleResult();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return totalRooms;
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(hr) FROM HotelRoom hr", Long.class);
+        return query.getSingleResult();
     }
 
     @Transactional
     public List<IssueReportDTO> getAllReports() {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
         String query = "SELECT new com.fyp.hotel.dto.userDto.IssueReportDTO(r.title, r.description, u, r.status, h, r.createdAt) " +
                 "FROM Report r " +
                 "JOIN r.user u " +
                 "JOIN u.hotel h";
 
-        List<IssueReportDTO> issueReportDTOs = session.createQuery(query, IssueReportDTO.class).getResultList();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return issueReportDTOs;
+        return entityManager.createQuery(query, IssueReportDTO.class).getResultList();
     }
 
     @Transactional
     public List<BookingDTO> getUserBookings(long userId, int page, int size) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        Query<BookingDTO> query = session.createQuery("SELECT " +
-                        "new com.fyp.hotel.dto.BookingDTO" +
+        TypedQuery<BookingDTO> query = entityManager.createQuery(
+                "SELECT new com.fyp.hotel.dto.BookingDTO" +
                         "(b.bookingId, b.checkInDate, b.checkOutDate, b.bookingDate, b.status, b.totalAmount, b.user, b.hotelRoom, b.paymentMethod, b.createdAt) " +
-                "FROM Booking b " +
-                "WHERE b.user.userId = :userId",
-                BookingDTO.class);
+                        "FROM Booking b " +
+                        "WHERE b.user.userId = :userId", BookingDTO.class);
         query.setParameter("userId", userId);
 
-        List<BookingDTO> bookings = query.getResultList();
-
-        session.getTransaction().commit();
-        session.close();
-
-        return bookings;
+        return query.getResultList();
     }
 
-    //get all the revenue from the bookings that are paid by cash on arrival
     @Transactional
     public long getTotalCashOnArrivalRevenue() {
-        Session session = null;
         try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-
             String hql = "SELECT SUM(b.totalAmount) FROM Booking b WHERE b.paymentMethod.paymentMethodName = 'Cash' AND b.status = 'BOOKED'";
-            Query query = session.createQuery(hql);
-            return (long) query.uniqueResult();
-
+            TypedQuery<Long> query = entityManager.createQuery(hql, Long.class);
+            Long result = query.getSingleResult();
+            return result != null ? result : 0L;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            return 0L;
         }
     }
 
-    //get all the revenue from the bookings that are paid by Khalti
     @Transactional
-    public long getTotalKhaltiRevenue(){
-            Session session = null;
+    public long getTotalKhaltiRevenue() {
         try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-
             String hql = "SELECT SUM(b.totalAmount) FROM Booking b WHERE b.paymentMethod.paymentMethodName = 'KHALTI' AND b.status = 'BOOKED'";
-            Query query = session.createQuery(hql);
-            return (long) query.uniqueResult();
-
+            TypedQuery<Long> query = entityManager.createQuery(hql, Long.class);
+            Long result = query.getSingleResult();
+            return result != null ? result : 0L;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            return 0L;
         }
     }
 
     @Transactional
     public User getUserProfile(long userId) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-
-        User user = session.get(User.class, userId);
-
-        session.getTransaction().commit();
-        session.close();
-
-        return user;
+        return entityManager.find(User.class, userId);
     }
 }

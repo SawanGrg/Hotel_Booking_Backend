@@ -1,7 +1,9 @@
 package com.fyp.hotel.dao.hotel;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import com.fyp.hotel.model.HotelRoom;
@@ -15,6 +17,9 @@ public class HotelRoomDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public List<HotelRoom> getHotelRooms(
             Long hotelId,
@@ -116,25 +121,12 @@ public class HotelRoomDAO {
         }
     }
 
-    //update room status as available based on booking id
+    @Transactional
     public void updateRoomStatusAsAvailable(Long bookingId) {
-        try {
-
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-
-            // Create a query to update the room status to available based on the booking ID
-            Query query = session.createQuery("UPDATE HotelRoom hr SET hr.roomStatus = 'AVAILABLE' WHERE hr.roomId = (SELECT b.hotelRoom.roomId FROM Booking b WHERE b.bookingId = :bookingId)");
-            query.setParameter("bookingId", bookingId);
-
-            query.executeUpdate();
-
-            session.getTransaction().commit();
-            session.close();
-        } catch (Exception e) {
-            // Handle exceptions and log error messages
-            System.out.println("Error in updateRoomStatusAsAvailable: this is from repo class " + e.getMessage());
-            e.printStackTrace();
-        }
+        entityManager.createQuery(
+                        "UPDATE HotelRoom hr SET hr.roomStatus = 'AVAILABLE' " +
+                                "WHERE hr.roomId = (SELECT b.hotelRoom.roomId FROM Booking b WHERE b.bookingId = :bookingId)")
+                .setParameter("bookingId", bookingId)
+                .executeUpdate();
     }
 }

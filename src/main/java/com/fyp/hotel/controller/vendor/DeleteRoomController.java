@@ -1,6 +1,6 @@
 package com.fyp.hotel.controller.vendor;
 
-import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

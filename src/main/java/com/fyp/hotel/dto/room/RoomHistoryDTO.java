@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.vendorDto;
+package com.fyp.hotel.dto.room;
 
 import com.fyp.hotel.enums.Status;
 import lombok.Getter;

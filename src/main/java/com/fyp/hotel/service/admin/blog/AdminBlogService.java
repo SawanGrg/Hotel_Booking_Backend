@@ -1,6 +1,6 @@
 package com.fyp.hotel.service.admin.blog;
 
-import com.fyp.hotel.dto.userDto.BlogDTO;
+import com.fyp.hotel.dto.blog.BlogDTO;
 
 import java.util.List;
 

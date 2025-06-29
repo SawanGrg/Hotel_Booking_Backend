@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.userDto;
+package com.fyp.hotel.dto.user;
 
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.User;

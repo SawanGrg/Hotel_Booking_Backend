@@ -1,6 +1,6 @@
 package com.fyp.hotel.dao.booking;
 
-import com.fyp.hotel.dto.userDto.BookingStatusDTO;
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.PaymentMethod;
 import jakarta.persistence.EntityManager;
@@ -28,7 +28,7 @@ public class BookingDAO {
 
     @Transactional
     public List<BookingStatusDTO> getBookingStatusDetails(long hotelId) {
-        String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
+        String hql = "SELECT new com.fyp.hotel.dto.user.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
                 "FROM Booking b " +
                 "WHERE b.hotelRoom.hotel.hotelId = :hotelId " +
                 "AND b.hotelRoom.roomStatus = :status " +
@@ -84,7 +84,7 @@ public class BookingDAO {
 
     @Transactional
     public List<BookingStatusDTO> getBookingStatusDetailsByRoomId(long roomId) {
-        String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
+        String hql = "SELECT new com.fyp.hotel.dto.user.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
                 "FROM Booking b " +
                 "WHERE b.hotelRoom.roomId = :roomId " +
                 "AND b.hotelRoom.roomStatus = :status " +

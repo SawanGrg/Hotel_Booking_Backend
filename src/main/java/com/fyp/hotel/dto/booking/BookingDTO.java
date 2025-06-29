@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto;
+package com.fyp.hotel.dto.booking;
 
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.model.PaymentMethod;

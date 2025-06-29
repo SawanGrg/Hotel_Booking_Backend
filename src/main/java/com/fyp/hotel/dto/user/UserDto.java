@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.userDto;
+package com.fyp.hotel.dto.user;
 
 import org.hibernate.validator.constraints.Length;
 

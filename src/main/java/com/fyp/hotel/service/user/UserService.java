@@ -1,12 +1,12 @@
 package com.fyp.hotel.service.user;
 
-import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
-import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.room.CheckRoomAvailabilityDto;
+import com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
-import com.fyp.hotel.dto.userDto.BlogDTO;
-import com.fyp.hotel.dto.userDto.BookDto;
-import com.fyp.hotel.dto.userDto.HotelReviewDTO;
-import com.fyp.hotel.dto.userDto.UserChangePasswordDto;
+import com.fyp.hotel.dto.blog.BlogDTO;
+import com.fyp.hotel.dto.booking.BookDto;
+import com.fyp.hotel.dto.hotel.HotelReviewDTO;
+import com.fyp.hotel.dto.user.UserChangePasswordDto;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
 import com.fyp.hotel.model.User;
@@ -16,8 +16,6 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 public interface UserService {
 

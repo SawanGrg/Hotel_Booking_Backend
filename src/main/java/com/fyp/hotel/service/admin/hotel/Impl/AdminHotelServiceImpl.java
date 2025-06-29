@@ -1,16 +1,14 @@
 package com.fyp.hotel.service.admin.hotel.Impl;
 
 import com.fyp.hotel.dao.admin.AdminDAO;
-import com.fyp.hotel.dto.vendorDto.HotelDto;
+import com.fyp.hotel.dto.hotel.HotelDto;
 import com.fyp.hotel.repository.HotelRepository;
 import com.fyp.hotel.service.admin.hotel.AdminHotelService;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;

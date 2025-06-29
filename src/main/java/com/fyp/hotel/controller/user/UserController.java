@@ -1,16 +1,23 @@
 package com.fyp.hotel.controller.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.*;
+import com.fyp.hotel.dto.blog.BlogCommentDTO;
+import com.fyp.hotel.dto.blog.BlogDTO;
+import com.fyp.hotel.dto.booking.BookDto;
+import com.fyp.hotel.dto.booking.BookingDTO;
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
+import com.fyp.hotel.dto.common.ApiResponse;
+import com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.hotel.HotelReviewDTO;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
-import com.fyp.hotel.dto.userDto.*;
-import com.fyp.hotel.dto.vendorDto.HotelDto;
+import com.fyp.hotel.dto.room.CheckRoomAvailabilityDto;
+import com.fyp.hotel.dto.user.*;
+import com.fyp.hotel.dto.hotel.HotelDto;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.vendorDto;
+package com.fyp.hotel.dto.room;
 
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;

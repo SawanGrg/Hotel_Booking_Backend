@@ -1,6 +1,6 @@
 package com.fyp.hotel.service.admin.user;
 
-import com.fyp.hotel.dto.BookingDTO;
+import com.fyp.hotel.dto.booking.BookingDTO;
 import com.fyp.hotel.model.User;
 
 import java.util.List;

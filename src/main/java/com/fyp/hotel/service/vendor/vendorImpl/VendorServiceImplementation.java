@@ -7,7 +7,11 @@ import java.util.*;
 
 import com.fyp.hotel.dao.booking.BookingDAO;
 import com.fyp.hotel.dao.hotel.HotelDAO;
-import com.fyp.hotel.dto.userDto.BookingStatusDTO;
+import com.fyp.hotel.dto.hotel.HotelDto;
+import com.fyp.hotel.dto.hotel.ReviewDTO;
+import com.fyp.hotel.dto.room.RoomDto;
+import com.fyp.hotel.dto.room.RoomHistoryDTO;
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;

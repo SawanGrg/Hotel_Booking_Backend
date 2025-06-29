@@ -2,7 +2,7 @@ package com.fyp.hotel.service.admin.user.Impl;
 
 import com.fyp.hotel.dao.admin.AdminDAO;
 import com.fyp.hotel.dao.hotel.HotelDAO;
-import com.fyp.hotel.dto.BookingDTO;
+import com.fyp.hotel.dto.booking.BookingDTO;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.User;
 import com.fyp.hotel.repository.HotelRepository;

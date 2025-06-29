@@ -1,7 +1,11 @@
 package com.fyp.hotel.controller.vendor;
 
-import com.fyp.hotel.dto.ApiResponse;
-import com.fyp.hotel.dto.userDto.BookingStatusDTO;
+import com.fyp.hotel.dto.common.ApiResponse;
+import com.fyp.hotel.dto.hotel.HotelDto;
+import com.fyp.hotel.dto.hotel.ReviewDTO;
+import com.fyp.hotel.dto.room.RoomDto;
+import com.fyp.hotel.dto.room.RoomHistoryDTO;
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;

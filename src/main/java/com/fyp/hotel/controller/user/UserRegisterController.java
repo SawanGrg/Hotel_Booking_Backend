@@ -1,6 +1,6 @@
 package com.fyp.hotel.controller.user;
 
-import com.fyp.hotel.dto.ApiResponse;
+import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.util.OtpMailSender;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

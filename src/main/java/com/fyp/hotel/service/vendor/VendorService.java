@@ -1,5 +1,7 @@
 package com.fyp.hotel.service.vendor;
 
+import com.fyp.hotel.dto.hotel.HotelDto;
+import com.fyp.hotel.dto.room.RoomDto;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
@@ -7,8 +9,6 @@ import com.fyp.hotel.model.Report;
 import com.fyp.hotel.model.RoomImage;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fyp.hotel.dto.userDto.UserDto;
 
 import java.util.List;
 

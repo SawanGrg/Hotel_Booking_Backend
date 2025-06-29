@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.userDto;
+package com.fyp.hotel.dto.booking;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

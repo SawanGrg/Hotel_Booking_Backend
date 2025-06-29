@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.userDto;
+package com.fyp.hotel.dto.blog;
 
 import com.fyp.hotel.model.User;
 import lombok.Getter;

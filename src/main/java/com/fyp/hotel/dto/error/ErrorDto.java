@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto;
+package com.fyp.hotel.dto.error;
 
 import java.time.ZonedDateTime;
 

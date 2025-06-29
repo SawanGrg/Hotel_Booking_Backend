@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.userDto;
+package com.fyp.hotel.dto.user;
 
 import jakarta.annotation.Nullable;
 import lombok.Getter;

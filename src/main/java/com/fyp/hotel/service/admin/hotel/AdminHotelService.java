@@ -1,6 +1,6 @@
 package com.fyp.hotel.service.admin.hotel;
 
-import com.fyp.hotel.dto.vendorDto.HotelDto;
+import com.fyp.hotel.dto.hotel.HotelDto;
 
 import java.util.List;
 

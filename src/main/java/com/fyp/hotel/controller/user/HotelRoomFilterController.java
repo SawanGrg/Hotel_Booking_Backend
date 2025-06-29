@@ -1,12 +1,11 @@
 package com.fyp.hotel.controller.user;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.ApiResponse;
-import com.fyp.hotel.dto.userDto.*;
+import com.fyp.hotel.dto.common.ApiResponse;
+import com.fyp.hotel.dto.user.*;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;

@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto;
+package com.fyp.hotel.dto.common;
 
 public class ApiResponse<T> {
     private int statusCode;

@@ -1,6 +1,6 @@
 package com.fyp.hotel.service.admin.blog.Impl;
 
-import com.fyp.hotel.dto.userDto.BlogDTO;
+import com.fyp.hotel.dto.blog.BlogDTO;
 import com.fyp.hotel.repository.BlogRepository;
 import com.fyp.hotel.service.admin.blog.AdminBlogService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
 package com.fyp.hotel.controller.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fyp.hotel.dto.ApiResponse;
-import com.fyp.hotel.dto.userDto.BookDto;
-import com.fyp.hotel.dto.userDto.UserProfileDto;
+import com.fyp.hotel.dto.common.ApiResponse;
+import com.fyp.hotel.dto.booking.BookDto;
+import com.fyp.hotel.dto.user.UserProfileDto;
 import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;

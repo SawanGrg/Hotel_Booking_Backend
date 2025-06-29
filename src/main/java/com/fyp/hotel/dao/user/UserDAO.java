@@ -1,46 +1,25 @@
 package com.fyp.hotel.dao.user;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserDAO {
 
-    private SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Autowired
-    public UserDAO(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
-    //true if user exist
     @Transactional
     public Boolean isUserExist(String username) {
-        Session session = null;
-        try{
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(*) FROM User u WHERE u.userName = :username",
+                Long.class);
+        query.setParameter("username", username);
 
-            Long count = (Long) session.createQuery("SELECT COUNT(*) FROM User u WHERE u.userName = :username")
-                    .setParameter("username", username)
-                    .uniqueResult();
-
-            session.getTransaction().commit();
-            return count > 0;
-
-        } catch (Exception e) {
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-            throw e;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-
+        Long count = query.getSingleResult();
+        return count > 0;
     }
 }

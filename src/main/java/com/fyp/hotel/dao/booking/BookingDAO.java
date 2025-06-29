@@ -3,11 +3,10 @@ package com.fyp.hotel.dao.booking;
 import com.fyp.hotel.dto.userDto.BookingStatusDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.PaymentMethod;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -16,148 +15,86 @@ import java.util.List;
 @Repository
 public class BookingDAO {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
+    @Transactional
     public List<Booking> checkOutDateMatchesCurrentDate() {
-        // Check if the checkout date matches the current date
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-
-            String hql = "FROM Booking b WHERE b.checkOutDate = :checkOutDate";
-
-            Query<Booking> query = session.createQuery(hql, Booking.class);
-            query.setParameter("checkOutDate", LocalDate.now());
-
-            return query.list();
-
-        }catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-
+        String hql = "FROM Booking b WHERE b.checkOutDate = :checkOutDate";
+        TypedQuery<Booking> query = entityManager.createQuery(hql, Booking.class);
+        query.setParameter("checkOutDate", LocalDate.now());
+        return query.getResultList();
     }
 
-    //extract those booking details if the hotel room is set as booked and the checkout date is less than the current date
+    @Transactional
     public List<BookingStatusDTO> getBookingStatusDetails(long hotelId) {
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+        String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
+                "FROM Booking b " +
+                "WHERE b.hotelRoom.hotel.hotelId = :hotelId " +
+                "AND b.hotelRoom.roomStatus = :status " +
+                "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate)";
 
-            String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
-                    "FROM Booking b " +
-                    "WHERE b.hotelRoom.hotel.hotelId = :hotelId " + // Add condition for hotel ID
-                    "AND b.hotelRoom.roomStatus = :status " + // Add space after :status
-                    "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate)";
+        TypedQuery<BookingStatusDTO> query = entityManager.createQuery(hql, BookingStatusDTO.class);
+        query.setParameter("hotelId", hotelId);
+        query.setParameter("status", "BOOKED");
+        query.setParameter("currentDate", LocalDate.now());
 
-            Query<BookingStatusDTO> query = session.createQuery(hql, BookingStatusDTO.class);
-
-            query.setParameter("hotelId", hotelId);
-            query.setParameter("status", "BOOKED");
-            query.setParameter("currentDate", LocalDate.now());
-
-            return query.list();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        return query.getResultList();
     }
 
     @Transactional
     public long getTotalCashOnArrivalRevenue(long hotelId, PaymentMethod paymentMethod) {
-        Session session = null;
         try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+            String hql = "SELECT SUM(b.totalAmount) FROM Booking b " +
+                    "WHERE b.hotelRoom.hotel.hotelId = :hotelId " +
+                    "AND b.paymentMethod = :paymentMethod " +
+                    "AND b.status = 'BOOKED'";
 
-            String hql = "SELECT SUM(b.totalAmount) FROM Booking b WHERE b.hotelRoom.hotel.hotelId = :hotelId AND b.paymentMethod = :paymentMethod AND b.status = 'BOOKED'";
-
-            Query query = session.createQuery(hql);
-
+            TypedQuery<Long> query = entityManager.createQuery(hql, Long.class);
             query.setParameter("hotelId", hotelId);
             query.setParameter("paymentMethod", paymentMethod);
 
-            return (long) query.uniqueResult();
-
+            Long result = query.getSingleResult();
+            return result != null ? result : 0L;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            return 0L;
         }
     }
 
     @Transactional
     public long getTotalKhaltiRevenue(long hotelId, PaymentMethod paymentMethod) {
-        Session session = null;
         try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+            String hql = "SELECT SUM(b.totalAmount) FROM Booking b " +
+                    "WHERE b.hotelRoom.hotel.hotelId = :hotelId " +
+                    "AND b.paymentMethod = :paymentMethod " +
+                    "AND b.status = 'BOOKED'";
 
-            String hql = "SELECT SUM(b.totalAmount) FROM Booking b WHERE b.hotelRoom.hotel.hotelId = :hotelId AND b.paymentMethod = :paymentMethod AND b.status = 'BOOKED'";
-
-            Query query = session.createQuery(hql);
-
+            TypedQuery<Long> query = entityManager.createQuery(hql, Long.class);
             query.setParameter("hotelId", hotelId);
             query.setParameter("paymentMethod", paymentMethod);
 
-            return (long) query.uniqueResult();
-
+            Long result = query.getSingleResult();
+            return result != null ? result : 0L;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            return 0L;
         }
     }
 
-
+    @Transactional
     public List<BookingStatusDTO> getBookingStatusDetailsByRoomId(long roomId) {
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            session.beginTransaction();
+        String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
+                "FROM Booking b " +
+                "WHERE b.hotelRoom.roomId = :roomId " +
+                "AND b.hotelRoom.roomStatus = :status " +
+                "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate)";
 
-            String hql = "SELECT new com.fyp.hotel.dto.userDto.BookingStatusDTO(b.bookingId, b.bookingDate, b.status, b.checkInDate, b.checkOutDate, b.totalAmount, b.hotelRoom.roomId) " +
-                    "FROM Booking b " +
-                    "WHERE b.hotelRoom.roomId = :roomId " +
-                    "AND b.hotelRoom.roomStatus = :status " +
-                    "AND (b.checkOutDate >= :currentDate OR b.checkOutDate = :currentDate)";
+        TypedQuery<BookingStatusDTO> query = entityManager.createQuery(hql, BookingStatusDTO.class);
+        query.setParameter("roomId", roomId);
+        query.setParameter("status", "BOOKED");
+        query.setParameter("currentDate", LocalDate.now());
 
-
-            Query<BookingStatusDTO> query = session.createQuery(hql, BookingStatusDTO.class);
-
-            query.setParameter("roomId", (Long) roomId); // Set roomId parameter
-            query.setParameter("status", "BOOKED");
-            query.setParameter("currentDate", LocalDate.now());
-
-            return query.list();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        return query.getResultList();
     }
-
-
 }

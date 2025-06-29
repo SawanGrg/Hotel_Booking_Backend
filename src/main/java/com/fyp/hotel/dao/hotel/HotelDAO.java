@@ -735,10 +735,4 @@ public class HotelDAO {
             }
         }
     }
-
-
-
-
-
-
 }

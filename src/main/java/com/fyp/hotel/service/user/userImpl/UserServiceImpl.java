@@ -11,7 +11,6 @@ import com.fyp.hotel.dao.booking.BookingDAO;
 import com.fyp.hotel.dao.booking.PaymentMethodDAO;
 import com.fyp.hotel.dao.hotel.HotelDAO;
 import com.fyp.hotel.dao.hotel.HotelRoomDAO;
-import com.fyp.hotel.dao.user.BlogDAO;
 import com.fyp.hotel.dao.user.UserDAO;
 import com.fyp.hotel.dao.user.UserHibernateRepo;
 import com.fyp.hotel.dto.BookingDTO;
@@ -75,7 +74,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private PaymentRepository paymentRepository;
     private ReviewRepository hotelReviewRepository;
     private BlogRepository blogRepository;
-    private BlogDAO blogDAO;
     private BlogCommentRepository blogCommentRepository;
     private BookingDAO bookingDAO;
     private WebClient webClient;
@@ -104,7 +102,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             @Lazy PaymentRepository paymentRepository,
             @Lazy ReviewRepository hotelReviewRepository,
             @Lazy BlogRepository blogRepository,
-            @Lazy BlogDAO blogDAO,
             @Lazy BlogCommentRepository blogCommentRepository,
             @Lazy BookingDAO bookingDAO,
             @Lazy KhaltiPayment khaltiPayment,
@@ -131,7 +128,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.paymentRepository = paymentRepository;
         this.hotelReviewRepository = hotelReviewRepository;
         this.blogRepository = blogRepository;
-        this.blogDAO = blogDAO;
         this.blogCommentRepository = blogCommentRepository;
         this.bookingDAO = bookingDAO;
         this.khaltiPayment = khaltiPayment;

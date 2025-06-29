@@ -1,32 +1,24 @@
 package com.fyp.hotel.dao.user;
 
 import com.fyp.hotel.model.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class UserHibernateRepo {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-
-    //    extract user details based on username
     public User getUserByUsername(String username) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        //typed query method is used to get the data from the database
-        //alternative of typed query is query method
-        TypedQuery<User> query = session.createQuery("FROM User u WHERE u.userName = :username", User.class);
+        TypedQuery<User> query = entityManager.createQuery(
+                "FROM User u WHERE u.userName = :username",
+                User.class);
         query.setParameter("username", username);
-        User user = query.getSingleResult(); // Use getSingleResult directly
-        session.close();
-        return user;
+        return query.getSingleResult();
     }
-
-
 }

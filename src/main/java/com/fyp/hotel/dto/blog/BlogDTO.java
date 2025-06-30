@@ -14,11 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-//@Data //data is a shortcut for @ToString, @EqualsAndHashCode, @Getter, @Setter and @RequiredArgsConstructor combined.
-public class BlogDTO implements Serializable {
-
-private static final long serialVersionUID = 1L;
-
+public class BlogDTO {
     private long id;
 
     @NotEmpty(message = "Title is required")
@@ -53,7 +49,4 @@ private static final long serialVersionUID = 1L;
         this.createdDate = createdDate;
         this.user = user;
     }
-
-
-
 }

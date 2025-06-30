@@ -3,96 +3,53 @@ package com.fyp.hotel.service.user;
 import com.fyp.hotel.dto.room.CheckRoomAvailabilityDto;
 import com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
+import com.fyp.hotel.dto.blog.BlogCommentDTO;
 import com.fyp.hotel.dto.blog.BlogDTO;
 import com.fyp.hotel.dto.booking.BookDto;
+import com.fyp.hotel.dto.booking.BookingDTO;
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
 import com.fyp.hotel.dto.hotel.HotelReviewDTO;
-import com.fyp.hotel.dto.user.UserChangePasswordDto;
-import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.model.HotelRoom;
-import com.fyp.hotel.model.User;
+import com.fyp.hotel.dto.user.*;
+import com.fyp.hotel.model.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
-
 public interface UserService {
 
-    @Transactional
+    // Existing methods
     boolean checkUserExist(String userName);
-
-    @Transactional
     String registerUser(User user, MultipartFile userImage);
-
-    @Transactional
     String verifyOtp(String otp);
-
-    @Transactional
     List<Hotel> getAllHotels(int page, int size);
-
-    @Transactional
     List<DisplayHotelWithAmenitiesDto> getAllHotelsWithAmenities(String hotelName, String hotelLocation, int page, int size);
-
-    @Transactional
-    String updateDetails(
-            String userName,
-            String userFirstName,
-            String userLastName,
-            String userEmail,
-            String userPhone,
-            String userAddress,
-            String dateOfBirth,
-            MultipartFile userProfilePicture
-    );
-
-    @Transactional
+    String updateDetails(String userName, String userFirstName, String userLastName,
+                         String userEmail, String userPhone, String userAddress,
+                         String dateOfBirth, MultipartFile userProfilePicture);
     String changePassword(UserChangePasswordDto userChangePasswordDto);
-
-    @Transactional
     String clearOutJwtToken();
-
-    @Transactional
     List<HotelRoom> getAllRoomsOfHotel(Long hotelId, int page, int size);
-
     User getUserById();
-
-    @Transactional
-    String hotelPaymentGateWay(@Validated BookDto bookDto);
-
-    @Transactional
-    KhaltiResponseDTO ePaymentGateway(@Validated BookDto bookDto);
-
-    @Transactional
-    String updatePaymentTable(String pidx, String status, String bookingId, long totalAmount);
-
-    @Transactional
-    List<HotelRoom> filterRooms(
-            Long hotelId,
-            String roomType,
-            String roomCategory,
-            String roomBed,
-            String minRoomPrice,
-            String maxRoomPrice,
-            Boolean hasAC,
-            Boolean hasBalcony,
-            Boolean hasRefridge,
-            int page,
-            int size
-    );
-
-    @Transactional
+    String cashOnArrivalTransaction(BookDto bookDto);
+    KhaltiResponseDTO onlinePaymentTransaction(BookDto bookDto);
+    String updatePaymentTransaction(String pidx, String status, String bookingId, long totalAmount);
+    List<HotelRoom> filterRooms(Long hotelId, String roomType, String roomCategory,
+                                String roomBed, String minRoomPrice, String maxRoomPrice,
+                                Boolean hasAC, Boolean hasBalcony, Boolean hasRefridge,
+                                int page, int size);
     List<Hotel> getHotelBasedOnNameOrLocation(String hotelName, String hotelLocation, int page, int size);
-
-    @Transactional
     CheckRoomAvailabilityDto checkRoomAvailability(Long roomId);
-
-    @Transactional
     String postHotelReviewByUser(long hotelId, HotelReviewDTO hotelReviewDTO);
-
-    @Transactional
     List<HotelReviewDTO> getAllHotelReviews(Long hotelId);
-
-    @Transactional
     String postUserBlog(MultipartFile blogImage, BlogDTO blogDTO);
+
+    // Missing methods from implementation
+    List<BlogDTO> viewUserBlog();
+    BlogDTO getSpecificBlog(long blogId);
+    String postBlogComment(long blogId, BlogCommentDTO blogCommentDTO);
+    List<BlogCommentDTO> getAllBlogCommentSpecificBlog(long blogId);
+    List<BookingDTO> viewBookingDetails();
+    List<BookingStatusDTO> getBookingStatus(Long hotelId);
+    String getUserNameOfHotel(long hotelId);
+    String postUserMessage(UserMessageDTO userMessageDTO);
 }

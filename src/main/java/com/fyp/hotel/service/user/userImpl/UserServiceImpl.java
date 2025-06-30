@@ -386,7 +386,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public String hotelPaymentGateWay(
+    public String cashOnArrivalTransaction(
             @Validated BookDto bookDto
     ){
         System.out.println("in the service implementation for cash or khalti");
@@ -433,7 +433,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public KhaltiResponseDTO ePaymentGateway(
+    public KhaltiResponseDTO onlinePaymentTransaction(
             @Validated BookDto bookDto
     ) {
         if (bookDto.getPaymentMethod().equals("khalti")) {
@@ -514,7 +514,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public String updatePaymentTable(
+    public String updatePaymentTransaction(
             String pidx,
             String status,
             String bookingId,

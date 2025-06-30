@@ -1,7 +1,10 @@
 package com.fyp.hotel.service.vendor;
 
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
 import com.fyp.hotel.dto.hotel.HotelDto;
+import com.fyp.hotel.dto.hotel.ReviewDTO;
 import com.fyp.hotel.dto.room.RoomDto;
+import com.fyp.hotel.dto.room.RoomHistoryDTO;
 import com.fyp.hotel.dto.vendorDto.*;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.HotelRoom;
@@ -49,4 +52,22 @@ public interface VendorService {
 
     // Method to retrieve vendor dashboard analytics
     VendorDashboardAnalyticsDTO getVendorAnalyticsService();
+
+    List<ReviewDTO> getHotelReviews();
+    VendorRevenueDTO getVendorRevenue();
+    List<HotelRoom> getRoomDetails(Long roomId);
+    List<BookingStatusDTO> getBookingStatusDetails(long roomId);
+    List<RoomHistoryDTO> getRoomHistory(long roomId);
+    Boolean checkRoomExistsOrNot(String roomNumber);
+    Hotel getHotelDetails(); // Consider merging with getHotelDetailsService()
+    String updateHotelDetails(
+            String hotelName,
+            String hotelAddress,
+            String hotelContact,
+            String hotelEmail,
+            String hotelPan,
+            String hotelDescription,
+            int hotelStar,
+            MultipartFile hotelImage
+    );
 }

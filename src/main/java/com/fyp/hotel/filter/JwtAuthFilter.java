@@ -2,13 +2,13 @@ package com.fyp.hotel.filter;
 
 import java.io.IOException;
 
+import com.fyp.hotel.service.user.UserServiceFacade;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.JwtUtils;
 
 import jakarta.servlet.FilterChain;
@@ -19,11 +19,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtUtils jwtUtils;
-    private UserServiceImpl userServiceImpl;
+    private UserServiceFacade userServiceFacade;
 
-    public JwtAuthFilter(JwtUtils jwtUtils, UserServiceImpl userServiceImpl) {
+    public JwtAuthFilter(JwtUtils jwtUtils, UserServiceFacade userServiceFacade) {
         this.jwtUtils = jwtUtils;
-        this.userServiceImpl = userServiceImpl;
+        this.userServiceFacade = userServiceFacade;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userServiceImpl.loadUserByUsername(userName);
+            UserDetails userDetails = userServiceFacade.userAuthenticationService.loadUserByUsername(userName);
 
             if (jwtToken != null && jwtUtils.isTokenValid(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken =

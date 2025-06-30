@@ -6,8 +6,7 @@ import com.fyp.hotel.dto.blog.BlogCommentDTO;
 import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.dto.blog.BlogDTO;
 import com.fyp.hotel.dto.user.UserProfileDto;
-import com.fyp.hotel.service.user.UserService;
-import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
+import com.fyp.hotel.service.user.UserServiceFacade;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +21,14 @@ import java.util.List;
 @Validated
 public class UserBlogController {
 
-    private UserService userServiceImpl;
+    private UserServiceFacade userServiceFacade;
     private UserProfileDto userProfileDto;
     private ValueMapper valueMapper;
     private ObjectMapper objectMapper;
 
     @Autowired
-    public UserBlogController(UserServiceImpl userServiceImpl, UserProfileDto userProfileDto, ValueMapper valueMapper, ObjectMapper objectMapper) {
-        this.userServiceImpl = userServiceImpl;
+    public UserBlogController(UserServiceFacade userServiceFacade, UserProfileDto userProfileDto, ValueMapper valueMapper, ObjectMapper objectMapper) {
+        this.userServiceFacade = userServiceFacade;
         this.userProfileDto = userProfileDto;
         this.valueMapper = valueMapper;
         this.objectMapper = objectMapper;
@@ -41,12 +40,12 @@ public class UserBlogController {
             @RequestParam("blogDTO") String blogDTOJson
     ) throws JsonProcessingException {
         BlogDTO blogDTO = objectMapper.readValue(blogDTOJson, BlogDTO.class);
-        String response = userServiceImpl.postUserBlog(blogImage, blogDTO);
+        String response = this.userServiceFacade.userBlogService.postUserBlog(blogImage, blogDTO);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
     }
     @GetMapping("/viewBlog")
     public ResponseEntity<?> viewBlog() {
-        List<BlogDTO> blogs = userServiceImpl.viewUserBlog();
+        List<BlogDTO> blogs = this.userServiceFacade.userBlogService.viewUserBlog();
         ApiResponse<List<BlogDTO>> response = new ApiResponse<>(200, "Success", blogs);
         return ResponseEntity.status(200).body(response);
     }
@@ -55,7 +54,7 @@ public class UserBlogController {
     public ResponseEntity<?> getSpecificBlog(
             @PathVariable(name = "blogId") long blogId
     ) {
-        BlogDTO blog = userServiceImpl.getSpecificBlog(blogId);
+        BlogDTO blog = this.userServiceFacade.userBlogService.getSpecificBlog(blogId);
         ApiResponse<BlogDTO> response = new ApiResponse<>(200, "Success", blog);
         return ResponseEntity.status(200).body(response);
     }
@@ -65,7 +64,7 @@ public class UserBlogController {
             @PathVariable(name = "blogId") long blogId,
             @RequestBody BlogCommentDTO blogCommentDTO
     ) {
-        String response = userServiceImpl.postBlogComment(blogId, blogCommentDTO);
+        String response = this.userServiceFacade.userBlogService.postBlogComment(blogId, blogCommentDTO);
         ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
         return ResponseEntity.status(200).body(successResponse);
     }
@@ -74,7 +73,7 @@ public class UserBlogController {
     public ResponseEntity<?> viewBlogComment(
             @PathVariable(name = "blogId") long blogId
     ) {
-        List<BlogCommentDTO> blogCommentDTOs = this.userServiceImpl.getAllBlogCommentSpecificBlog(blogId);
+        List<BlogCommentDTO> blogCommentDTOs = this.userServiceFacade.userBlogService.getAllBlogCommentSpecificBlog(blogId);
         ApiResponse<List<BlogCommentDTO>> blogCommentResponse = new ApiResponse<>(200, "success", blogCommentDTOs);
         return ResponseEntity.status(200).body(blogCommentResponse);
     }

@@ -5,7 +5,7 @@ import com.fyp.hotel.dto.booking.BookingDTO;
 import com.fyp.hotel.dto.booking.BookingStatusDTO;
 import com.fyp.hotel.dto.booking.BookDto;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
-import com.fyp.hotel.service.user.UserService;
+import com.fyp.hotel.service.user.UserServiceFacade;
 import com.fyp.hotel.util.ValueMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,24 +17,24 @@ import java.util.List;
 @RequestMapping("/v1/user")
 public class UserBookingController {
 
-    private UserService userService;
+    private UserServiceFacade userServiceFacade;
     private ValueMapper valueMapper;
 
     @Autowired
-    public UserBookingController(UserService userService, ValueMapper valueMapper) {
-        this.userService = userService;
+    public UserBookingController(UserServiceFacade userServiceFacade, ValueMapper valueMapper) {
+        this.userServiceFacade = userServiceFacade;
         this.valueMapper = valueMapper;
     }
 
     @GetMapping("/bookingStatus/{hotelId}")
     public ResponseEntity<?> getBookingStatus(@PathVariable Long hotelId) {
-        List<BookingStatusDTO> statuses = userService.getBookingStatus(hotelId);
+        List<BookingStatusDTO> statuses = this.userServiceFacade.userBookingService.getBookingStatus(hotelId);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", statuses));
     }
 
     @GetMapping("/viewBookingDetails")
     public ResponseEntity<?> viewBookingDetails() {
-        List<BookingDTO> bookings = userService.viewBookingDetails();
+        List<BookingDTO> bookings = this.userServiceFacade.userBookingService.viewBookingDetails();
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", bookings));
     }
 
@@ -48,7 +48,7 @@ public class UserBookingController {
             @RequestParam String paymentMethod)
     {
         BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
-        String response = userService.cashOnArrivalTransaction(bookDto);
+        String response = this.userServiceFacade.userBookingService.cashOnArrivalTransaction(bookDto);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
     }
 
@@ -61,7 +61,7 @@ public class UserBookingController {
             @RequestParam String paymentMethod)
     {
         BookDto bookDto = valueMapper.mapToBooking(roomId, checkInDate, checkOutDate, numberOfGuest, paymentMethod);
-        return userService.onlinePaymentTransaction(bookDto);
+        return this.userServiceFacade.userBookingService.onlinePaymentTransaction(bookDto);
     }
 
     @PostMapping("/khalti/update")
@@ -70,7 +70,7 @@ public class UserBookingController {
             @RequestParam String status,
             @RequestParam String bookingId,
             @RequestParam long totalAmount) {
-        String response = userService.updatePaymentTransaction(pidx, status, bookingId, totalAmount);
+        String response = this.userServiceFacade.userBookingService.updatePaymentTransaction(pidx, status, bookingId, totalAmount);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
     }
 }

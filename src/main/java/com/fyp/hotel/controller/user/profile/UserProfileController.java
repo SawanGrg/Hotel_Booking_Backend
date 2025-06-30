@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.dto.user.*;
 import com.fyp.hotel.model.User;
-import com.fyp.hotel.service.user.UserService;
+import com.fyp.hotel.service.user.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,17 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserProfileController {
 
     private final ObjectMapper objectMapper;
-    private UserService userServiceImpl;
+    private UserServiceFacade userServiceFacade;
 
     @Autowired
-    public UserProfileController(UserService userServiceImpl, ObjectMapper objectMapper) {
-        this.userServiceImpl = userServiceImpl;
+    public UserProfileController(UserServiceFacade userServiceFacade, ObjectMapper objectMapper) {
+        this.userServiceFacade = userServiceFacade;
         this.objectMapper = objectMapper;
     }
 
     @GetMapping("/view-user-details")
     public ResponseEntity<?> viewUserDetails() {
-        User user = userServiceImpl.getUserById();
+        User user = this.userServiceFacade.userAuthenticationService.getUserById();
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", user));
     }
 
@@ -40,7 +40,7 @@ public class UserProfileController {
             userUpgradingDetails = objectMapper.readValue(userUpgradingDetailsJson, UserProfileDto.class);
         }
         String userProfileImageFilename = userProfileImage != null ? userProfileImage.getOriginalFilename() : null;
-        String response = userServiceImpl.updateDetails(
+        String response = this.userServiceFacade.userProfileService.updateDetails(
                 userUpgradingDetails != null ? userUpgradingDetails.getUserName() : null,
                 userUpgradingDetails != null ? userUpgradingDetails.getUserFirstName() : null,
                 userUpgradingDetails != null ? userUpgradingDetails.getUserLastName() : null,
@@ -61,13 +61,13 @@ public class UserProfileController {
 
     @PostMapping("/user-change-password")
     public ResponseEntity<?> changePassword(@RequestBody UserChangePasswordDto dto) {
-        String response = userServiceImpl.changePassword(dto);
+        String response = this.userServiceFacade.userAuthenticationService.changePassword(dto);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
-        String response = userServiceImpl.clearOutJwtToken();
+        String response = this.userServiceFacade.userAuthenticationService.clearOutJwtToken();
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
     }
 
@@ -75,7 +75,7 @@ public class UserProfileController {
     public ResponseEntity<?> getInTouch(
             @RequestBody UserMessageDTO userMessageDTO
     ) {
-        String response = userServiceImpl.postUserMessage(userMessageDTO);
+        String response = this.userServiceFacade.userMessageService.postUserMessage(userMessageDTO);
         ApiResponse<String> successResponse = new ApiResponse<>(200, "Success", response);
         return ResponseEntity.status(200).body(successResponse);
     }

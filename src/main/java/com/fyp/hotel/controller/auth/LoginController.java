@@ -1,5 +1,6 @@
 package com.fyp.hotel.controller.auth;
 
+import com.fyp.hotel.service.user.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import com.fyp.hotel.dto.login.LoginRequestDto;
 import com.fyp.hotel.dto.login.LoginResponseDto;
 import com.fyp.hotel.model.User;
-import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
 import com.fyp.hotel.util.JwtUtils;
 
 @RestController
@@ -21,13 +21,13 @@ public class LoginController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final UserServiceImpl userServiceImpl;
+    private final UserServiceFacade userServiceFacade;
 
     @Autowired
-    public LoginController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserServiceImpl userServiceImpl) {
+    public LoginController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserServiceFacade userServiceFacade) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        this.userServiceImpl = userServiceImpl;
+        this.userServiceFacade = userServiceFacade;
     }
 
     @PostMapping("/login")
@@ -37,7 +37,7 @@ public class LoginController {
             LoginRequestDto request)
     {
         doAuthenticate(request.getUsername(), request.getPassword());
-        final User user = (User) userServiceImpl.loadUserByUsername(request.getUsername());
+        final User user = (User) userServiceFacade.userAuthenticationService.loadUserByUsername(request.getUsername());
 
         if (user == null) {
             LoginResponseDto loginResponseDto = new LoginResponseDto();

@@ -1,7 +1,7 @@
 package com.fyp.hotel.config;
 
 import com.fyp.hotel.filter.*;
-import com.fyp.hotel.service.user.userImpl.UserServiceImpl;
+import com.fyp.hotel.service.user.UserServiceFacade;
 import com.fyp.hotel.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +36,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private UserServiceImpl userServiceImplementation;
+    private UserServiceFacade userServiceFacade;
     @Autowired
     private CorsConfig corsConfig;
 
@@ -52,7 +52,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         final DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userServiceImplementation);
+        provider.setUserDetailsService(userServiceFacade.userAuthenticationService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
@@ -158,7 +158,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().hasAuthority("ROLE_USER")
                 )
-                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceImplementation), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceFacade), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
@@ -173,7 +173,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().hasAuthority("ROLE_VENDOR")
                 )
-                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceImplementation), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceFacade), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
@@ -188,7 +188,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().hasAuthority("ROLE_ADMIN")
                 )
-                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceImplementation), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceFacade), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
@@ -204,7 +204,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .anyRequest().hasAnyAuthority("ROLE_USER", "ROLE_VENDOR")
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceImplementation), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtUtils, userServiceFacade), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session

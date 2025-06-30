@@ -1,9 +1,9 @@
 package com.fyp.hotel.util;
 
-import com.fyp.hotel.dto.userDto.BookDto;
-import com.fyp.hotel.dto.vendorDto.HotelDto;
+import com.fyp.hotel.dto.booking.BookDto;
+import com.fyp.hotel.dto.hotel.HotelDto;
 import com.fyp.hotel.dto.vendorDto.ReportDto;
-import com.fyp.hotel.dto.vendorDto.RoomDto;
+import com.fyp.hotel.dto.room.RoomDto;
 import com.fyp.hotel.dto.vendorDto.VendorDto;
 import com.fyp.hotel.enums.HotelBedType;
 import com.fyp.hotel.enums.HotelRoomCategory;

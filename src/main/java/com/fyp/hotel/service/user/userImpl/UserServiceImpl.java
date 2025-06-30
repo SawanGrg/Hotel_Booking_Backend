@@ -13,14 +13,19 @@ import com.fyp.hotel.dao.hotel.HotelDAO;
 import com.fyp.hotel.dao.hotel.HotelRoomDAO;
 import com.fyp.hotel.dao.user.UserDAO;
 import com.fyp.hotel.dao.user.UserHibernateRepo;
-import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.CheckRoomAvailabilityDto;
-import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
-import com.fyp.hotel.dto.userDto.UserMessageDTO;
+import com.fyp.hotel.dto.blog.BlogCommentDTO;
+import com.fyp.hotel.dto.blog.BlogDTO;
+import com.fyp.hotel.dto.booking.BookDto;
+import com.fyp.hotel.dto.booking.BookingDTO;
+import com.fyp.hotel.dto.booking.BookingStatusDTO;
+import com.fyp.hotel.dto.room.CheckRoomAvailabilityDto;
+import com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.hotel.HotelReviewDTO;
+import com.fyp.hotel.dto.user.UserMessageDTO;
 import com.fyp.hotel.dto.khalti.CustomerInfo;
 import com.fyp.hotel.dto.khalti.KhaltiInitationRequest;
 import com.fyp.hotel.dto.khalti.KhaltiResponseDTO;
-import com.fyp.hotel.dto.userDto.*;
+import com.fyp.hotel.dto.user.*;
 import com.fyp.hotel.enums.Status;
 import com.fyp.hotel.model.*;
 import com.fyp.hotel.repository.*;
@@ -381,7 +386,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public String hotelPaymentGateWay(
+    public String cashOnArrivalTransaction(
             @Validated BookDto bookDto
     ){
         System.out.println("in the service implementation for cash or khalti");
@@ -428,7 +433,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public KhaltiResponseDTO ePaymentGateway(
+    public KhaltiResponseDTO onlinePaymentTransaction(
             @Validated BookDto bookDto
     ) {
         if (bookDto.getPaymentMethod().equals("khalti")) {
@@ -509,7 +514,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Transactional
-    public String updatePaymentTable(
+    public String updatePaymentTransaction(
             String pidx,
             String status,
             String bookingId,

@@ -1,7 +1,7 @@
 package com.fyp.hotel.dao.admin;
 
-import com.fyp.hotel.dto.BookingDTO;
-import com.fyp.hotel.dto.userDto.IssueReportDTO;
+import com.fyp.hotel.dto.booking.BookingDTO;
+import com.fyp.hotel.dto.user.IssueReportDTO;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.model.Role;
 import com.fyp.hotel.model.User;
@@ -124,7 +124,7 @@ public class AdminDAO {
 
     @Transactional
     public List<IssueReportDTO> getAllReports() {
-        String query = "SELECT new com.fyp.hotel.dto.userDto.IssueReportDTO(r.title, r.description, u, r.status, h, r.createdAt) " +
+        String query = "SELECT new com.fyp.hotel.dto.user.IssueReportDTO(r.title, r.description, u, r.status, h, r.createdAt) " +
                 "FROM Report r " +
                 "JOIN r.user u " +
                 "JOIN u.hotel h";

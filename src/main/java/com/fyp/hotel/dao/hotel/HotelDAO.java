@@ -1,7 +1,7 @@
 package com.fyp.hotel.dao.hotel;
 
-import com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto;
-import com.fyp.hotel.dto.vendorDto.ReviewDTO;
+import com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto;
+import com.fyp.hotel.dto.hotel.ReviewDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.enums.Status;

@@ -3,7 +3,7 @@ package com.fyp.hotel.service.admin.analytics.Impl;
 import com.fyp.hotel.dao.admin.AdminDAO;
 import com.fyp.hotel.dto.admin.AdminAnalyticsDto;
 import com.fyp.hotel.dto.admin.AdminRevenueDTO;
-import com.fyp.hotel.dto.userDto.IssueReportDTO;
+import com.fyp.hotel.dto.user.IssueReportDTO;
 import com.fyp.hotel.service.admin.analytics.AdminAnalyticsService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

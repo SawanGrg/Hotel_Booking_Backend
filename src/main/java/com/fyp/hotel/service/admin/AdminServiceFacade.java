@@ -10,14 +10,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminServiceFacade {
 
-    @Autowired
     public AdminAnalyticsService analyticsService;
-    @Autowired
     public AdminBlogService blogService;
-    @Autowired
     public AdminHotelService hotelService;
-    @Autowired
     public AdminUserService userService;
 
+    @Autowired
+    public AdminServiceFacade(AdminAnalyticsService analyticsService,
+                              AdminBlogService blogService,
+                              AdminHotelService hotelService,
+                              AdminUserService userService) {
+        this.analyticsService = analyticsService;
+        this.blogService = blogService;
+        this.hotelService = hotelService;
+        this.userService = userService;
+    }
 }
 

@@ -4,7 +4,7 @@ import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.dto.hotel.HotelDto;
 import com.fyp.hotel.dto.vendorDto.ReportDto;
 import com.fyp.hotel.dto.vendorDto.VendorDto;
-import com.fyp.hotel.service.user.UserService;
+import com.fyp.hotel.service.user.UserServiceFacade;
 import com.fyp.hotel.service.vendor.VendorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fyp.hotel.util.ValueMapper;
@@ -18,14 +18,18 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/v1/vendor")
 public class VendorUserController {
 
-    @Autowired
     private VendorService vendorService;
-    @Autowired
-    private UserService userServiceImpl;
-    @Autowired
+    private UserServiceFacade userServiceFacade;
     private ObjectMapper objectMapper;
-    @Autowired
     private ValueMapper valueMapper;
+
+    @Autowired
+    public VendorUserController(VendorService vendorService, UserServiceFacade userServiceFacade, ObjectMapper objectMapper, ValueMapper valueMapper) {
+        this.vendorService = vendorService;
+        this.userServiceFacade = userServiceFacade;
+        this.objectMapper = objectMapper;
+        this.valueMapper = valueMapper;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> vendorRegister(
@@ -35,7 +39,7 @@ public class VendorUserController {
             @RequestParam("hotelImage") MultipartFile hotelImage
     ) throws Exception {
         VendorDto vendorDto = objectMapper.readValue(vendorDataJson, VendorDto.class);
-        if (userServiceImpl.checkUserExist(vendorDto.getUserName())) {
+        if (this.userServiceFacade.userAuthenticationService.checkUserExist(vendorDto.getUserName())) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(400, "User exists", null));
         }
         String status = vendorService.registerVendor(vendorDto,

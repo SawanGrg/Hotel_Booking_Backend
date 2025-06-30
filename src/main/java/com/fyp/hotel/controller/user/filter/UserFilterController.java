@@ -2,7 +2,7 @@ package com.fyp.hotel.controller.user.filter;
 
 import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.model.HotelRoom;
-import com.fyp.hotel.service.user.UserService;
+import com.fyp.hotel.service.user.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +13,11 @@ import java.util.List;
 @RequestMapping("/v1/user")
 public class UserFilterController {
 
-    private UserService userService;
+    private UserServiceFacade userServiceFacade;
 
     @Autowired
-    public UserFilterController(UserService userService) {
-        this.userService = userService;
+    public UserFilterController(UserServiceFacade userServiceFacade) {
+        this.userServiceFacade = userServiceFacade;
     }
 
     @GetMapping("/filterRooms")
@@ -34,7 +34,7 @@ public class UserFilterController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
-        List<HotelRoom> rooms = userService.filterRooms(
+        List<HotelRoom> rooms = this.userServiceFacade.userHotelService.filterRooms(
                 hotelId,
                 roomType,
                 roomCategory,

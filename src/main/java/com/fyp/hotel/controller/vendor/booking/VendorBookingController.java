@@ -2,7 +2,7 @@ package com.fyp.hotel.controller.vendor.booking;
 
 import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.dto.vendorDto.VendorBookingDTO;
-import com.fyp.hotel.service.vendor.VendorService;
+import com.fyp.hotel.service.vendor.VendorServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 public class VendorBookingController {
 
     @Autowired
-    private VendorService vendorService;
+    private VendorServiceFacade vendorServiceFacade;
 
     @GetMapping("/bookings")
     public ResponseEntity<?> getBookings(
@@ -22,7 +22,7 @@ public class VendorBookingController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "30") int size
     ) {
-        List<VendorBookingDTO> vendorBookingDTOS = vendorService.getBookings(status, page, size);
+        List<VendorBookingDTO> vendorBookingDTOS = vendorServiceFacade.getVendorBookingService().getBookings(status, page, size);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", vendorBookingDTOS));
     }
 
@@ -32,7 +32,7 @@ public class VendorBookingController {
             @PathVariable(name = "userId") long userId,
             @RequestParam(name = "vendorDecision", defaultValue = "BOOKED") String status
     ) {
-        String response = vendorService.updateBooking(bookingId, userId, status);
+        String response = vendorServiceFacade.getVendorBookingService().updateBooking(bookingId, userId, status);
         if ("Successfully Changed".equals(response)) {
             return ResponseEntity.ok(new ApiResponse<>(200, "Successfully Booked", response));
         }
@@ -41,6 +41,6 @@ public class VendorBookingController {
 
     @GetMapping("/bookingStatus/{roomId}")
     public ResponseEntity<?> getBookingStatus(@PathVariable long roomId) {
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", vendorService.getBookingStatusDetails(roomId)));
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", vendorServiceFacade.getVendorBookingService().getBookingStatusDetails(roomId)));
     }
 }

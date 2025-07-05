@@ -3,8 +3,8 @@ package com.fyp.hotel.controller.vendor.hotel;
 import com.fyp.hotel.dto.common.ApiResponse;
 import com.fyp.hotel.dto.hotel.HotelDto;
 import com.fyp.hotel.model.Hotel;
-import com.fyp.hotel.service.vendor.VendorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fyp.hotel.service.vendor.VendorServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class VendorHotelController {
 
     @Autowired
-    private VendorService vendorService;
+    private VendorServiceFacade vendorServiceFacade;
     @Autowired
     private ObjectMapper objectMapper;
 
     @GetMapping("/hotelDetails")
     public ResponseEntity<?> getHotelDetails() {
-        Hotel hotel = vendorService.getHotelDetailsService();
+        Hotel hotel = vendorServiceFacade.getVendorHotelService().getHotelDetails();
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", hotel));
     }
 
@@ -31,7 +31,7 @@ public class VendorHotelController {
             @RequestParam(value = "mainHotelImage", required = false) MultipartFile mainHotelImage
     ) throws Exception {
         HotelDto hotelDto = objectMapper.readValue(hotelDataJson, HotelDto.class);
-        String response = vendorService.updateHotelDetails(
+        String response = vendorServiceFacade.getVendorHotelService().updateHotelDetails(
                 hotelDto.getHotelName(),
                 hotelDto.getHotelAddress(),
                 hotelDto.getHotelContact(),

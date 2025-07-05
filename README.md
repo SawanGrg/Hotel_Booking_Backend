@@ -34,9 +34,6 @@ JDK 17 or later
 MySQL 8.0.32 or later
 Maven 3.6 or later
 
-Clone the repository:
-git clone https://github.com/your-username/annapurna-hotel-booking.git
-
 📦 Dependencies
 
 Spring Boot: Main framework for backend development.

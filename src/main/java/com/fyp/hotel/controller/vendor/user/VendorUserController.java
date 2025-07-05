@@ -5,8 +5,8 @@ import com.fyp.hotel.dto.hotel.HotelDto;
 import com.fyp.hotel.dto.vendorDto.ReportDto;
 import com.fyp.hotel.dto.vendorDto.VendorDto;
 import com.fyp.hotel.service.user.UserServiceFacade;
-import com.fyp.hotel.service.vendor.VendorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fyp.hotel.service.vendor.VendorServiceFacade;
 import com.fyp.hotel.util.ValueMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/v1/vendor")
 public class VendorUserController {
 
-    private VendorService vendorService;
+    private VendorServiceFacade vendorService;
     private UserServiceFacade userServiceFacade;
     private ObjectMapper objectMapper;
     private ValueMapper valueMapper;
 
     @Autowired
-    public VendorUserController(VendorService vendorService, UserServiceFacade userServiceFacade, ObjectMapper objectMapper, ValueMapper valueMapper) {
+    public VendorUserController(VendorServiceFacade vendorService, UserServiceFacade userServiceFacade, ObjectMapper objectMapper, ValueMapper valueMapper) {
         this.vendorService = vendorService;
         this.userServiceFacade = userServiceFacade;
         this.objectMapper = objectMapper;
@@ -42,7 +42,7 @@ public class VendorUserController {
         if (this.userServiceFacade.userAuthenticationService.checkUserExist(vendorDto.getUserName())) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(400, "User exists", null));
         }
-        String status = vendorService.registerVendor(vendorDto,
+        String status = vendorService.getVendorUserService().registerVendor(vendorDto,
                 vendorImage,
                 objectMapper.readValue(hotelDataJson, HotelDto.class),
                 hotelImage);
@@ -51,7 +51,7 @@ public class VendorUserController {
 
     @PostMapping("/report")
     public ResponseEntity<?> postReport(@RequestBody ReportDto reportDto) {
-        String status = vendorService.postReport(valueMapper.conversionToReport(reportDto));
+        String status = vendorService.getVendorReportService().postReport(valueMapper.conversionToReport(reportDto));
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", status));
     }
 }

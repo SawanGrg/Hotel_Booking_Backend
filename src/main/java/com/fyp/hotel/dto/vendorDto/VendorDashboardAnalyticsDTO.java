@@ -1,10 +1,12 @@
 package com.fyp.hotel.dto.vendorDto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class VendorDashboardAnalyticsDTO {
 
 

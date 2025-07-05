@@ -1,4 +1,4 @@
-package com.fyp.hotel.dto.hotel;
+package com.fyp.hotel.dto.review;
 
 import com.fyp.hotel.model.User;
 import lombok.Getter;

@@ -1,6 +1,7 @@
 package com.fyp.hotel.dto.room;
 
 import com.fyp.hotel.enums.Status;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@Builder
 public class RoomHistoryDTO {
 
     private String userName;

@@ -1,7 +1,7 @@
 package com.fyp.hotel.dao.hotel;
 
 import com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto;
-import com.fyp.hotel.dto.hotel.ReviewDTO;
+import com.fyp.hotel.dto.review.ReviewDTO;
 import com.fyp.hotel.model.Booking;
 import com.fyp.hotel.model.Hotel;
 import com.fyp.hotel.enums.Status;
@@ -157,7 +157,7 @@ public class HotelDAO {
             sessionObj = this.sessionFactory.openSession();
             sessionObj.beginTransaction();
 
-            String hql = "select new com.fyp.hotel.dto.DisplayHotelWithAmenitiesDto(" +
+            String hql = "select new com.fyp.hotel.dto.hotel.DisplayHotelWithAmenitiesDto(" +
                     "h.hotelId, h.hotelName, h.hotelContact, h.hotelAddress, h.hotelEmail, " +
                     "h.hotelDescription, h.hotelImage, h.hotelPan, h.hotelStatus, " +
                     "hr.hasWifi, hr.hasRefridge, hr.hasAC, hr.hasTV, hr.hasBalcony, h.hotelStar) " +
@@ -525,7 +525,7 @@ public class HotelDAO {
             session = this.sessionFactory.openSession();
             session.beginTransaction();
 
-            String hql = "SELECT new com.fyp.hotel.dto.vendorDto.ReviewDTO(r.reviewId, r.reviewContent, r.hotel.hotelId, r.user, r.createdDate) FROM Review r WHERE r.hotel.hotelId = :hotelId";
+            String hql = "SELECT new com.fyp.hotel.dto.review.ReviewDTO(r.reviewId, r.reviewContent, r.hotel.hotelId, r.user, r.createdDate) FROM Review r WHERE r.hotel.hotelId = :hotelId";
 
             Query<ReviewDTO> query = session.createQuery(hql, ReviewDTO.class);
             query.setParameter("hotelId", hotelId);
